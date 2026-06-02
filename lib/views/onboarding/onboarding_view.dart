@@ -91,23 +91,22 @@ class _OnboardingViewState extends State<OnboardingView>
 
   @override
   Widget build(BuildContext context) {
-    // Standard credit card ratio: 85.6 × 53.98 mm = 1.5858 : 1
-    // On 375 design width: 265 wide, 167 tall
-    final double cardW = 265.w;
-    final double cardH = 167.h;
+    // Card dimensions — tall portrait cards
+    final double cardW = 200.w;
+    final double cardH = 190.h;
 
-    // Stack height = card height + 72h vertical offset between the two cards
-    final double stackH = cardH + 72.h;
+    // Stack must fit both cards in their cross arrangement
+    final double stackH = cardH + 80.h;
 
     return CommonBackground(
       showGrid: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top spacer — roughly 10% of screen
-          SizedBox(height: 60.h),
+          // Top spacer
+          SizedBox(height: 70.h),
 
-          // ── Card Stack ─────────────────────────────────────────────
+          // ── Card Stack (half-cross / X overlap) ─────────────────────
           SizedBox(
             height: stackH,
             width: double.infinity,
@@ -116,37 +115,36 @@ class _OnboardingViewState extends State<OnboardingView>
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Dark card: top-right, +8°
+                  // BEHIND: Blue card — bottom-left, tilted CCW
                   AnimatedBuilder(
                     animation: Listenable.merge([_slideCtrl, _hoverCtrl]),
                     builder: (context, _) {
                       final hover =
-                          math.sin(_hoverCtrl.value * 2 * math.pi) * 5.h;
+                          math.cos(_hoverCtrl.value * 2 * math.pi) * 4.h;
                       return Positioned(
-                        // Bleeds ~20px off right edge so card feels full-width
-                        right: -18.w + _slideDarkCard.value,
-                        top: hover,
+                        left: 30.w + _slideBlueCard.value,
+                        bottom: hover,
                         child: Transform.rotate(
-                          angle: 8.0 * math.pi / 180,
-                          child: _buildDarkCard(cardW, cardH),
+                          angle: -14.0 * math.pi / 180,
+                          child: _buildBlueCard(cardW, cardH),
                         ),
                       );
                     },
                   ),
 
-                  // Blue card: bottom-left, -12°
+                  // IN FRONT: Dark glass card — top-right, tilted CW
+                  // Glass effect lets blue card show through overlap zone
                   AnimatedBuilder(
                     animation: Listenable.merge([_slideCtrl, _hoverCtrl]),
                     builder: (context, _) {
                       final hover =
-                          math.cos(_hoverCtrl.value * 2 * math.pi) * 5.h;
+                          math.sin(_hoverCtrl.value * 2 * math.pi) * 4.h;
                       return Positioned(
-                        // Bleeds ~20px off left edge
-                        left: -18.w + _slideBlueCard.value,
-                        bottom: hover,
+                        right: 24.w + _slideDarkCard.value,
+                        top: hover,
                         child: Transform.rotate(
-                          angle: -12.0 * math.pi / 180,
-                          child: _buildBlueCard(cardW, cardH),
+                          angle: 10.0 * math.pi / 180,
+                          child: _buildDarkCard(cardW, cardH),
                         ),
                       );
                     },
@@ -277,31 +275,31 @@ class _OnboardingViewState extends State<OnboardingView>
     return ClipRRect(
       borderRadius: BorderRadius.circular(18.r),
       child: BackdropFilter(
-        // Subtle blur — keeps text crisp but shows glass depth
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        // Glass blur — blue card shows through overlap
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
         child: Container(
           width: w,
           height: h,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18.r),
-            // Solid-ish dark navy — matches reference (not transparent)
+            // Semi-transparent dark glass — lets blue card bleed through
             gradient: LinearGradient(
               colors: [
-                const Color(0xFF1D3045).withOpacity(0.92),
-                const Color(0xFF0C1A28).withOpacity(0.97),
+                const Color(0xFF1A2E42).withOpacity(0.10),
+                const Color(0xFF0B1822).withOpacity(0.18),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             border: Border.all(
-              color: Colors.white.withOpacity(0.09),
-              width: 1.2.w,
+              color: Colors.white.withOpacity(0.12),
+              width: 1.w,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.6),
-                blurRadius: 24.r,
-                offset: Offset(0, 10.h),
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 20.r,
+                offset: Offset(0, 8.h),
               ),
             ],
           ),
@@ -311,9 +309,9 @@ class _OnboardingViewState extends State<OnboardingView>
             amount: "\$2,328.50",
             cardNumber: "**** 8543",
             isGold: false,
-            labelOpacity: 0.72,
-            numberOpacity: 0.50,
-            visaOpacity: 0.88,
+            labelOpacity: 0.80,
+            numberOpacity: 0.58,
+            visaOpacity: 0.92,
           ),
         ),
       ),

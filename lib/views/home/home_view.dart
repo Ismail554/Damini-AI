@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:julkar_vai/views/auth/login_view.dart';
+import 'package:julkar_vai/views/onboarding/onboarding_view.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/navigation_provider.dart';
 import '../../controllers/opportunity_provider.dart';
@@ -33,7 +34,9 @@ class _HomeViewState extends State<HomeView> {
 
     // Reactive Connectivity Monitoring
     _checkInitialConnectivity();
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) {
       if (!mounted) return;
       setState(() {
         _isConnected = !results.contains(ConnectivityResult.none);
@@ -69,19 +72,28 @@ class _HomeViewState extends State<HomeView> {
         children: [
           // Persistent top offline banner
           if (!_isConnected) const NetworkInfoBar(),
-          
+
           Expanded(
             child: IndexedStack(
               index: navProvider.currentIndex,
               children: [
                 _buildDashboard(oppProvider),
-                const _PlaceholderPage(title: "Analytics / Trends", icon: Icons.analytics_outlined),
-                const _PlaceholderPage(title: "Wallet / Payments", icon: Icons.account_balance_wallet_outlined),
-                const _PlaceholderPage(title: "User Profile", icon: Icons.person_outline),
+                const _PlaceholderPage(
+                  title: "Analytics / Trends",
+                  icon: Icons.analytics_outlined,
+                ),
+                const _PlaceholderPage(
+                  title: "Wallet / Payments",
+                  icon: Icons.account_balance_wallet_outlined,
+                ),
+                const _PlaceholderPage(
+                  title: "User Profile",
+                  icon: Icons.person_outline,
+                ),
               ],
             ),
           ),
-          
+
           // Bottom Navigation Bar matching mockup
           _buildBottomNavBar(navProvider),
         ],
@@ -146,7 +158,10 @@ class _HomeViewState extends State<HomeView> {
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.03),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.w),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.08),
+                          width: 1.w,
+                        ),
                       ),
                       child: Icon(
                         Icons.notifications_none_rounded,
@@ -178,11 +193,23 @@ class _HomeViewState extends State<HomeView> {
               physics: const BouncingScrollPhysics(),
               child: Row(
                 children: [
-                  _buildStatCard("Active Interests", "05", Icons.interests_outlined),
+                  _buildStatCard(
+                    "Active Interests",
+                    "05",
+                    Icons.interests_outlined,
+                  ),
                   SizedBox(width: 12.w),
-                  _buildStatCard("Opportunities Live", "15", Icons.explore_outlined),
+                  _buildStatCard(
+                    "Opportunities Live",
+                    "15",
+                    Icons.explore_outlined,
+                  ),
                   SizedBox(width: 12.w),
-                  _buildStatCard("Avg. Return", "19%", Icons.trending_up_rounded),
+                  _buildStatCard(
+                    "Avg. Return",
+                    "19%",
+                    Icons.trending_up_rounded,
+                  ),
                 ],
               ),
             ),
@@ -239,9 +266,7 @@ class _HomeViewState extends State<HomeView> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, color: AppColors.primaryColor, size: 20.r),
-            ],
+            children: [Icon(icon, color: AppColors.primaryColor, size: 20.r)],
           ),
           SizedBox(height: 16.h),
           Text(
@@ -285,10 +310,14 @@ class _HomeViewState extends State<HomeView> {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primaryColor : const Color(0xFF1E2D3D).withOpacity(0.2),
+                  color: isSelected
+                      ? AppColors.primaryColor
+                      : const Color(0xFF1E2D3D).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(
-                    color: isSelected ? Colors.transparent : Colors.white.withOpacity(0.08),
+                    color: isSelected
+                        ? Colors.transparent
+                        : Colors.white.withOpacity(0.08),
                     width: 1.w,
                   ),
                 ),
@@ -298,7 +327,9 @@ class _HomeViewState extends State<HomeView> {
                     style: GoogleFonts.outfit(
                       fontSize: 13.sp,
                       color: isSelected ? Colors.white : AppColors.grey,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -332,7 +363,7 @@ class _HomeViewState extends State<HomeView> {
               ElevatedButton(
                 onPressed: () => provider.loadOpportunities(),
                 child: const Text("Retry"),
-              )
+              ),
             ],
           ),
         ),
@@ -362,7 +393,10 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildOpportunityCard(OpportunityModel item, OpportunityProvider provider) {
+  Widget _buildOpportunityCard(
+    OpportunityModel item,
+    OpportunityProvider provider,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.r),
@@ -383,16 +417,27 @@ class _HomeViewState extends State<HomeView> {
                 width: 44.r,
                 height: 44.r,
                 decoration: BoxDecoration(
-                  color: item.logoText == 'N' ? Colors.black : Colors.orangeAccent.withOpacity(0.2),
+                  color: item.logoText == 'N'
+                      ? Colors.black
+                      : Colors.orangeAccent.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Center(
                   child: item.logoText == 'N'
-                      ? Text("N", style: TextStyle(color: Colors.red, fontSize: 24.sp, fontWeight: FontWeight.w900))
+                      ? Text(
+                          "N",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 24.sp,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        )
                       : Text(
                           item.logoText,
                           style: TextStyle(
-                            color: item.logoText == 'a' ? Colors.orange : Colors.greenAccent,
+                            color: item.logoText == 'a'
+                                ? Colors.orange
+                                : Colors.greenAccent,
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                           ),
@@ -438,7 +483,9 @@ class _HomeViewState extends State<HomeView> {
                   item.badgeText,
                   style: GoogleFonts.outfit(
                     fontSize: 10.sp,
-                    color: item.badgeText.toLowerCase() == 'hot' ? Colors.redAccent : Colors.blueAccent,
+                    color: item.badgeText.toLowerCase() == 'hot'
+                        ? Colors.redAccent
+                        : Colors.blueAccent,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -487,7 +534,9 @@ class _HomeViewState extends State<HomeView> {
               value: item.fundedPercentage / 100.0,
               minHeight: 6.h,
               backgroundColor: const Color(0xFF1E2D3D).withOpacity(0.3),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primaryColor,
+              ),
             ),
           ),
           SizedBox(height: 20.h),
@@ -508,27 +557,35 @@ class _HomeViewState extends State<HomeView> {
                           ? "Removed interest from ${item.title}"
                           : "Expressed interest in ${item.title}!",
                     ),
-                    backgroundColor: item.hasExpressedInterest ? Colors.orangeAccent : AppColors.success,
+                    backgroundColor: item.hasExpressedInterest
+                        ? Colors.orangeAccent
+                        : AppColors.success,
                   ),
                 );
               },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(
-                  color: item.hasExpressedInterest ? AppColors.success : Colors.white.withOpacity(0.1),
+                  color: item.hasExpressedInterest
+                      ? AppColors.success
+                      : Colors.white.withOpacity(0.1),
                   width: 1.w,
                 ),
-                backgroundColor: item.hasExpressedInterest 
-                    ? AppColors.success.withOpacity(0.1) 
+                backgroundColor: item.hasExpressedInterest
+                    ? AppColors.success.withOpacity(0.1)
                     : Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.r),
                 ),
               ),
               child: Text(
-                item.hasExpressedInterest ? "Expressed Interest" : "Express Interest",
+                item.hasExpressedInterest
+                    ? "Expressed Interest"
+                    : "Express Interest",
                 style: GoogleFonts.outfit(
                   fontSize: 14.sp,
-                  color: item.hasExpressedInterest ? AppColors.success : AppColors.primaryColor,
+                  color: item.hasExpressedInterest
+                      ? AppColors.success
+                      : AppColors.primaryColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -545,10 +602,7 @@ class _HomeViewState extends State<HomeView> {
       children: [
         Text(
           title,
-          style: GoogleFonts.outfit(
-            fontSize: 11.sp,
-            color: AppColors.grey,
-          ),
+          style: GoogleFonts.outfit(fontSize: 11.sp, color: AppColors.grey),
         ),
         SizedBox(height: 4.h),
         Text(
@@ -565,21 +619,27 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildShimmerLoader() {
     return Column(
-      children: List.generate(2, (index) => Container(
-        height: 230.h,
-        margin: EdgeInsets.only(bottom: 16.h),
-        decoration: BoxDecoration(
-          color: AppColors.secondaryColor.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Center(
-          child: SizedBox(
-            width: 32.r,
-            height: 32.r,
-            child: const CircularProgressIndicator(color: AppColors.primaryColor, strokeWidth: 2),
+      children: List.generate(
+        2,
+        (index) => Container(
+          height: 230.h,
+          margin: EdgeInsets.only(bottom: 16.h),
+          decoration: BoxDecoration(
+            color: AppColors.secondaryColor.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Center(
+            child: SizedBox(
+              width: 32.r,
+              height: 32.r,
+              child: const CircularProgressIndicator(
+                color: AppColors.primaryColor,
+                strokeWidth: 2,
+              ),
+            ),
           ),
         ),
-      )),
+      ),
     );
   }
 
@@ -603,10 +663,7 @@ class _NavItem {
 class _CustomBottomNavBar extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
-  const _CustomBottomNavBar({
-    required this.currentIndex,
-    required this.onTap,
-  });
+  const _CustomBottomNavBar({required this.currentIndex, required this.onTap});
   @override
   State<_CustomBottomNavBar> createState() => _CustomBottomNavBarState();
 }
@@ -619,7 +676,11 @@ class _CustomBottomNavBarState extends State<_CustomBottomNavBar>
   static const _items = [
     _NavItem(Icons.home_rounded, Icons.home_outlined, "Home"),
     _NavItem(Icons.bar_chart_rounded, Icons.bar_chart_outlined, "Analytics"),
-    _NavItem(Icons.account_balance_wallet_rounded, Icons.account_balance_wallet_outlined, "Wallet"),
+    _NavItem(
+      Icons.account_balance_wallet_rounded,
+      Icons.account_balance_wallet_outlined,
+      "Wallet",
+    ),
     _NavItem(Icons.person_rounded, Icons.person_outline_rounded, "Profile"),
   ];
 
@@ -630,9 +691,10 @@ class _CustomBottomNavBarState extends State<_CustomBottomNavBar>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _scaleAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutBack),
-    );
+    _scaleAnim = Tween<double>(
+      begin: 0.85,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutBack));
     _animCtrl.forward();
   }
 
@@ -654,15 +716,12 @@ class _CustomBottomNavBarState extends State<_CustomBottomNavBar>
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        height: 64.h,
-        margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
+        height: 60.h,
+        margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 0.h),
         decoration: BoxDecoration(
           color: const Color(0xFF0D1F30),
           borderRadius: BorderRadius.circular(32.r),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.07),
-            width: 1.w,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.07), width: 1.w),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.4),
@@ -765,16 +824,13 @@ class _PlaceholderPage extends StatelessWidget {
           SizedBox(height: 8.h),
           Text(
             "Feature screen mock content",
-            style: GoogleFonts.outfit(
-              fontSize: 14.sp,
-              color: AppColors.grey,
-            ),
+            style: GoogleFonts.outfit(fontSize: 14.sp, color: AppColors.grey),
           ),
           SizedBox(height: 24.h),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const LoginView()),
+                MaterialPageRoute(builder: (context) => const OnboardingView()),
               );
             },
             style: ElevatedButton.styleFrom(
