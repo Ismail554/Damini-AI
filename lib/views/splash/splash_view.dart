@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:julkar_vai/controllers/auth_provider.dart';
-import 'package:julkar_vai/core/services/storage_service.dart';
-import 'package:julkar_vai/core/utils/app_colors.dart';
+import 'package:Braintech/controllers/auth_provider.dart';
+import 'package:Braintech/core/services/storage_service.dart';
+import 'package:Braintech/core/utils/app_colors.dart';
 import '../../core/widgets/common_background.dart';
 import '../onboarding/onboarding_view.dart';
 import '../auth/login_view.dart';

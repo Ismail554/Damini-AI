@@ -1,4 +1,4 @@
-package com.julkar.jvai.julkar_vai
+package com.julkar.jvai.Braintech
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -93,10 +93,10 @@ class _OnboardingViewState extends State<OnboardingView>
   Widget build(BuildContext context) {
     // Card dimensions — tall portrait cards
     final double cardW = 200.w;
-    final double cardH = 190.h;
+    final double cardH = 220.h;
 
     // Stack must fit both cards in their cross arrangement
-    final double stackH = cardH + 80.h;
+    final double stackH = cardH + 90.h;
 
     return CommonBackground(
       showGrid: true,
@@ -104,36 +104,36 @@ class _OnboardingViewState extends State<OnboardingView>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Top spacer
-          SizedBox(height: 70.h),
+          SizedBox(height: 100.h),
 
-          // ── Card Stack (half-cross / X overlap) ─────────────────────
+          // ── Card Stack (same Y level, cross overlap) ──────────────
           SizedBox(
-            height: stackH,
+            height: cardH + 28.h,
             width: double.infinity,
             child: FadeTransition(
               opacity: _fadeCards,
               child: Stack(
                 clipBehavior: Clip.none,
+                alignment: Alignment.center,
                 children: [
-                  // BEHIND: Blue card — bottom-left, tilted CCW
+                  // BEHIND: Blue card — left, tilted CCW
                   AnimatedBuilder(
                     animation: Listenable.merge([_slideCtrl, _hoverCtrl]),
                     builder: (context, _) {
                       final hover =
                           math.cos(_hoverCtrl.value * 2 * math.pi) * 4.h;
                       return Positioned(
-                        left: 30.w + _slideBlueCard.value,
-                        bottom: hover,
+                        left: 18.w + _slideBlueCard.value,
+                        top: 10.h + hover,
                         child: Transform.rotate(
-                          angle: -14.0 * math.pi / 180,
+                          angle: -10.0 * math.pi / 180,
                           child: _buildBlueCard(cardW, cardH),
                         ),
                       );
                     },
                   ),
 
-                  // IN FRONT: Dark glass card — top-right, tilted CW
-                  // Glass effect lets blue card show through overlap zone
+                  // IN FRONT: Dark glass card — right, tilted CW
                   AnimatedBuilder(
                     animation: Listenable.merge([_slideCtrl, _hoverCtrl]),
                     builder: (context, _) {
@@ -141,7 +141,7 @@ class _OnboardingViewState extends State<OnboardingView>
                           math.sin(_hoverCtrl.value * 2 * math.pi) * 4.h;
                       return Positioned(
                         right: 24.w + _slideDarkCard.value,
-                        top: hover,
+                        top: 10.h + hover,
                         child: Transform.rotate(
                           angle: 10.0 * math.pi / 180,
                           child: _buildDarkCard(cardW, cardH),

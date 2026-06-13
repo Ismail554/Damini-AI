@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:julkar_vai/controllers/theme_provider.dart';
-import 'package:julkar_vai/core/theme/app_theme.dart';
-import 'package:julkar_vai/views/splash/splash_view.dart';
+import 'package:Braintech/controllers/theme_provider.dart';
+import 'package:Braintech/core/theme/app_theme.dart';
+import 'package:Braintech/views/splash/splash_view.dart';
 import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
