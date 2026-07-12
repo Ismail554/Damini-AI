@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:Braintech/views/auth/login_view.dart';
 import 'package:Braintech/views/onboarding/onboarding_view.dart';
 import 'package:provider/provider.dart';
+import 'package:cupertino_native/cupertino_native.dart';
+import 'package:Braintech/data/models/nav_tab.dart';
+import 'package:Braintech/views/home/fallback_tab_bar.dart';
 import '../../controllers/navigation_provider.dart';
 import '../../controllers/opportunity_provider.dart';
 import '../../core/utils/app_colors.dart';
@@ -643,158 +646,55 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildBottomNavBar(NavigationProvider navProvider) {
-    return _CustomBottomNavBar(
-      currentIndex: navProvider.currentIndex,
-      onTap: navProvider.setIndex,
-    );
-  }
-}
+  bool get _useNativeTabBar =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
 
-// ── PREMIUM BOTTOM NAV ─────────────────────────────────────────────────
-
-class _NavItem {
-  final IconData activeIcon;
-  final IconData inactiveIcon;
-  final String label;
-  const _NavItem(this.activeIcon, this.inactiveIcon, this.label);
-}
-
-class _CustomBottomNavBar extends StatefulWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-  const _CustomBottomNavBar({required this.currentIndex, required this.onTap});
-  @override
-  State<_CustomBottomNavBar> createState() => _CustomBottomNavBarState();
-}
-
-class _CustomBottomNavBarState extends State<_CustomBottomNavBar>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animCtrl;
-  late Animation<double> _scaleAnim;
-
-  static const _items = [
-    _NavItem(Icons.home_rounded, Icons.home_outlined, "Home"),
-    _NavItem(Icons.bar_chart_rounded, Icons.bar_chart_outlined, "Analytics"),
-    _NavItem(
-      Icons.account_balance_wallet_rounded,
-      Icons.account_balance_wallet_outlined,
-      "Wallet",
+  static const _tabs = [
+    NavTab(
+      label: "Home",
+      iconName: "house.fill",
+      fallbackIcon: Icons.home_rounded,
     ),
-    _NavItem(Icons.person_rounded, Icons.person_outline_rounded, "Profile"),
+    NavTab(
+      label: "Analytics",
+      iconName: "chart.bar.fill",
+      fallbackIcon: Icons.bar_chart_rounded,
+    ),
+    NavTab(
+      label: "Wallet",
+      iconName: "creditcard.fill",
+      fallbackIcon: Icons.account_balance_wallet_rounded,
+    ),
+    NavTab(
+      label: "Profile",
+      iconName: "person.fill",
+      fallbackIcon: Icons.person_rounded,
+    ),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _animCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _scaleAnim = Tween<double>(
-      begin: 0.85,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutBack));
-    _animCtrl.forward();
-  }
-
-  @override
-  void didUpdateWidget(_CustomBottomNavBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.currentIndex != widget.currentIndex) {
-      _animCtrl.forward(from: 0);
+  Widget _buildBottomNavBar(NavigationProvider navProvider) {
+    if (_useNativeTabBar) {
+      return CNTabBar(
+        items: [
+          for (final tab in _tabs)
+            CNTabBarItem(
+              label: tab.label,
+              icon: CNSymbol(tab.iconName),
+            ),
+        ],
+        currentIndex: navProvider.currentIndex,
+        tint: AppColors.primaryColor,
+        height: 85,
+        onTap: navProvider.setIndex,
+      );
     }
-  }
-
-  @override
-  void dispose() {
-    _animCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        height: 60.h,
-        margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 0.h),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0D1F30),
-          borderRadius: BorderRadius.circular(32.r),
-          border: Border.all(color: Colors.white.withOpacity(0.07), width: 1.w),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 24.r,
-              offset: Offset(0, 8.h),
-            ),
-            BoxShadow(
-              color: AppColors.primaryColor.withOpacity(0.08),
-              blurRadius: 32.r,
-              offset: Offset(0, 4.h),
-            ),
-          ],
-        ),
-        child: Row(
-          children: List.generate(_items.length, (i) {
-            final isActive = widget.currentIndex == i;
-            return Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => widget.onTap(i),
-                child: AnimatedBuilder(
-                  animation: _animCtrl,
-                  builder: (context, _) {
-                    final scale = isActive ? _scaleAnim.value : 1.0;
-                    return Transform.scale(
-                      scale: scale,
-                      child: _buildNavItem(_items[i], isActive),
-                    );
-                  },
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(_NavItem item, bool isActive) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeInOut,
-          width: isActive ? 46.w : 32.w,
-          height: 32.h,
-          decoration: BoxDecoration(
-            color: isActive
-                ? AppColors.primaryColor.withOpacity(0.18)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          child: Center(
-            child: Icon(
-              isActive ? item.activeIcon : item.inactiveIcon,
-              color: isActive ? AppColors.primaryColor : AppColors.grey,
-              size: isActive ? 22.r : 20.r,
-            ),
-          ),
-        ),
-        SizedBox(height: 2.h),
-        AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 200),
-          style: TextStyle(
-            fontSize: isActive ? 9.5.sp : 0,
-            color: isActive ? AppColors.primaryColor : Colors.transparent,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
-          ),
-          child: Text(item.label),
-        ),
-      ],
+    return FallbackTabBar(
+      tabs: _tabs,
+      currentIndex: navProvider.currentIndex,
+      onTap: navProvider.setIndex,
+      tint: AppColors.primaryColor,
     );
   }
 }
