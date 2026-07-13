@@ -7,5 +7,8 @@ class StorageService {
   static Future<String?> getToken() async => _storage.read(key: 'auth_token');
   static Future<void> saveUuid(String uuid) async => _storage.write(key: 'uuid', value: uuid);
   static Future<String?> getUuid() async => _storage.read(key: 'uuid');
+  static Future<void> saveRole(String role) async => _storage.write(key: 'user_role', value: role);
+  static Future<String?> getRole() async => _storage.read(key: 'user_role');
   static Future<void> clearAll() async => _storage.deleteAll();
 }
+

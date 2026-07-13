@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:Braintech/controllers/auth_provider.dart';
 import 'package:Braintech/core/services/storage_service.dart';
 import 'package:Braintech/core/utils/app_colors.dart';
+import 'package:Braintech/core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
 import '../onboarding/onboarding_view.dart';
 import '../auth/login_view.dart';
 import '../home/home_view.dart';
+import '../role_selection/role_selection_view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -16,25 +19,32 @@ class SplashView extends StatefulWidget {
   State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> with SingleTickerProviderStateMixin {
+class _SplashViewState extends State<SplashView>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
-  late Animation<double> _fadeText;
-  late Animation<double> _scaleText;
+  late Animation<double> _fade;
+  late Animation<double> _scale;
 
   @override
   void initState() {
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1800),
     );
 
-    _fadeText = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.7, curve: Curves.easeIn)),
+    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _ctrl,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeIn),
+      ),
     );
 
-    _scaleText = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack)),
+    _scale = Tween<double>(begin: 0.75, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _ctrl,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack),
+      ),
     );
 
     _ctrl.forward();
@@ -48,7 +58,11 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
         if (mounted) {
           Widget nextScreen;
           if (hasToken) {
-            nextScreen = const HomeView();
+            if (auth.userRole == null) {
+              nextScreen = const RoleSelectionView();
+            } else {
+              nextScreen = const HomeView();
+            }
           } else if (hasSeenOnboarding) {
             nextScreen = const LoginView();
           } else {
@@ -57,11 +71,13 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => nextScreen,
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                return FadeTransition(opacity: animation, child: child);
-              },
-              transitionDuration: const Duration(milliseconds: 500),
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  nextScreen,
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+              transitionDuration: const Duration(milliseconds: 400),
             ),
           );
         }
@@ -78,10 +94,9 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return CommonBackground(
-      showGrid: true,
       child: Stack(
         children: [
-          // Screen 0 Design: Left Side Large Rotated Vertical Text "Damini AI"
+          // Background Label
           Positioned(
             left: -80.w,
             top: 0,
@@ -94,39 +109,30 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                   style: TextStyle(
                     fontSize: 84.sp,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white.withOpacity(0.025),
+                    color: Colors.white.withOpacity(0.02),
                     letterSpacing: 2.0,
                   ),
                 ),
               ),
             ),
           ),
-          
-          // Centered Brand Name
+
+          // Centered Brand Svg Logo & Text
           Center(
             child: FadeTransition(
-              opacity: _fadeText,
+              opacity: _fade,
               child: ScaleTransition(
-                scale: _scaleText,
-                child: RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      fontSize: 36.sp,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.5,
-                      fontFamily: 'Outfit',
+                scale: _scale,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      IconAssets.app_logo,
+                      width: 160.r,
+                      height: 160.r,
                     ),
-                    children: const [
-                      TextSpan(
-                        text: "Damini",
-                        style: TextStyle(color: AppColors.white),
-                      ),
-                      TextSpan(
-                        text: " AI",
-                        style: TextStyle(color: AppColors.primaryColor),
-                      ),
-                    ],
-                  ),
+                    SizedBox(height: 20.h),
+                  ],
                 ),
               ),
             ),

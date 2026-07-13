@@ -665,14 +665,14 @@ class _HomeViewState extends State<HomeView> {
       fallbackIcon: Icons.home_rounded,
     ),
     NavTab(
-      label: "Analytics",
-      iconName: "chart.bar.fill",
-      fallbackIcon: Icons.bar_chart_rounded,
+      label: "Favorites",
+      iconName: "heart.fill",
+      fallbackIcon: Icons.favorite_border_sharp,
     ),
     NavTab(
-      label: "Wallet",
-      iconName: "creditcard.fill",
-      fallbackIcon: Icons.account_balance_wallet_rounded,
+      label: "Chat",
+      iconName: "message.fill",
+      fallbackIcon: Icons.chat_bubble_outline,
     ),
     NavTab(
       label: "Profile",

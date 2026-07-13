@@ -8,7 +8,7 @@ class CommonBackground extends StatelessWidget {
   const CommonBackground({
     super.key, 
     required this.child,
-    this.showGrid = true,
+    this.showGrid = false,
   });
 
   @override

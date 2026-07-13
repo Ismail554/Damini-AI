@@ -1,73 +1,336 @@
-Project Brief: Damani AI
-1. Project Overview
-Damani AI is a professional investment and sponsorship platform built with Flutter. The app facilitates a seamless connection between Investors and Sponsors, utilizing a robust onboarding process and profile verification system.
-2. Tech Stack
-Framework: Flutter
-State Management: Riverpod (Provider/StateNotifier/AsyncNotifier)
-Local Storage: Shared Preferences or Flutter Secure Storage (for UUID and Onboarding status)
-Architecture: Feature-first Folder Structure
-3. Visual Identity & Theme
-The app maintains a premium, tech-forward aesthetic using a consistent gradient background across both themes.
-3.1 Color Palette
-Primary Background (Dark - Default):
-Top: #050E17
-Center: #0A1F33
-Bottom: #040A10
-Primary Background (Light):
-Top: #F0F4F8
-Center: #E1E9F0
-Bottom: #D6E0E9
-Accent Colors: (Recommended) Cyber Blue / Gold / White Text
-3.2 UI Component Strategy
-Glassmorphism: Use blurred overlays for cards to let the background gradient shine through.
-Consistency: Background logic is handled by a BaseScaffold widget to ensure the gradient is omnipresent.
-4. Detailed User Flow
-Phase 1: Launch & Authentication
-Splash Screen:
-System checks for unique UUID and isFirstTime flag.
-If first time: Redirect to 4-Screen Onboarding.
-If returning: Redirect to Auth Screen.
-Onboarding: 4 swipeable screens highlighting app value propositions.
-Authentication:
-Login: Traditional email/pass. Includes "Forgot Password" flow.
-SignUp: Basic inputs (Name, Email, Password).
-OTP Verification: Email-based OTP entry.
-Success Screen: Animated confirmation before proceeding.
-Password Recovery: Email Input → OTP Verify → Change Password → Return to Login.
-Phase 2: Role Selection & Onboarding
-After account creation, users must select one of two paths:
-Investor Role
-Sponsor Role
-Role-Specific Onboarding Flow:
-Start Screen: Introduction to the specific role features.
-Choose Type: Selection of sub-categories (e.g., Individual vs. Institutional).
-Complete Profile: Remaining data fields (Phone, Location, Bio, etc.).
-Interest: Selection of industries or categories of interest.
-Company Verify: Submission of official documents or IDs.
-Company Profile: Setup of the public-facing company/entity page.
-Verification Pending:
-Status screen explaining the review process.
-Action: Includes a "Skip to App" button allowing the user to browse the dashboard while verification is in progress.
-5. State Management Logic (Riverpod)
-ThemeModeProvider: Toggles between Dark (Default) and Light modes.
-AuthProvider: Handles session, login/signup states, and OTP timing.
-OnboardingProvider: Tracks page index and UUID persistence.
-ProfileProvider: Manages the multi-step form data during the Role Onboarding phase.
-6. Directory Structure (Proposed)
-code
-Text
+# Project Brief: Damani AI
+
+## 1. Project Overview
+
+**Damani AI** is a professional investment and sponsorship platform built with **Flutter**. The application creates a seamless ecosystem connecting **Investors** and **Sponsors** through a structured onboarding process, secure authentication, and profile verification system.
+
+---
+
+## 2. Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | Flutter |
+| State Management | Riverpod (Provider / StateNotifier / AsyncNotifier) |
+| Local Storage | Shared Preferences or Flutter Secure Storage (UUID & onboarding status) |
+| Architecture | Feature-first Folder Structure |
+
+---
+
+## 3. Visual Identity & Theme
+
+Damani AI follows a premium, modern, and technology-focused design language using a consistent gradient background across both Dark and Light themes.
+
+### 3.1 Color Palette
+
+#### Dark Theme (Default)
+
+- **Top:** `#050E17`
+- **Center:** `#0A1F33`
+- **Bottom:** `#040A10`
+
+#### Light Theme
+
+- **Top:** `#F0F4F8`
+- **Center:** `#E1E9F0`
+- **Bottom:** `#D6E0E9`
+
+#### Accent Colors
+
+- Cyber Blue
+- Gold
+- White (Primary Text)
+
+---
+
+### 3.2 UI Component Strategy
+
+#### Glassmorphism
+
+Use frosted-glass cards with blurred translucent backgrounds so the gradient remains visible.
+
+#### Consistent Background
+
+A reusable `BaseScaffold` widget should provide the application's gradient background for every screen.
+
+---
+
+## 4. User Flow
+
+### Phase 1 — Launch & Authentication
+
+### Splash Screen
+
+On launch:
+
+1. Check for stored UUID.
+2. Check `isFirstTime` flag.
+
+Navigation logic:
+
+- **First launch** → 4-screen onboarding
+- **Returning user** → Authentication
+
+---
+
+### Onboarding
+
+Four swipeable introduction screens highlighting:
+
+- Investment opportunities
+- Sponsor discovery
+- Secure verification
+- Professional networking
+
+---
+
+### Authentication
+
+#### Login
+
+- Email
+- Password
+- Forgot Password
+
+#### Sign Up
+
+- Full Name
+- Email
+- Password
+
+#### OTP Verification
+
+- Email-based OTP
+- Timer & resend functionality
+
+#### Success Screen
+
+Animated confirmation before continuing.
+
+---
+
+### Password Recovery Flow
+
+Email Input
+
+↓
+
+OTP Verification
+
+↓
+
+Create New Password
+
+↓
+
+Return to Login
+
+---
+
+## 5. Role Selection & Profile Onboarding
+
+After account creation, users choose one role:
+
+- Investor
+- Sponsor
+
+---
+
+### Role-Specific Flow
+
+#### Step 1 — Introduction
+
+Overview of platform features for the selected role.
+
+#### Step 2 — Choose Type
+
+Examples:
+
+- Individual
+- Institutional
+
+---
+
+#### Step 3 — Complete Profile
+
+Collect information such as:
+
+- Phone Number
+- Location
+- Biography
+- Additional details
+
+---
+
+#### Step 4 — Interests
+
+Choose industries or investment categories.
+
+---
+
+#### Step 5 — Company Verification
+
+Upload:
+
+- Government ID
+- Company documents
+- Verification files
+
+---
+
+#### Step 6 — Company Profile
+
+Configure public-facing organization profile.
+
+---
+
+### Verification Pending
+
+Display verification status with explanation.
+
+Actions:
+
+- Wait for approval
+- **Skip to App** (dashboard accessible while verification is pending)
+
+---
+
+## 6. State Management (Riverpod)
+
+### ThemeModeProvider
+
+Responsibilities:
+
+- Dark Mode (default)
+- Light Mode
+- Theme persistence
+
+---
+
+### AuthProvider
+
+Responsibilities:
+
+- Login
+- Signup
+- Session management
+- OTP timer
+- Authentication state
+
+---
+
+### OnboardingProvider
+
+Responsibilities:
+
+- Current onboarding page
+- UUID persistence
+- First-launch detection
+
+---
+
+### ProfileProvider
+
+Responsibilities:
+
+- Multi-step onboarding forms
+- Validation
+- Temporary profile data
+- Submission
+
+---
+
+## 7. Proposed Directory Structure
+
+```text
 lib/
 ├── core/
-│   ├── constants/      # Colors, Gradients, Styles
-│   ├── theme/          # Dark/Light Theme data
-│   └── common_widgets/ # BaseScaffold, CustomButtons
+│   ├── constants/
+│   │   ├── colors.dart
+│   │   ├── gradients.dart
+│   │   └── styles.dart
+│   │
+│   ├── theme/
+│   │   ├── dark_theme.dart
+│   │   ├── light_theme.dart
+│   │   └── theme_provider.dart
+│   │
+│   └── common_widgets/
+│       ├── base_scaffold.dart
+│       ├── custom_button.dart
+│       ├── glass_card.dart
+│       └── loading_indicator.dart
+│
 ├── features/
-│   ├── onboarding/     # 4-screen onboarding logic
-│   ├── auth/           # Login, Signup, OTP, Forgot Pass
-│   ├── role_selection/ # Investor vs Sponsor logic
-│   └── profile_setup/  # Multi-step verification flow
+│   ├── onboarding/
+│   ├── auth/
+│   ├── role_selection/
+│   └── profile_setup/
+│
 └── main.dart
-7. Development Guidelines
-Gradient Consistency: All screens must wrap their content in the LinearGradient container defined in the project requirements.
-Responsiveness: Use Sizer or LayoutBuilder to ensure the onboarding and forms look consistent across all device sizes.
-Security: UUID check must happen before the first frame is fully rendered to prevent "flicker" between Splash and Onboarding.
+```
+
+---
+
+## 8. Development Guidelines
+
+### Gradient Consistency
+
+Every screen must be wrapped with the application's reusable `BaseScaffold` so the gradient background remains consistent throughout the app.
+
+---
+
+### Responsive Design
+
+Use:
+
+- `Sizer`
+- `LayoutBuilder`
+- Responsive spacing
+- Adaptive typography
+
+to ensure consistent layouts across all screen sizes.
+
+---
+
+### Security
+
+The UUID and onboarding status must be checked **before the first frame is rendered** to avoid flickering between:
+
+Splash Screen → Onboarding → Authentication
+
+---
+
+## 9. Core Features Summary
+
+- Professional Flutter application
+- Investor & Sponsor ecosystem
+- Secure email authentication
+- OTP verification
+- Password recovery
+- Multi-step profile onboarding
+- Company verification workflow
+- Glassmorphism UI
+- Premium gradient theme
+- Riverpod state management
+- Feature-first architecture
+- Responsive layouts
+- Persistent onboarding and session handling
+
+---
+
+## 10. Future Enhancements
+
+Potential roadmap items:
+
+- Push notifications
+- Real-time messaging
+- AI-powered investment matching
+- Document OCR verification
+- Video KYC
+- Admin moderation dashboard
+- Analytics dashboard
+- Multi-language support
+- In-app support chat
+- Dark/Light theme customization
+```
