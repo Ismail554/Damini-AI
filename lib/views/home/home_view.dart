@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:Braintech/views/onboarding/onboarding_view.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:cupertino_native/cupertino_native.dart';
 import 'package:Braintech/data/models/nav_tab.dart';
@@ -75,7 +76,13 @@ class _HomeViewState extends State<HomeView> {
         children: [
           // Persistent top offline banner
           if (!_isConnected) const NetworkInfoBar(),
-
+          Lottie.asset(
+            'assets/lottie/success.json',
+            width: 200,
+            height: 200,
+            fit: BoxFit.cover,
+            animate: true,
+          ),
           Expanded(
             child: IndexedStack(
               index: navProvider.currentIndex,
@@ -679,10 +686,7 @@ class _HomeViewState extends State<HomeView> {
       return CNTabBar(
         items: [
           for (final tab in _tabs)
-            CNTabBarItem(
-              label: tab.label,
-              icon: CNSymbol(tab.iconName),
-            ),
+            CNTabBarItem(label: tab.label, icon: CNSymbol(tab.iconName)),
         ],
         currentIndex: navProvider.currentIndex,
         tint: AppColors.primaryColor,

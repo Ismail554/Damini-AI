@@ -81,7 +81,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
       showGrid: true,
       child: Stack(
         children: [
-          // Screen 0 Design: Left Side Large Rotated Vertical Text "DiasporaVest"
+          // Screen 0 Design: Left Side Large Rotated Vertical Text "Damini AI"
           Positioned(
             left: -80.w,
             top: 0,
@@ -90,7 +90,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
               child: RotatedBox(
                 quarterTurns: 3,
                 child: Text(
-                  "DiasporaVest",
+                  "Damini AI",
                   style: TextStyle(
                     fontSize: 84.sp,
                     fontWeight: FontWeight.w900,
@@ -118,11 +118,11 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                     ),
                     children: const [
                       TextSpan(
-                        text: "Diaspora",
+                        text: "Damini",
                         style: TextStyle(color: AppColors.white),
                       ),
                       TextSpan(
-                        text: "Vest",
+                        text: " AI",
                         style: TextStyle(color: AppColors.primaryColor),
                       ),
                     ],

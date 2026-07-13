@@ -80,7 +80,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  "Sign in to continue to DiasporaVest",
+                  "Sign in to continue to Damini AI",
                   style: GoogleFonts.outfit(
                     fontSize: 15.sp,
                     color: AppColors.grey,
