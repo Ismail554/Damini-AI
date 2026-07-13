@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
 import '../../core/widgets/glass_card.dart';
-import '../role_selection/role_selection_view.dart';
 
 class SuccessView extends StatelessWidget {
   const SuccessView({super.key});
@@ -62,13 +62,7 @@ class SuccessView extends StatelessWidget {
               width: double.infinity,
               height: 56.h,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const RoleSelectionView(),
-                    ),
-                  );
-                },
+                onPressed: () => context.go('/role-selection'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
                   foregroundColor: Colors.white,

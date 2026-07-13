@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/widgets/common_background.dart';
-import 'otp_verification_view.dart';
 
 class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({super.key});
@@ -31,11 +31,9 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
     try {
       await auth.forgotPassword(_emailCtrl.text);
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OtpVerificationView(email: _emailCtrl.text, isRecovery: true),
-          ),
+        context.go(
+          '/otp',
+          extra: {'email': _emailCtrl.text, 'isRecovery': true},
         );
       }
     } catch (e) {
@@ -57,7 +55,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10.h),
-              IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+              IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white), onPressed: () => context.pop()),
               SizedBox(height: 10.h),
               Text("Recover Password", style: GoogleFonts.outfit(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Colors.white)),
               SizedBox(height: 8.h),

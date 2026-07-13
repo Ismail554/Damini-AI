@@ -4,11 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/widgets/common_background.dart';
-import 'success_view.dart';
-import 'reset_password_view.dart';
 
 class OtpVerificationView extends StatefulWidget {
   final String email;
@@ -65,15 +64,9 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
       await auth.verifyOtp(code);
       if (mounted) {
         if (widget.isRecovery) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const ResetPasswordView()),
-          );
+          context.go('/reset-password');
         } else {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const SuccessView()),
-          );
+          context.go('/success');
         }
       }
     } catch (e) {
@@ -94,7 +87,7 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10.h),
-            IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+            IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white), onPressed: () => context.pop()),
             SizedBox(height: 10.h),
             Text("Verification Code", style: GoogleFonts.outfit(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Colors.white)),
             SizedBox(height: 8.h),

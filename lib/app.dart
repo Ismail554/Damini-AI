@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:Braintech/controllers/theme_provider.dart';
 import 'package:Braintech/core/theme/app_theme.dart';
-import 'package:Braintech/views/splash/splash_view.dart';
+import 'package:Braintech/core/routing/app_router.dart';
 import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
@@ -26,13 +26,13 @@ class MyApp extends StatelessWidget {
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
-          return MaterialApp(
+          return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'Damini AI',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            home: const SplashView(),
+            routerConfig: AppRouter.router,
           );
         },
       ),

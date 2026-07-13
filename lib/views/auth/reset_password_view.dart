@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/widgets/common_background.dart';
-import 'login_view.dart';
 
 class ResetPasswordView extends StatefulWidget {
   const ResetPasswordView({super.key});
@@ -39,10 +39,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Password successfully reset! Sign in with your new credentials.")),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginView()),
-        );
+        context.go('/login');
       }
     } catch (e) {
       if (mounted) {
@@ -64,7 +61,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10.h),
-              IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white), onPressed: () => Navigator.pop(context)),
+              IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white), onPressed: () => context.pop()),
               SizedBox(height: 10.h),
               Text("Reset Password", style: GoogleFonts.outfit(fontSize: 28.sp, fontWeight: FontWeight.bold, color: Colors.white)),
               SizedBox(height: 8.h),

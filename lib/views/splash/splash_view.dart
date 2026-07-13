@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:Braintech/controllers/auth_provider.dart';
 import 'package:Braintech/core/services/storage_service.dart';
 import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
-import '../onboarding/onboarding_view.dart';
-import '../auth/login_view.dart';
-import '../home/home_view.dart';
-import '../role_selection/role_selection_view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -56,30 +52,15 @@ class _SplashViewState extends State<SplashView>
         final hasSeenOnboarding = (await StorageService.getUuid()) != null;
 
         if (mounted) {
-          Widget nextScreen;
+          String nextRoute;
           if (hasToken) {
-            if (auth.userRole == null) {
-              nextScreen = const RoleSelectionView();
-            } else {
-              nextScreen = const HomeView();
-            }
+            nextRoute = auth.userRole == null ? '/role-selection' : '/home';
           } else if (hasSeenOnboarding) {
-            nextScreen = const LoginView();
+            nextRoute = '/login';
           } else {
-            nextScreen = const OnboardingView();
+            nextRoute = '/onboarding';
           }
-
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  nextScreen,
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-              transitionDuration: const Duration(milliseconds: 400),
-            ),
-          );
+          context.go(nextRoute);
         }
       }
     });
@@ -94,29 +75,7 @@ class _SplashViewState extends State<SplashView>
   @override
   Widget build(BuildContext context) {
     return CommonBackground(
-      child: Stack(
-        children: [
-          // Background Label
-          Positioned(
-            left: -80.w,
-            top: 0,
-            bottom: 0,
-            child: Center(
-              child: RotatedBox(
-                quarterTurns: 3,
-                child: Text(
-                  "Damini AI",
-                  style: TextStyle(
-                    fontSize: 84.sp,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white.withOpacity(0.02),
-                    letterSpacing: 2.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
+      child:
           // Centered Brand Svg Logo & Text
           Center(
             child: FadeTransition(
@@ -137,8 +96,6 @@ class _SplashViewState extends State<SplashView>
               ),
             ),
           ),
-        ],
-      ),
     );
   }
 }

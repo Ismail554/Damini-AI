@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/widgets/common_background.dart';
 import '../../core/widgets/glass_card.dart';
-import 'otp_verification_view.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -45,11 +45,9 @@ class _SignUpViewState extends State<SignUpView> {
     try {
       await auth.signUp(_nameCtrl.text, _emailCtrl.text, _passwordCtrl.text);
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OtpVerificationView(email: _emailCtrl.text, isRecovery: false),
-          ),
+        context.go(
+          '/otp',
+          extra: {'email': _emailCtrl.text, 'isRecovery': false},
         );
       }
     } catch (e) {
@@ -77,7 +75,7 @@ class _SignUpViewState extends State<SignUpView> {
               SizedBox(height: 10.h),
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
               ),
               SizedBox(height: 10.h),
               Text(

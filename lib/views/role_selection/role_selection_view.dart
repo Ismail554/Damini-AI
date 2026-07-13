@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
-import 'role_onboarding_view.dart';
 
 class RoleSelectionView extends StatelessWidget {
   const RoleSelectionView({super.key});
@@ -92,11 +91,7 @@ class RoleSelectionView extends StatelessWidget {
         final auth = context.read<AuthProvider>();
         await auth.setRole(role);
         if (context.mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => RoleOnboardingView(role: role),
-            ),
-          );
+          context.go('/role-onboarding', extra: {'role': role});
         }
       },
       child: Container(
