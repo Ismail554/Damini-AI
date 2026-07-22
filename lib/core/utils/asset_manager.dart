@@ -13,6 +13,7 @@ class ImageAssets {
 
 class IconAssets {
   static const String app_logo = "$iconPath/app_logo.png";
+  static const String rawLogo = "$iconPath/raw_logo.png";
 }
 
 class JsonAssets {}
@@ -20,6 +21,8 @@ class JsonAssets {}
 class SvgAssets {
   static const String logo = "$svgPath/app_logo.svg";
   static const String successmark = "$svgPath/successmark.svg";
+  static const String rawIcon = "$svgPath/raw_icon.svg";
+  static const String google = "$svgPath/google.svg";
 }
 
 class LottieAssets {

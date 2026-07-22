@@ -5,8 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
-import '../../core/widgets/glass_card.dart';
+import 'widgets/labeled_text_field.dart';
+import 'widgets/social_auth_section.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -17,37 +19,43 @@ class SignUpView extends StatefulWidget {
 
 class _SignUpViewState extends State<SignUpView> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  
+  final _confirmPasswordCtrl = TextEditingController();
+
   bool _obscurePassword = true;
-  bool _acceptTerms = false;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _handleSignUp() async {
     if (!_formKey.currentState!.validate()) return;
-    if (!_acceptTerms) {
+    if (_passwordCtrl.text != _confirmPasswordCtrl.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please accept the terms & conditions")),
+        const SnackBar(content: Text("Passwords do not match")),
       );
       return;
     }
 
+    final fullName =
+        "${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}";
     final auth = context.read<AuthProvider>();
     try {
-      await auth.signUp(_nameCtrl.text, _emailCtrl.text, _passwordCtrl.text);
+      await auth.signUp(fullName, _emailCtrl.text.trim(), _passwordCtrl.text);
       if (mounted) {
         context.go(
           '/otp',
-          extra: {'email': _emailCtrl.text, 'isRecovery': false},
+          extra: {'email': _emailCtrl.text.trim(), 'isRecovery': false},
         );
       }
     } catch (e) {
@@ -65,166 +73,201 @@ class _SignUpViewState extends State<SignUpView> {
 
     return CommonBackground(
       showGrid: false,
-      child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 10.h),
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                onPressed: () => context.pop(),
-              ),
-              SizedBox(height: 10.h),
-              Text(
-                "Create Account",
-                style: GoogleFonts.outfit(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.asset(IconAssets.rawLogo, height: 60.h, width: 60.w),
+                SizedBox(height: 16.h),
+                Text(
+                  "Create Account",
+                  style: GoogleFonts.outfit(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                "Register to start networking with sponsors and investors.",
-                style: GoogleFonts.outfit(
-                  fontSize: 15.sp,
-                  color: AppColors.grey,
+                SizedBox(height: 8.h),
+                Text(
+                  "Join Nexus to start collaborating.",
+                  style: GoogleFonts.outfit(
+                    fontSize: 15.sp,
+                    color: AppColors.grey,
+                  ),
                 ),
-              ),
-              SizedBox(height: 36.h),
+                SizedBox(height: 24.h),
+                const SocialAuthSection(),
+                SizedBox(height: 24.h),
 
-              GlassCard(
-                child: Column(
+                Row(
                   children: [
-                    // Name Field
-                    _buildTextField(_nameCtrl, "Full Name", Icons.person_outline, false, (val) {
-                      if (val == null || val.trim().isEmpty) return "Please enter your name";
-                      return null;
-                    }),
-                    SizedBox(height: 16.h),
-
-                    // Email Field
-                    _buildTextField(_emailCtrl, "Email Address", Icons.email_outlined, false, (val) {
-                      if (val == null || !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) {
-                        return "Please enter a valid email";
-                      }
-                      return null;
-                    }),
-                    SizedBox(height: 16.h),
-
-                    // Password Field
-                    _buildTextField(
-                      _passwordCtrl,
-                      "Password",
-                      Icons.lock_outline_rounded,
-                      _obscurePassword,
-                      (val) {
-                        if (val == null || val.length < 6) return "Password must be 6+ characters";
-                        return null;
-                      },
-                      suffix: IconButton(
-                        icon: Icon(
-                          _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                          color: AppColors.grey,
-                          size: 20.r,
-                        ),
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    Expanded(
+                      child: LabeledTextField(
+                        textInputAction: TextInputAction.next,
+                        label: "First Name",
+                        hint: "Enter name",
+                        controller: _firstNameCtrl,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? "Enter first name"
+                            : null,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: LabeledTextField(
+                              textInputAction: TextInputAction.next,
+                        label: "Last Name",
+                        hint: "Enter name",
+                        controller: _lastNameCtrl,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? "Enter last name"
+                            : null,
                       ),
                     ),
                   ],
                 ),
-              ),
-              SizedBox(height: 20.h),
+                SizedBox(height: 16.h),
 
-              // Accept Terms checkbox
-              Row(
-                children: [
-                  Checkbox(
-                    value: _acceptTerms,
-                    onChanged: (val) => setState(() => _acceptTerms = val ?? false),
-                    activeColor: AppColors.primaryColor,
-                    side: const BorderSide(color: AppColors.grey),
+                LabeledTextField(
+                        textInputAction: TextInputAction.next,
+                  label: "Email",
+                  hint: "Enter email",
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null ||
+                        !RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        ).hasMatch(v.trim())) {
+                      return "Enter a valid email";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 16.h),
+
+                LabeledTextField(
+                        textInputAction: TextInputAction.next,
+                  label: "Password",
+                  hint: "••••••••",
+                  controller: _passwordCtrl,
+                  obscureText: _obscurePassword,
+                  validator: (v) => (v == null || v.length < 6)
+                      ? "Password must be 6+ characters"
+                      : null,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: AppColors.grey,
+                      size: 20.r,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
-                  Expanded(
-                    child: Text(
-                      "I accept the terms & privacy policies.",
-                      style: GoogleFonts.outfit(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: 13.sp,
+                ),
+                SizedBox(height: 16.h),
+
+                LabeledTextField(
+                        textInputAction: TextInputAction.done,
+                  label: "Confirm Password",
+                  hint: "••••••••",
+                  controller: _confirmPasswordCtrl,
+                  obscureText: _obscureConfirmPassword,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return "Confirm your password";
+                    if (v != _passwordCtrl.text) {
+                      return "Passwords do not match";
+                    }
+                    return null;
+                  },
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: AppColors.grey,
+                      size: 20.r,
+                    ),
+                    onPressed: () => setState(
+                      () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 28.h),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 56.h,
+                  child: ElevatedButton(
+                    onPressed: auth.isLoading ? null : _handleSignUp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28.r),
+                      ),
+                    ),
+                    child: auth.isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            "Create Account",
+                            style: GoogleFonts.outfit(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (Navigator.of(context).canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/login');
+                      }
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        style: GoogleFonts.outfit(
+                          fontSize: 14.sp,
+                          color: Colors.white.withValues(alpha: 0.7),
+                        ),
+                        children: const [
+                          TextSpan(text: "Already have an account? "),
+                          TextSpan(
+                            text: "Sign In",
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: 24.h),
-
-              // SignUp CTA
-              SizedBox(
-                width: double.infinity,
-                height: 56.h,
-                child: ElevatedButton(
-                  onPressed: auth.isLoading ? null : _handleSignUp,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28.r),
-                    ),
-                  ),
-                  child: auth.isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                        )
-                      : Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                 ),
-              ),
-            ],
+                SizedBox(height: 16.h),
+              ],
+            ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(
-    TextEditingController ctrl,
-    String hint,
-    IconData icon,
-    bool obscure,
-    String? Function(String?)? validator, {
-    Widget? suffix,
-  }) {
-    return TextFormField(
-      controller: ctrl,
-      obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: GoogleFonts.outfit(color: AppColors.grey, fontSize: 14.sp),
-        prefixIcon: Icon(icon, color: AppColors.grey, size: 20.r),
-        suffixIcon: suffix,
-        filled: true,
-        fillColor: const Color(0xFF0F1E2E).withOpacity(0.6),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24.r),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24.r),
-          borderSide: const BorderSide(color: AppColors.primaryColor),
-        ),
-      ),
-      validator: validator,
     );
   }
 }
