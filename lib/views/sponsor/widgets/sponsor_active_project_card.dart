@@ -37,7 +37,6 @@ class SponsorActiveProjectCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Badges Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -71,8 +70,6 @@ class SponsorActiveProjectCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 12.h),
-
-          // Title & Description
           Text(
             title,
             style: GoogleFonts.outfit(
@@ -91,8 +88,6 @@ class SponsorActiveProjectCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16.h),
-
-          // Nested Progress Container
           Container(
             padding: EdgeInsets.all(14.r),
             decoration: BoxDecoration(

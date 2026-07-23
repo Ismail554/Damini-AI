@@ -36,7 +36,6 @@ class FeaturedOpportunityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Banner Image with Badges
           Stack(
             children: [
               ClipRRect(
@@ -51,7 +50,6 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              // Category Tag
               Positioned(
                 top: 10.h,
                 left: 10.w,
@@ -71,7 +69,6 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   ),
                 ),
               ),
-              // Bookmark Button
               Positioned(
                 top: 10.h,
                 right: 10.w,
@@ -90,8 +87,6 @@ class FeaturedOpportunityCard extends StatelessWidget {
               ),
             ],
           ),
-
-          // Bottom Content Panel
           Padding(
             padding: EdgeInsets.all(14.r),
             child: Column(
@@ -126,8 +121,6 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 10.h),
-
-                // Orange Progress Bar Line
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2.r),
                   child: LinearProgressIndicator(
@@ -140,8 +133,6 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.h),
-
-                // Metrics Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

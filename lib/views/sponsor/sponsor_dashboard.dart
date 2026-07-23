@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/utils/app_colors.dart';
-import 'sponsor_active_project_card.dart';
-import 'sponsor_draft_card.dart';
-import 'sponsor_metric_card.dart';
-import 'sponsor_request_card.dart';
+import '../../core/utils/app_colors.dart';
+import 'widgets/sponsor_active_project_card.dart';
+import 'widgets/sponsor_draft_card.dart';
+import 'widgets/sponsor_metric_card.dart';
+import 'widgets/sponsor_request_card.dart';
 
 class SponsorDashboard extends StatelessWidget {
   const SponsorDashboard({super.key});
@@ -18,7 +18,6 @@ class SponsorDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -89,8 +88,6 @@ class SponsorDashboard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 20.h),
-
-          // Top Metrics Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
@@ -112,8 +109,6 @@ class SponsorDashboard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 28.h),
-
-          // Active Projects Section
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -146,8 +141,6 @@ class SponsorDashboard extends StatelessWidget {
             progress: 0.24,
           ),
           SizedBox(height: 28.h),
-
-          // Recent Requests Section
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -185,8 +178,6 @@ class SponsorDashboard extends StatelessWidget {
             onReview: () {},
           ),
           SizedBox(height: 24.h),
-
-          // Drafts Section
           Text(
             "Drafts",
             style: GoogleFonts.outfit(

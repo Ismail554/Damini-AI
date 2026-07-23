@@ -29,7 +29,6 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
           ),
           child: Row(
             children: [
-              // Left Blue Content Panel
               Expanded(
                 flex: 5,
                 child: Container(
@@ -118,8 +117,6 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                   ),
                 ),
               ),
-
-              // Right Image Preview Panel
               Expanded(
                 flex: 5,
                 child: ClipRRect(
@@ -139,8 +136,6 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
           ),
         ),
         SizedBox(height: 12.h),
-
-        // Indicator Dots
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(3, (idx) {

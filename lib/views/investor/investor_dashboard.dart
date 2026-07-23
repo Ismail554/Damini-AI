@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/utils/app_colors.dart';
-import 'featured_opportunity_card.dart';
-import 'investor_banner_carousel.dart';
-import 'investor_category_chip.dart';
-import 'trending_opportunity_card.dart';
+import '../../core/utils/app_colors.dart';
+import 'widgets/featured_opportunity_card.dart';
+import 'widgets/investor_banner_carousel.dart';
+import 'widgets/investor_category_chip.dart';
+import 'widgets/trending_opportunity_card.dart';
 
 class InvestorDashboard extends StatefulWidget {
   const InvestorDashboard({super.key});
@@ -32,7 +32,6 @@ class _InvestorDashboardState extends State<InvestorDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -103,8 +102,6 @@ class _InvestorDashboardState extends State<InvestorDashboard> {
             ],
           ),
           SizedBox(height: 18.h),
-
-          // Search Bar
           Container(
             height: 48.h,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -145,12 +142,8 @@ class _InvestorDashboardState extends State<InvestorDashboard> {
             ),
           ),
           SizedBox(height: 20.h),
-
-          // Hero Banner Carousel
           const InvestorBannerCarousel(),
           SizedBox(height: 20.h),
-
-          // Category Quick-Filters
           SizedBox(
             height: 75.h,
             child: ListView.builder(
@@ -169,8 +162,6 @@ class _InvestorDashboardState extends State<InvestorDashboard> {
             ),
           ),
           SizedBox(height: 28.h),
-
-          // Featured Opportunity Section
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -228,8 +219,6 @@ class _InvestorDashboardState extends State<InvestorDashboard> {
             ),
           ),
           SizedBox(height: 28.h),
-
-          // Trending Now Section
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

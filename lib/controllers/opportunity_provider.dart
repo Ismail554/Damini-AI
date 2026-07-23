@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/models/opportunity_model.dart';
 import '../data/repositories/opportunity_repository.dart';
-import '../business/opportunity_service.dart';
+import '../data/services/opportunity_service.dart';
 
 class OpportunityProvider extends ChangeNotifier {
   final OpportunityService _service = OpportunityService(OpportunityRepositoryImpl());

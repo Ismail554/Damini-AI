@@ -35,7 +35,6 @@ class TrendingOpportunityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner Image with Badges
           Stack(
             children: [
               ClipRRect(
@@ -87,8 +86,6 @@ class TrendingOpportunityCard extends StatelessWidget {
               ),
             ],
           ),
-
-          // Content Box
           Padding(
             padding: EdgeInsets.all(16.r),
             child: Column(
@@ -112,8 +109,6 @@ class TrendingOpportunityCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16.h),
-
-                // Raised vs Goal Box
                 Container(
                   padding: EdgeInsets.all(14.r),
                   decoration: BoxDecoration(

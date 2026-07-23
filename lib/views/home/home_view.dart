@@ -6,8 +6,8 @@ import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
 import '../profile/investor_profile_view.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
-import 'widgets/investor_dashboard.dart';
-import 'widgets/sponsor_dashboard.dart';
+import '../investor/investor_dashboard.dart';
+import '../sponsor/sponsor_dashboard.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
