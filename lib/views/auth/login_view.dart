@@ -40,10 +40,8 @@ class _LoginViewState extends State<LoginView> {
     try {
       await auth.login(_emailCtrl.text.trim(), _passwordCtrl.text);
       if (mounted && auth.isAuthenticated) {
-        if (auth.userRole == GlobalKeys.investorRole) {
-          context.go('/role-onboarding', extra: {'role': GlobalKeys.investorRole});
-        } else if (auth.userRole == GlobalKeys.sponsorRole) {
-          context.go('/role-onboarding', extra: {'role': GlobalKeys.sponsorRole});
+        if (GlobalKeys.isValidRole(auth.userRole)) {
+          context.go('/home');
         } else {
           context.go('/role-selection');
         }

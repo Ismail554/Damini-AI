@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_colors.dart';
+
+class SponsorMetricCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const SponsorMetricCard({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 110.w,
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F2035).withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.08),
+          width: 1.w,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: Colors.white.withValues(alpha: 0.7), size: 16.r),
+              SizedBox(width: 6.w),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.outfit(
+                    fontSize: 11.sp,
+                    color: AppColors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            value,
+            style: GoogleFonts.outfit(
+              fontSize: 20.sp,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
