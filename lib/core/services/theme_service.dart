@@ -2,7 +2,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeService {
   static SharedPreferences? _prefs;
-  static Future<void> init() async => _prefs = await SharedPreferences.getInstance();
-  static bool isDarkMode() => _prefs?.getBool('is_dark') ?? false;
-  static Future<void> setDarkMode(bool isDark) async => _prefs?.setBool('is_dark', isDark);
+  static const String _key = 'theme_mode_key';
+
+  static Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  static String getThemeModeString() {
+    return _prefs?.getString(_key) ?? 'system';
+  }
+
+  static Future<void> setThemeModeString(String mode) async {
+    await _prefs?.setString(_key, mode);
+  }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class InvestorBannerCarousel extends StatefulWidget {
   const InvestorBannerCarousel({super.key});
@@ -14,17 +17,19 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Column(
       children: [
         Container(
           width: double.infinity,
           height: 145.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.r),
-            color: const Color(0xFF0F2238),
+            borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+            color: tc.cardHero,
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1.w,
+              color: tc.borderColor,
+              width: AppDimens.borderThin,
             ),
           ),
           child: Row(
@@ -32,9 +37,9 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
               Expanded(
                 flex: 5,
                 child: Container(
-                  padding: EdgeInsets.all(14.r),
+                  padding: EdgeInsets.all(AppDimens.paddingMd),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF006EDB),
+                    color: AppColors.primaryColor,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(19.r),
                       bottomLeft: Radius.circular(19.r),
@@ -57,7 +62,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: 2.h),
+                          SizedBox(height: AppDimens.spaceXxs),
                           Row(
                             children: [
                               Icon(
@@ -88,18 +93,21 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          SizedBox(height: 6.h),
+                          SizedBox(height: AppDimens.spaceSm),
                           SizedBox(
-                            height: 32.h,
+                            height: AppDimens.buttonSm - 4,
                             child: ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF0052CC),
                                 foregroundColor: Colors.white,
                                 elevation: 0,
-                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: AppDimens.paddingLg - 4,
+                                ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16.r),
+                                  borderRadius:
+                                      BorderRadius.circular(AppDimens.radiusMd),
                                 ),
                               ),
                               child: Text(
@@ -135,7 +143,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
             ],
           ),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: AppDimens.spaceMd),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(3, (idx) {
@@ -146,8 +154,8 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
               height: 4.h,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? const Color(0xFF006EDB)
-                    : Colors.white.withValues(alpha: 0.2),
+                    ? AppColors.primaryColor
+                    : tc.textTertiary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2.r),
               ),
             );

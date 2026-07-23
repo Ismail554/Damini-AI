@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/utils/app_dimens.dart';
+import '../../core/utils/app_theme_colors.dart';
 import 'widgets/sponsor_active_project_card.dart';
 import 'widgets/sponsor_draft_card.dart';
 import 'widgets/sponsor_metric_card.dart';
@@ -12,82 +14,19 @@ class SponsorDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.screenHorizontal,
+        vertical: AppDimens.screenVertical,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome back",
-                    style: GoogleFonts.outfit(
-                      fontSize: 13.sp,
-                      color: AppColors.grey,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    "Shawn Blake",
-                    style: GoogleFonts.outfit(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Stack(
-                    children: [
-                      Container(
-                        width: 44.r,
-                        height: 44.r,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF132B47),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.08),
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.notifications_none_rounded,
-                          color: Colors.white,
-                          size: 22.r,
-                        ),
-                      ),
-                      Positioned(
-                        top: 10.h,
-                        right: 12.w,
-                        child: Container(
-                          width: 8.r,
-                          height: 8.r,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFF5252),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: 12.w),
-                  CircleAvatar(
-                    radius: 22.r,
-                    backgroundImage: const NetworkImage(
-                      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 20.h),
+          _buildGreetingRow(tc),
+          SizedBox(height: AppDimens.spaceXl),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
@@ -108,29 +47,9 @@ class SponsorDashboard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 28.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Active Projects",
-                style: GoogleFonts.outfit(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                "View All",
-                style: GoogleFonts.outfit(
-                  fontSize: 13.sp,
-                  color: const Color(0xFFFF5252),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 14.h),
+          SizedBox(height: AppDimens.spaceXxl),
+          _buildSectionHeader(tc, "Active Projects"),
+          SizedBox(height: AppDimens.paddingMd),
           const SponsorActiveProjectCard(
             title: "Downtown Tech Hub",
             description:
@@ -140,29 +59,9 @@ class SponsorDashboard extends StatelessWidget {
             goalAmount: "5.0M",
             progress: 0.24,
           ),
-          SizedBox(height: 28.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Recent Requests",
-                style: GoogleFonts.outfit(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                "View All",
-                style: GoogleFonts.outfit(
-                  fontSize: 13.sp,
-                  color: const Color(0xFFFF5252),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 14.h),
+          SizedBox(height: AppDimens.spaceXxl),
+          _buildSectionHeader(tc, "Recent Requests"),
+          SizedBox(height: AppDimens.paddingMd),
           SponsorRequestCard(
             name: "Venture Partners LLC",
             subtitle: "Requested NDA access for Downtown Tech Hub",
@@ -177,16 +76,16 @@ class SponsorDashboard extends StatelessWidget {
                 "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
             onReview: () {},
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: AppDimens.spaceXl),
           Text(
             "Drafts",
             style: GoogleFonts.outfit(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: tc.textPrimary,
             ),
           ),
-          SizedBox(height: 14.h),
+          SizedBox(height: AppDimens.paddingMd),
           const SponsorDraftCard(
             title: "Urban Logistics Hub",
             lastEdited: "Last edited 2 days ago",
@@ -194,6 +93,100 @@ class SponsorDashboard extends StatelessWidget {
           SizedBox(height: 80.h),
         ],
       ),
+    );
+  }
+
+  Widget _buildGreetingRow(AppThemeColors tc) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Welcome back",
+              style: GoogleFonts.outfit(
+                fontSize: 13.sp,
+                color: tc.textTertiary,
+              ),
+            ),
+            SizedBox(height: AppDimens.spaceXxs),
+            Text(
+              "Shawn Blake",
+              style: GoogleFonts.outfit(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.bold,
+                color: tc.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: tc.buttonSecondary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: tc.borderColor),
+                  ),
+                  child: Icon(
+                    Icons.notifications_none_rounded,
+                    color: tc.textPrimary,
+                    size: AppDimens.iconLg,
+                  ),
+                ),
+                Positioned(
+                  top: 10.h,
+                  right: 12.w,
+                  child: Container(
+                    width: 8.r,
+                    height: 8.r,
+                    decoration: const BoxDecoration(
+                      color: AppColors.accentRed,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(width: AppDimens.spaceMd),
+            CircleAvatar(
+              radius: AppDimens.avatarSm,
+              backgroundImage: const NetworkImage(
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(AppThemeColors tc, String title) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.outfit(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: tc.textPrimary,
+          ),
+        ),
+        Text(
+          "View All",
+          style: GoogleFonts.outfit(
+            fontSize: 13.sp,
+            color: AppColors.accentRed,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class CustomNavItemData {
   final String label;
@@ -24,25 +26,30 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      margin: EdgeInsets.symmetric(
+        horizontal: AppDimens.navBarMarginH,
+        vertical: AppDimens.navBarMarginV,
+      ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(36.r),
+        borderRadius: BorderRadius.circular(AppDimens.radiusPill),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
           child: Container(
-            height: 72.h,
+            height: AppDimens.navBarHeight,
             padding: EdgeInsets.symmetric(horizontal: 6.w),
             decoration: BoxDecoration(
-              color: const Color(0xFF071424).withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(36.r),
+              color: tc.navBg,
+              borderRadius: BorderRadius.circular(AppDimens.radiusPill),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.12),
-                width: 1.w,
+                color: tc.navBorder,
+                width: AppDimens.borderThin,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.35),
+                  color: tc.shadowColor,
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -62,7 +69,6 @@ class CustomBottomNavBar extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Selected item pops up with translate
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             transform: Matrix4.translationValues(
@@ -71,25 +77,24 @@ class CustomBottomNavBar extends StatelessWidget {
                               0,
                             ),
                             padding: EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                              vertical: 8.h,
+                              horizontal: AppDimens.paddingLg,
+                              vertical: AppDimens.paddingSm,
                             ),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? const Color(0xFF0F325A)
+                                  ? tc.navSelectedPill
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20.r),
+                              borderRadius:
+                                  BorderRadius.circular(AppDimens.radiusLg),
                             ),
                             child: Icon(
                               item.icon,
                               color: isSelected
-                                  ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.5),
-                              size: 22.r,
+                                  ? tc.navSelectedIcon
+                                  : tc.navIcon,
+                              size: AppDimens.iconLg,
                             ),
                           ),
-
-                          // Label only for selected
                           if (isSelected)
                             Transform.translate(
                               offset: Offset(0, -4.h),
@@ -97,7 +102,7 @@ class CustomBottomNavBar extends StatelessWidget {
                                 item.label,
                                 style: GoogleFonts.outfit(
                                   fontSize: 11.sp,
-                                  color: Colors.white,
+                                  color: tc.navSelectedText,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 maxLines: 1,

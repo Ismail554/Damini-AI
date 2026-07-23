@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class ProfileHeroCard extends StatelessWidget {
   final String name;
@@ -20,26 +23,28 @@ class ProfileHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(20.r),
+      padding: EdgeInsets.all(AppDimens.paddingLg),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F2238).withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(24.r),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-          width: 1.w,
-        ),
+        color: tc.cardHero,
+        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+        border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
       ),
       child: Column(
         children: [
-          // Avatar Image with Green Verified Dot Badge
+          // Avatar with Verified Badge
           Stack(
             children: [
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2.w),
+                  border: Border.all(
+                    color: tc.textPrimary,
+                    width: AppDimens.borderMedium,
+                  ),
                 ),
                 child: CircleAvatar(
                   radius: 40.r,
@@ -52,7 +57,7 @@ class ProfileHeroCard extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(3.r),
                   decoration: const BoxDecoration(
-                    color: Color(0xFF10B981),
+                    color: AppColors.successGreen,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -64,26 +69,26 @@ class ProfileHeroCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppDimens.spaceMd),
 
-          // User Name & Subtitle
+          // Name & Title
           Text(
             name,
             style: GoogleFonts.outfit(
               fontSize: 20.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: tc.textPrimary,
             ),
           ),
-          SizedBox(height: 2.h),
+          SizedBox(height: AppDimens.spaceXxs),
           Text(
             title,
             style: GoogleFonts.outfit(
               fontSize: 13.sp,
-              color: Colors.white.withValues(alpha: 0.6),
+              color: tc.textTertiary,
             ),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppDimens.spaceMd),
 
           // Pill Badges Row
           Row(
@@ -92,14 +97,14 @@ class ProfileHeroCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF122C4A),
-                  borderRadius: BorderRadius.circular(12.r),
+                  color: tc.pillBg,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
                 child: Text(
                   "Sponsor",
                   style: GoogleFonts.outfit(
                     fontSize: 11.sp,
-                    color: const Color(0xFF3892FF),
+                    color: tc.pillText,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -108,14 +113,14 @@ class ProfileHeroCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0D3326),
-                  borderRadius: BorderRadius.circular(12.r),
+                  color: tc.greenPillBg,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.verified_outlined,
-                      color: const Color(0xFF10B981),
+                      color: tc.greenPillText,
                       size: 12.r,
                     ),
                     SizedBox(width: 4.w),
@@ -123,7 +128,7 @@ class ProfileHeroCard extends StatelessWidget {
                       "Verified",
                       style: GoogleFonts.outfit(
                         fontSize: 11.sp,
-                        color: const Color(0xFF10B981),
+                        color: tc.greenPillText,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -138,7 +143,7 @@ class ProfileHeroCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: tc.textPrimary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(18.r),
             ),
             child: Row(
@@ -146,7 +151,7 @@ class ProfileHeroCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.auto_awesome_rounded,
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: tc.textSecondary,
                   size: 14.r,
                 ),
                 SizedBox(width: 6.w),
@@ -154,88 +159,71 @@ class ProfileHeroCard extends StatelessWidget {
                   "Free Member",
                   style: GoogleFonts.outfit(
                     fontSize: 13.sp,
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: tc.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: AppDimens.spaceXl),
 
           // Stats Boxes Row
           Row(
             children: [
               Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF071424),
-                    borderRadius: BorderRadius.circular(16.r),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.06),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        investedAmount,
-                        style: GoogleFonts.outfit(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        "INVESTED",
-                        style: GoogleFonts.outfit(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white.withValues(alpha: 0.6),
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: _buildStatBox(
+                  tc: tc,
+                  value: investedAmount,
+                  label: "INVESTED",
                 ),
               ),
-              SizedBox(width: 12.w),
+              SizedBox(width: AppDimens.spaceMd),
               Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF071424),
-                    borderRadius: BorderRadius.circular(16.r),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.06),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        projectsCount,
-                        style: GoogleFonts.outfit(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        "PROJECTS",
-                        style: GoogleFonts.outfit(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white.withValues(alpha: 0.6),
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: _buildStatBox(
+                  tc: tc,
+                  value: projectsCount,
+                  label: "PROJECTS",
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatBox({
+    required AppThemeColors tc,
+    required String value,
+    required String label,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 14.h),
+      decoration: BoxDecoration(
+        color: tc.cardInner,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        border: Border.all(color: tc.borderSubtle),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: GoogleFonts.outfit(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: tc.textPrimary,
+            ),
+          ),
+          SizedBox(height: AppDimens.spaceXxs),
+          Text(
+            label,
+            style: GoogleFonts.outfit(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.bold,
+              color: tc.textTertiary,
+              letterSpacing: 0.5,
+            ),
           ),
         ],
       ),

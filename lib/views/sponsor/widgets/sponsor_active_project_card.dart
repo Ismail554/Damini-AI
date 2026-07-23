@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class SponsorActiveProjectCard extends StatelessWidget {
   final String title;
@@ -23,15 +25,17 @@ class SponsorActiveProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C1B2C).withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(20.r),
+        color: tc.cardBg,
+        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-          width: 1.w,
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
         ),
       ),
       child: Column(
@@ -43,14 +47,14 @@ class SponsorActiveProjectCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF132B47),
-                  borderRadius: BorderRadius.circular(16.r),
+                  color: tc.pillBg,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                 ),
                 child: Text(
                   badgeText,
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
-                    color: AppColors.primaryColor,
+                    color: tc.pillText,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -58,41 +62,41 @@ class SponsorActiveProjectCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(10.r),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF132B47),
-                  borderRadius: BorderRadius.circular(12.r),
+                  color: tc.cardHeader,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
                 child: Icon(
                   Icons.trending_up_rounded,
-                  color: Colors.white,
-                  size: 20.r,
+                  color: tc.textPrimary,
+                  size: AppDimens.iconMd,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppDimens.spaceMd),
           Text(
             title,
             style: GoogleFonts.outfit(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: tc.textPrimary,
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: AppDimens.spaceSm),
           Text(
             description,
             style: GoogleFonts.outfit(
               fontSize: 13.sp,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: tc.textSecondary,
               height: 1.35,
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: AppDimens.spaceLg),
           Container(
-            padding: EdgeInsets.all(14.r),
+            padding: EdgeInsets.all(AppDimens.paddingMd),
             decoration: BoxDecoration(
-              color: const Color(0xFF091422),
-              borderRadius: BorderRadius.circular(14.r),
+              color: tc.cardInner,
+              borderRadius: BorderRadius.circular(AppDimens.paddingMd),
             ),
             child: Column(
               children: [
@@ -106,10 +110,10 @@ class SponsorActiveProjectCard extends StatelessWidget {
                           "Raised",
                           style: GoogleFonts.outfit(
                             fontSize: 11.sp,
-                            color: AppColors.grey,
+                            color: tc.textTertiary,
                           ),
                         ),
-                        SizedBox(height: 2.h),
+                        SizedBox(height: AppDimens.spaceXxs),
                         Text(
                           raisedAmount,
                           style: GoogleFonts.outfit(
@@ -127,15 +131,15 @@ class SponsorActiveProjectCard extends StatelessWidget {
                           "Goal",
                           style: GoogleFonts.outfit(
                             fontSize: 11.sp,
-                            color: AppColors.grey,
+                            color: tc.textTertiary,
                           ),
                         ),
-                        SizedBox(height: 2.h),
+                        SizedBox(height: AppDimens.spaceXxs),
                         Text(
                           goalAmount,
                           style: GoogleFonts.outfit(
                             fontSize: 14.sp,
-                            color: Colors.white,
+                            color: tc.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -149,7 +153,7 @@ class SponsorActiveProjectCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6.h,
-                    backgroundColor: const Color(0xFF162D4A),
+                    backgroundColor: tc.progressBg,
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       AppColors.primaryColor,
                     ),

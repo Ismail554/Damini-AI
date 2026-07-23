@@ -4,36 +4,48 @@ import '../utils/app_colors.dart';
 class CommonBackground extends StatelessWidget {
   final Widget child;
   final bool showGrid;
-  
+
   const CommonBackground({
-    super.key, 
+    super.key,
     required this.child,
     this.showGrid = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final gradientColors = isDark
+        ? const [
+            AppColors.darkBgStart,
+            AppColors.darkBgCenter,
+            AppColors.darkBgEnd,
+          ]
+        : const [
+            AppColors.lightBgStart,
+            AppColors.lightBgCenter,
+            AppColors.lightBgEnd,
+          ];
+
+    final scaffoldBg = isDark ? AppColors.darkBgStart : AppColors.lightBgStart;
+
     return Scaffold(
-      backgroundColor: AppColors.darkBgStart,
+      backgroundColor: scaffoldBg,
       body: Stack(
         children: [
-          // Gradient Background
+          // Dynamic Gradient Background
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFF050E17),
-                  Color(0xFF0A1F33),
-                  Color(0xFF040A10),
-                ],
+                colors: gradientColors,
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
           ),
-          
+
           // Ambient Neon Glow (Top Right)
           Positioned(
             top: -100,
@@ -45,7 +57,9 @@ class CommonBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryColor.withOpacity(0.15),
+                    color: AppColors.primaryColor.withValues(
+                      alpha: isDark ? 0.15 : 0.08,
+                    ),
                     blurRadius: 120,
                     spreadRadius: 40,
                   ),
@@ -65,7 +79,9 @@ class CommonBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentColor.withOpacity(0.08),
+                    color: AppColors.accentCyan.withValues(
+                      alpha: isDark ? 0.08 : 0.04,
+                    ),
                     blurRadius: 100,
                     spreadRadius: 30,
                   ),
@@ -80,11 +96,11 @@ class CommonBackground extends StatelessWidget {
               child: Opacity(
                 opacity: 0.05,
                 child: CustomPaint(
-                  painter: GridPainter(),
+                  painter: GridPainter(isDark: isDark),
                 ),
               ),
             ),
-            
+
           // Screen Content
           SafeArea(
             bottom: false,
@@ -97,21 +113,23 @@ class CommonBackground extends StatelessWidget {
 }
 
 class GridPainter extends CustomPainter {
+  final bool isDark;
+
+  GridPainter({required this.isDark});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF00C6FF)
+      ..color = isDark ? const Color(0xFF00C6FF) : const Color(0xFF006EDB)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
     const double spacing = 40.0;
-    
-    // Draw horizontal grid lines
+
     for (double y = 0; y < size.height; y += spacing) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
-    
-    // Draw vertical grid lines
+
     for (double x = 0; x < size.width; x += spacing) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }

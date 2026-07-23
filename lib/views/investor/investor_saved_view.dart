@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/utils/app_dimens.dart';
+import '../../core/utils/app_theme_colors.dart';
 import 'widgets/featured_opportunity_card.dart';
 
 class InvestorSavedView extends StatelessWidget {
@@ -9,9 +11,14 @@ class InvestorSavedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.screenHorizontal,
+        vertical: AppDimens.screenVertical,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -23,32 +30,32 @@ class InvestorSavedView extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: tc.textPrimary,
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(8.r),
+                padding: EdgeInsets.all(AppDimens.paddingSm),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF132B47),
+                  color: tc.buttonSecondary,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.bookmark_outlined,
-                  color: const Color(0xFFFF5252),
-                  size: 20.r,
+                  color: AppColors.accentRed,
+                  size: AppDimens.iconMd,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: AppDimens.spaceSm),
           Text(
             "Your bookmarked opportunities & projects.",
             style: GoogleFonts.outfit(
               fontSize: 13.sp,
-              color: AppColors.grey,
+              color: tc.textTertiary,
             ),
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: AppDimens.spaceXl),
 
           // Saved items grid/list
           const FeaturedOpportunityCard(
@@ -60,7 +67,7 @@ class InvestorSavedView extends StatelessWidget {
             targetRaise: "\$5.0M",
             targetRoi: "~ 18%",
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: AppDimens.spaceLg),
           const FeaturedOpportunityCard(
             title: "AI Logistics Network",
             location: "United Kingdom",

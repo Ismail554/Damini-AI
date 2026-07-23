@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class SponsorDraftCard extends StatelessWidget {
   final String title;
@@ -17,17 +18,19 @@ class SponsorDraftCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(14.r),
+        padding: EdgeInsets.all(AppDimens.paddingMd),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C1B2C).withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(16.r),
+          color: tc.cardBg,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.08),
-            width: 1.w,
+            color: tc.borderColor,
+            width: AppDimens.borderThin,
           ),
         ),
         child: Row(
@@ -35,16 +38,16 @@ class SponsorDraftCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(10.r),
               decoration: BoxDecoration(
-                color: const Color(0xFF162B42),
-                borderRadius: BorderRadius.circular(12.r),
+                color: tc.cardHeader,
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
               ),
               child: Icon(
                 Icons.access_time_rounded,
-                color: Colors.white,
-                size: 20.r,
+                color: tc.textPrimary,
+                size: AppDimens.iconMd,
               ),
             ),
-            SizedBox(width: 14.w),
+            SizedBox(width: AppDimens.paddingMd),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,15 +57,15 @@ class SponsorDraftCard extends StatelessWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: tc.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 2.h),
+                  SizedBox(height: AppDimens.spaceXxs),
                   Text(
                     lastEdited,
                     style: GoogleFonts.outfit(
                       fontSize: 12.sp,
-                      color: AppColors.grey,
+                      color: tc.textTertiary,
                     ),
                   ),
                 ],

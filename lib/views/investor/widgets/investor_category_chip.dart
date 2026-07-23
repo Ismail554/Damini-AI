@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class InvestorCategoryChip extends StatelessWidget {
   final String label;
@@ -18,19 +21,23 @@ class InvestorCategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 100.w,
         height: 80.h,
         margin: EdgeInsets.only(right: 10.w),
-        padding: EdgeInsets.all(12.r),
+        padding: EdgeInsets.all(AppDimens.paddingSm + 4),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF006EDB) : const Color(0xFF0D1D30),
-          borderRadius: BorderRadius.circular(16.r),
+          color: isSelected ? AppColors.primaryColor : tc.cardBg,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
           border: Border.all(
-            color: Colors.white.withValues(alpha: isSelected ? 0.2 : 0.08),
-            width: 1.w,
+            color: isSelected
+                ? AppColors.primaryColor.withValues(alpha: 0.4)
+                : tc.borderColor,
+            width: AppDimens.borderThin,
           ),
         ),
         child: Column(
@@ -39,15 +46,15 @@ class InvestorCategoryChip extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: Colors.white,
-              size: 24.r,
+              color: isSelected ? Colors.white : tc.textPrimary,
+              size: AppDimens.iconXl - 4,
             ),
             Text(
               label,
               style: GoogleFonts.outfit(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: isSelected ? Colors.white : tc.textPrimary,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

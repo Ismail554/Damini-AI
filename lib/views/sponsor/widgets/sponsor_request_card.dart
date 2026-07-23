@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class SponsorRequestCard extends StatelessWidget {
   final String name;
@@ -19,25 +20,27 @@ class SponsorRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(14.r),
+      margin: EdgeInsets.only(bottom: AppDimens.spaceMd),
+      padding: EdgeInsets.all(AppDimens.paddingMd),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C1B2C).withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(16.r),
+        color: tc.cardBg,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-          width: 1.w,
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
         ),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 22.r,
-            backgroundColor: const Color(0xFF1E2D3D),
+            radius: AppDimens.avatarSm,
+            backgroundColor: tc.chatAvatarBg,
             backgroundImage: NetworkImage(avatarUrl),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: AppDimens.spaceMd),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,17 +50,17 @@ class SponsorRequestCard extends StatelessWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: tc.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 2.h),
+                SizedBox(height: AppDimens.spaceXxs),
                 Text(
                   subtitle,
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
-                    color: AppColors.grey,
+                    color: tc.textTertiary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -65,16 +68,16 @@ class SponsorRequestCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: AppDimens.paddingSm),
           SizedBox(
-            height: 36.h,
+            height: AppDimens.buttonSm,
             child: ElevatedButton(
               onPressed: onReview,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF163456),
-                foregroundColor: Colors.white,
+                backgroundColor: tc.buttonSecondary,
+                foregroundColor: tc.buttonSecondaryText,
                 elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: AppDimens.paddingLg - 4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18.r),
                 ),

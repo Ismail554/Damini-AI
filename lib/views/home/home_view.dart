@@ -80,14 +80,12 @@ class _HomeViewState extends State<HomeView> {
         child: Stack(
           children: [
             // Body Content
-            Positioned.fill(
-              child: _buildBody(isSponsor),
-            ),
+            Positioned.fill(child: _buildBody(isSponsor)),
 
             // Floating Action Buttons (Right)
             Positioned(
               right: 20.w,
-              bottom: 80.h,
+              bottom: 100.h,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -101,7 +99,9 @@ class _HomeViewState extends State<HomeView> {
                         borderRadius: BorderRadius.circular(16.r),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFD34E27).withValues(alpha: 0.4),
+                            color: const Color(
+                              0xFFD34E27,
+                            ).withValues(alpha: 0.4),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -127,7 +127,9 @@ class _HomeViewState extends State<HomeView> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF006EDB).withValues(alpha: 0.4),
+                              color: const Color(
+                                0xFF006EDB,
+                              ).withValues(alpha: 0.4),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),

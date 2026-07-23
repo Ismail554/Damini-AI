@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class SponsorMetricCard extends StatelessWidget {
   final String label;
@@ -17,15 +18,17 @@ class SponsorMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Container(
       width: 110.w,
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F2035).withValues(alpha: 0.8),
+        color: tc.cardBg,
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-          width: 1.w,
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
         ),
       ),
       child: Column(
@@ -33,14 +36,14 @@ class SponsorMetricCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: Colors.white.withValues(alpha: 0.7), size: 16.r),
+              Icon(icon, color: tc.textTertiary, size: AppDimens.iconSm),
               SizedBox(width: 6.w),
               Expanded(
                 child: Text(
                   label,
                   style: GoogleFonts.outfit(
                     fontSize: 11.sp,
-                    color: AppColors.grey,
+                    color: tc.textTertiary,
                     fontWeight: FontWeight.w500,
                   ),
                   maxLines: 1,
@@ -49,12 +52,12 @@ class SponsorMetricCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppDimens.spaceMd),
           Text(
             value,
             style: GoogleFonts.outfit(
               fontSize: 20.sp,
-              color: Colors.white,
+              color: tc.textPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),

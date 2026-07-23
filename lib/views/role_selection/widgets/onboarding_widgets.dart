@@ -73,10 +73,10 @@ class OnboardingWidgets {
         hintStyle: GoogleFonts.outfit(color: AppColors.grey, fontSize: 14.sp),
         prefixIcon: Icon(icon, color: AppColors.grey, size: 20.r),
         filled: true,
-        fillColor: const Color(0xFF0F1E2E).withOpacity(0.6),
+        fillColor: const Color(0xFF0F1E2E).withValues(alpha: 0.6),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),

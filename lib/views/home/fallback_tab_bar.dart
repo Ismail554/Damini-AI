@@ -90,7 +90,7 @@ class _FallbackTabBarState extends State<FallbackTabBar> {
                         width: itemWidth - _capsuleMargin * 2,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            color: widget.tint.withOpacity(0.22),
+                            color: widget.tint.withValues(alpha: 0.22),
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),

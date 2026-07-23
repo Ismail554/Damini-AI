@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class FeaturedOpportunityCard extends StatelessWidget {
   final String title;
@@ -22,15 +25,17 @@ class FeaturedOpportunityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Container(
       width: 250.w,
-      margin: EdgeInsets.only(right: 14.w),
+      margin: EdgeInsets.only(right: AppDimens.paddingMd),
       decoration: BoxDecoration(
-        color: const Color(0xFF0A192D),
-        borderRadius: BorderRadius.circular(20.r),
+        color: tc.cardBg,
+        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-          width: 1.w,
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
         ),
       ),
       child: Column(
@@ -57,7 +62,7 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                   ),
                   child: Text(
                     category,
@@ -81,14 +86,14 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   child: Icon(
                     Icons.bookmark_border_rounded,
                     color: Colors.white,
-                    size: 16.r,
+                    size: AppDimens.iconSm,
                   ),
                 ),
               ),
             ],
           ),
           Padding(
-            padding: EdgeInsets.all(14.r),
+            padding: EdgeInsets.all(AppDimens.paddingMd),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -97,17 +102,17 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: tc.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 2.h),
+                SizedBox(height: AppDimens.spaceXxs),
                 Row(
                   children: [
                     Icon(
                       Icons.location_on_outlined,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: tc.textTertiary,
                       size: 12.r,
                     ),
                     SizedBox(width: 4.w),
@@ -115,7 +120,7 @@ class FeaturedOpportunityCard extends StatelessWidget {
                       location,
                       style: GoogleFonts.outfit(
                         fontSize: 11.sp,
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: tc.textTertiary,
                       ),
                     ),
                   ],
@@ -126,10 +131,8 @@ class FeaturedOpportunityCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: 0.45,
                     minHeight: 4.h,
-                    backgroundColor: const Color(0xFF1E334D),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFFFF5252),
-                    ),
+                    backgroundColor: tc.progressBg,
+                    valueColor: AlwaysStoppedAnimation<Color>(tc.progressFill),
                   ),
                 ),
                 SizedBox(height: 10.h),
@@ -143,14 +146,14 @@ class FeaturedOpportunityCard extends StatelessWidget {
                           "Target Raise",
                           style: GoogleFonts.outfit(
                             fontSize: 10.sp,
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: tc.textTertiary,
                           ),
                         ),
                         Text(
                           targetRaise,
                           style: GoogleFonts.outfit(
                             fontSize: 12.sp,
-                            color: Colors.white,
+                            color: tc.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -163,14 +166,14 @@ class FeaturedOpportunityCard extends StatelessWidget {
                           "Target ROI",
                           style: GoogleFonts.outfit(
                             fontSize: 10.sp,
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: tc.textTertiary,
                           ),
                         ),
                         Text(
                           targetRoi,
                           style: GoogleFonts.outfit(
                             fontSize: 12.sp,
-                            color: const Color(0xFFFF5252),
+                            color: AppColors.accentRed,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

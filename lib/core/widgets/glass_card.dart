@@ -28,9 +28,9 @@ class GlassCard extends StatelessWidget {
           padding: padding ?? EdgeInsets.all(20.r),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius.r),
-            color: Colors.white.withOpacity(backgroundOpacity),
+            color: Colors.white.withValues(alpha: backgroundOpacity),
             border: Border.all(
-              color: Colors.white.withOpacity(borderOpacity),
+              color: Colors.white.withValues(alpha: borderOpacity),
               width: 1.5.w,
             ),
           ),

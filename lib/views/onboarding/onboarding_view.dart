@@ -82,7 +82,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                               borderRadius: BorderRadius.circular(24.r),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.3),
+                                  color: Colors.black.withValues(alpha: 0.3),
                                   blurRadius: 15.r,
                                   offset: const Offset(0, 10),
                                 ),
@@ -109,7 +109,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.2),
+                                            color: Colors.black.withValues(alpha: 0.2),
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           ),
@@ -143,7 +143,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                           slide["desc"]!,
                           style: GoogleFonts.outfit(
                             fontSize: 14.sp,
-                            color: Colors.white.withOpacity(0.6),
+                            color: Colors.white.withValues(alpha: 0.6),
                             height: 1.5,
                           ),
                         ),
@@ -164,7 +164,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                     height: 6.h,
                     margin: EdgeInsets.symmetric(horizontal: 3.w),
                     decoration: BoxDecoration(
-                      color: _currentIndex == index ? AppColors.primaryColor : Colors.white.withOpacity(0.3),
+                      color: _currentIndex == index ? AppColors.primaryColor : Colors.white.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
@@ -226,7 +226,7 @@ class _OnboardingViewState extends State<OnboardingView> {
             child: Text(
               "Back",
               style: GoogleFonts.outfit(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -240,7 +240,7 @@ class _OnboardingViewState extends State<OnboardingView> {
             child: Text(
               "Skip",
               style: GoogleFonts.outfit(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
               ),

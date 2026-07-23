@@ -13,8 +13,12 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.lightBg,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primaryColor,
-        surface: AppColors.cardLight,
-        onSurface: AppColors.textLight,
+        secondary: Color(0xFF475569),
+        surface: Colors.white,
+        onSurface: Color(0xFF0F172A),
+        onPrimary: Colors.white,
+        error: AppColors.error,
+        outline: Color(0xFFE2E8F0),
       ),
       textTheme: GoogleFonts.outfitTextTheme(ThemeData.light().textTheme),
       appBarTheme: const AppBarTheme(
@@ -22,7 +26,29 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        foregroundColor: AppColors.textLight,
+        foregroundColor: Color(0xFF0F172A),
+      ),
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: Color(0xFFF1F5F9),
+        thickness: 1,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+        ),
       ),
     );
   }
@@ -35,8 +61,12 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.darkBg,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primaryColor,
-        surface: AppColors.secondaryColor,
-        onSurface: AppColors.textDark,
+        secondary: Color(0xFF6B8A9D),
+        surface: Color(0xFF0B1E32),
+        onSurface: Colors.white,
+        onPrimary: Colors.white,
+        error: AppColors.error,
+        outline: Color(0xFF1E334D),
       ),
       textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
       appBarTheme: const AppBarTheme(
@@ -44,7 +74,31 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        foregroundColor: AppColors.textDark,
+        foregroundColor: Colors.white,
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.darkCardBg,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.08),
+          ),
+        ),
+      ),
+      dividerTheme: DividerThemeData(
+        color: Colors.white.withValues(alpha: 0.06),
+        thickness: 1,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+        ),
       ),
     );
   }

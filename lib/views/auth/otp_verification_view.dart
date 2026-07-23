@@ -150,8 +150,8 @@ class _OtpVerificationViewState extends State<OtpVerificationView> {
         inputFormatters: [LengthLimitingTextInputFormatter(1), FilteringTextInputFormatter.digitsOnly],
         decoration: InputDecoration(
           filled: true,
-          fillColor: const Color(0xFF0F1E2E).withOpacity(0.6),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide(color: Colors.white.withOpacity(0.08))),
+          fillColor: const Color(0xFF0F1E2E).withValues(alpha: 0.6),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: const BorderSide(color: AppColors.primaryColor, width: 2.0)),
         ),
         onChanged: (val) {

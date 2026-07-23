@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/app_dimens.dart';
+import '../../../core/utils/app_theme_colors.dart';
 
 class AccountTypeSwitcherCard extends StatelessWidget {
   final String activeRole;
@@ -14,17 +17,18 @@ class AccountTypeSwitcherCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
     final isInvestor = activeRole == 'investor';
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(18.r),
+      padding: EdgeInsets.all(AppDimens.paddingLg),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F2238).withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(20.r),
+        color: tc.cardHero,
+        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
-          width: 1.w,
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
         ),
       ),
       child: Column(
@@ -34,15 +38,15 @@ class AccountTypeSwitcherCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(8.r),
+                padding: EdgeInsets.all(AppDimens.paddingSm),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF132B47),
-                  borderRadius: BorderRadius.circular(10.r),
+                  color: tc.cardHeader,
+                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
                 child: Icon(
                   Icons.sync_alt_rounded,
-                  color: Colors.white,
-                  size: 18.r,
+                  color: tc.textPrimary,
+                  size: AppDimens.iconSm + 2,
                 ),
               ),
               SizedBox(width: 10.w),
@@ -54,35 +58,37 @@ class AccountTypeSwitcherCard extends StatelessWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: tc.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 2.h),
+                  SizedBox(height: AppDimens.spaceXxs),
                   Text(
                     "Switch your active experience at any time",
                     style: GoogleFonts.outfit(
                       fontSize: 11.sp,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: tc.textTertiary,
                     ),
                   ),
                 ],
               ),
             ],
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: AppDimens.spaceLg),
 
           // Sponsor Card Option
           _buildRoleOption(
+            tc: tc,
             title: "Sponsor",
             subtitle: "Publish projects & raise capital",
             icon: Icons.business_center_outlined,
             isActive: !isInvestor,
             onTap: () => onSwitchRole('sponsor'),
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppDimens.spaceMd),
 
           // Investor Card Option
           _buildRoleOption(
+            tc: tc,
             title: "Investor",
             subtitle: "Discover & fund opportunities",
             icon: Icons.trending_up_rounded,
@@ -95,6 +101,7 @@ class AccountTypeSwitcherCard extends StatelessWidget {
   }
 
   Widget _buildRoleOption({
+    required AppThemeColors tc,
     required String title,
     required String subtitle,
     required IconData icon,
@@ -105,15 +112,15 @@ class AccountTypeSwitcherCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.all(14.r),
+        padding: EdgeInsets.all(AppDimens.paddingMd),
         decoration: BoxDecoration(
-          color: const Color(0xFF091626),
-          borderRadius: BorderRadius.circular(16.r),
+          color: tc.cardInner,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
           border: Border.all(
             color: isActive
-                ? const Color(0xFF10B981)
-                : Colors.white.withValues(alpha: 0.08),
-            width: isActive ? 1.5.w : 1.w,
+                ? AppColors.successGreen
+                : tc.borderColor,
+            width: isActive ? 1.5.w : AppDimens.borderThin,
           ),
         ),
         child: Row(
@@ -121,16 +128,16 @@ class AccountTypeSwitcherCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(10.r),
               decoration: BoxDecoration(
-                color: const Color(0xFF132B47),
-                borderRadius: BorderRadius.circular(12.r),
+                color: tc.cardHeader,
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
               ),
               child: Icon(
                 icon,
-                color: isActive ? const Color(0xFF10B981) : Colors.white,
-                size: 20.r,
+                color: isActive ? AppColors.successGreen : tc.textPrimary,
+                size: AppDimens.iconMd,
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: AppDimens.spaceMd),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,35 +147,35 @@ class AccountTypeSwitcherCard extends StatelessWidget {
                     style: GoogleFonts.outfit(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: tc.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 2.h),
+                  SizedBox(height: AppDimens.spaceXxs),
                   Text(
                     subtitle,
                     style: GoogleFonts.outfit(
                       fontSize: 11.sp,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: tc.textTertiary,
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 8.w),
+            SizedBox(width: AppDimens.paddingSm),
             if (isActive)
               Row(
                 children: [
                   Icon(
                     Icons.check_rounded,
-                    color: const Color(0xFF10B981),
-                    size: 16.r,
+                    color: AppColors.successGreen,
+                    size: AppDimens.iconSm,
                   ),
                   SizedBox(width: 4.w),
                   Text(
                     "Active",
                     style: GoogleFonts.outfit(
                       fontSize: 12.sp,
-                      color: const Color(0xFF10B981),
+                      color: AppColors.successGreen,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -179,7 +186,7 @@ class AccountTypeSwitcherCard extends StatelessWidget {
                 "Switch",
                 style: GoogleFonts.outfit(
                   fontSize: 12.sp,
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: tc.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
