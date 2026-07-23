@@ -7,6 +7,7 @@ import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
+import '../../shared/global_key.dart';
 import 'widgets/labeled_text_field.dart';
 import 'widgets/social_auth_section.dart';
 
@@ -39,8 +40,13 @@ class _LoginViewState extends State<LoginView> {
     try {
       await auth.login(_emailCtrl.text.trim(), _passwordCtrl.text);
       if (mounted && auth.isAuthenticated) {
-        final nextRoute = auth.userRole == null ? '/role-selection' : '/home';
-        context.go(nextRoute);
+        if (auth.userRole == GlobalKeys.investorRole) {
+          context.go('/role-onboarding', extra: {'role': GlobalKeys.investorRole});
+        } else if (auth.userRole == GlobalKeys.sponsorRole) {
+          context.go('/role-onboarding', extra: {'role': GlobalKeys.sponsorRole});
+        } else {
+          context.go('/role-selection');
+        }
       }
     } catch (e) {
       if (mounted) {
