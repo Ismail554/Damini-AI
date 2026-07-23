@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/app_colors.dart';
 
@@ -27,6 +28,11 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         foregroundColor: Color(0xFF0F172A),
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
       ),
       cardTheme: CardThemeData(
         color: Colors.white,
@@ -69,12 +75,17 @@ class AppTheme {
         outline: Color(0xFF1E334D),
       ),
       textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         foregroundColor: Colors.white,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.darkCardBg,

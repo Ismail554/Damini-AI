@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_dimens.dart';
@@ -48,7 +49,7 @@ class SponsorDashboard extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppDimens.spaceXxl),
-          _buildSectionHeader(tc, "Active Projects"),
+          _buildSectionHeader(context, tc, "Active Projects"),
           SizedBox(height: AppDimens.paddingMd),
           const SponsorActiveProjectCard(
             title: "Downtown Tech Hub",
@@ -60,21 +61,26 @@ class SponsorDashboard extends StatelessWidget {
             progress: 0.24,
           ),
           SizedBox(height: AppDimens.spaceXxl),
-          _buildSectionHeader(tc, "Recent Requests"),
+          _buildSectionHeader(
+            context,
+            tc,
+            "Recent Requests",
+            onTapViewAll: () => context.push('/collaboration-requests'),
+          ),
           SizedBox(height: AppDimens.paddingMd),
           SponsorRequestCard(
             name: "Venture Partners LLC",
             subtitle: "Requested NDA access for Downtown Tech Hub",
             avatarUrl:
                 "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
-            onReview: () {},
+            onReview: () => context.push('/collaboration-requests'),
           ),
           SponsorRequestCard(
             name: "Sarah Jenkins",
             subtitle: "Interested in the EcoTech Solar Farm",
             avatarUrl:
                 "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-            onReview: () {},
+            onReview: () => context.push('/collaboration-requests'),
           ),
           SizedBox(height: AppDimens.spaceXl),
           Text(
@@ -166,7 +172,12 @@ class SponsorDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(AppThemeColors tc, String title) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    AppThemeColors tc,
+    String title, {
+    VoidCallback? onTapViewAll,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -178,12 +189,15 @@ class SponsorDashboard extends StatelessWidget {
             color: tc.textPrimary,
           ),
         ),
-        Text(
-          "View All",
-          style: GoogleFonts.outfit(
-            fontSize: 13.sp,
-            color: AppColors.accentRed,
-            fontWeight: FontWeight.w600,
+        GestureDetector(
+          onTap: onTapViewAll,
+          child: Text(
+            "View All",
+            style: GoogleFonts.outfit(
+              fontSize: 13.sp,
+              color: AppColors.accentRed,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

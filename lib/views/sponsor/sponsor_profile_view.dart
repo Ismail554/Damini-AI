@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
+import '../../core/utils/app_dimens.dart';
+import '../../core/utils/app_theme_colors.dart';
 import '../profile/widgets/account_type_switcher_card.dart';
 import '../profile/widgets/profile_hero_card.dart';
 import '../profile/widgets/profile_menu_card.dart';
@@ -13,12 +15,16 @@ class SponsorProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
     final auth = context.watch<AuthProvider>();
     final currentRole = auth.userRole ?? 'sponsor';
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.screenHorizontal,
+        vertical: AppDimens.screenVertical,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -30,20 +36,20 @@ class SponsorProfileView extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: tc.textPrimary,
                 ),
               ),
               IconButton(
                 icon: Icon(
                   Icons.settings_outlined,
-                  color: Colors.white,
-                  size: 22.r,
+                  color: tc.textPrimary,
+                  size: AppDimens.iconLg,
                 ),
                 onPressed: () {},
               ),
             ],
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: AppDimens.spaceLg),
 
           const ProfileHeroCard(
             name: "Shawn Blake",
@@ -53,7 +59,7 @@ class SponsorProfileView extends StatelessWidget {
             investedAmount: "\$1.2M",
             projectsCount: "2",
           ),
-          SizedBox(height: 18.h),
+          SizedBox(height: AppDimens.spaceLg),
 
           AccountTypeSwitcherCard(
             activeRole: currentRole,
@@ -61,10 +67,10 @@ class SponsorProfileView extends StatelessWidget {
               await context.read<AuthProvider>().setRole(newRole);
             },
           ),
-          SizedBox(height: 18.h),
+          SizedBox(height: AppDimens.spaceLg),
 
           const ProfileMenuCard(),
-          SizedBox(height: 24.h),
+          SizedBox(height: AppDimens.spaceXl),
 
           GestureDetector(
             onTap: () async {
@@ -76,13 +82,13 @@ class SponsorProfileView extends StatelessWidget {
             },
             child: Container(
               width: double.infinity,
-              height: 52.h,
+              height: AppDimens.buttonLg,
               decoration: BoxDecoration(
-                color: const Color(0xFF2E1220),
-                borderRadius: BorderRadius.circular(26.r),
+                color: tc.logoutBg,
+                borderRadius: BorderRadius.circular(AppDimens.radiusPill),
                 border: Border.all(
-                  color: const Color(0xFFFF5252).withValues(alpha: 0.3),
-                  width: 1.w,
+                  color: tc.logoutText.withValues(alpha: 0.3),
+                  width: AppDimens.borderThin,
                 ),
               ),
               child: Row(
@@ -90,16 +96,16 @@ class SponsorProfileView extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.logout_rounded,
-                    color: const Color(0xFFFF5252),
-                    size: 20.r,
+                    color: tc.logoutText,
+                    size: AppDimens.iconMd,
                   ),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: AppDimens.spaceSm),
                   Text(
                     "Log Out",
                     style: GoogleFonts.outfit(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFF5252),
+                      color: tc.logoutText,
                     ),
                   ),
                 ],
