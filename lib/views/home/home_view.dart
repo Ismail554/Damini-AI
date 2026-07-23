@@ -4,10 +4,15 @@ import 'package:provider/provider.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
-import '../profile/investor_profile_view.dart';
-import 'widgets/custom_bottom_nav_bar.dart';
+import '../investor/investor_chat_view.dart';
 import '../investor/investor_dashboard.dart';
+import '../investor/investor_saved_view.dart';
+import '../profile/investor_profile_view.dart';
+import '../sponsor/sponsor_chat_view.dart';
 import '../sponsor/sponsor_dashboard.dart';
+import '../sponsor/sponsor_profile_view.dart';
+import '../sponsor/sponsor_saved_view.dart';
+import 'widgets/custom_bottom_nav_bar.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -21,25 +26,46 @@ class _HomeViewState extends State<HomeView> {
 
   static const _sponsorNavItems = [
     CustomNavItemData(label: "Dashboard", icon: Icons.home_rounded),
-    CustomNavItemData(label: "Search", icon: Icons.search_rounded),
-    CustomNavItemData(label: "Favorites", icon: Icons.favorite_border_rounded),
+    CustomNavItemData(label: "Saved", icon: Icons.favorite_border_rounded),
     CustomNavItemData(label: "Chat", icon: Icons.chat_bubble_outline_rounded),
-    CustomNavItemData(label: "Profile", icon: Icons.person_outline_rounded),
+    CustomNavItemData(label: "Person", icon: Icons.person_outline_rounded),
   ];
 
   static const _investorNavItems = [
     CustomNavItemData(label: "Explore", icon: Icons.home_rounded),
-    CustomNavItemData(label: "Analytics", icon: Icons.pie_chart_outline_rounded),
+    CustomNavItemData(label: "Saved", icon: Icons.favorite_border_rounded),
     CustomNavItemData(label: "Chat", icon: Icons.chat_bubble_outline_rounded),
-    CustomNavItemData(label: "Profile", icon: Icons.person_outline_rounded),
+    CustomNavItemData(label: "Person", icon: Icons.person_outline_rounded),
   ];
 
   Widget _buildBody(bool isSponsor) {
-    final isProfileTab = isSponsor ? _currentIndex == 4 : _currentIndex == 3;
-    if (isProfileTab) {
-      return const InvestorProfileView();
+    if (isSponsor) {
+      switch (_currentIndex) {
+        case 0:
+          return const SponsorDashboard();
+        case 1:
+          return const SponsorSavedView();
+        case 2:
+          return const SponsorChatView();
+        case 3:
+          return const SponsorProfileView();
+        default:
+          return const SponsorDashboard();
+      }
+    } else {
+      switch (_currentIndex) {
+        case 0:
+          return const InvestorDashboard();
+        case 1:
+          return const InvestorSavedView();
+        case 2:
+          return const InvestorChatView();
+        case 3:
+          return const InvestorProfileView();
+        default:
+          return const InvestorDashboard();
+      }
     }
-    return isSponsor ? const SponsorDashboard() : const InvestorDashboard();
   }
 
   @override

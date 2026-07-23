@@ -1,0 +1,114 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import '../../controllers/auth_provider.dart';
+import '../profile/widgets/account_type_switcher_card.dart';
+import '../profile/widgets/profile_hero_card.dart';
+import '../profile/widgets/profile_menu_card.dart';
+
+class SponsorProfileView extends StatelessWidget {
+  const SponsorProfileView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final currentRole = auth.userRole ?? 'sponsor';
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Sponsor Profile",
+                style: GoogleFonts.outfit(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: Colors.white,
+                  size: 22.r,
+                ),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+
+          const ProfileHeroCard(
+            name: "Shawn Blake",
+            title: "Managing Director at Austin Tech Capital",
+            avatarUrl:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
+            investedAmount: "\$1.2M",
+            projectsCount: "2",
+          ),
+          SizedBox(height: 18.h),
+
+          AccountTypeSwitcherCard(
+            activeRole: currentRole,
+            onSwitchRole: (newRole) async {
+              await context.read<AuthProvider>().setRole(newRole);
+            },
+          ),
+          SizedBox(height: 18.h),
+
+          const ProfileMenuCard(),
+          SizedBox(height: 24.h),
+
+          GestureDetector(
+            onTap: () async {
+              final authProvider = context.read<AuthProvider>();
+              await authProvider.logout();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              height: 52.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2E1220),
+                borderRadius: BorderRadius.circular(26.r),
+                border: Border.all(
+                  color: const Color(0xFFFF5252).withValues(alpha: 0.3),
+                  width: 1.w,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.logout_rounded,
+                    color: const Color(0xFFFF5252),
+                    size: 20.r,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    "Log Out",
+                    style: GoogleFonts.outfit(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFF5252),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 90.h),
+        ],
+      ),
+    );
+  }
+}
