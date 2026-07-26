@@ -49,7 +49,12 @@ class SponsorDashboard extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppDimens.spaceXxl),
-          _buildSectionHeader(context, tc, "Active Projects"),
+          _buildSectionHeader(
+            context,
+            tc,
+            "Active Projects",
+            onTapViewAll: () => context.push('/sponsor-projects'),
+          ),
           SizedBox(height: AppDimens.paddingMd),
           const SponsorActiveProjectCard(
             title: "Downtown Tech Hub",

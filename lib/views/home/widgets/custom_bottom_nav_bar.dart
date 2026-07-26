@@ -84,8 +84,9 @@ class CustomBottomNavBar extends StatelessWidget {
                               color: isSelected
                                   ? tc.navSelectedPill
                                   : Colors.transparent,
-                              borderRadius:
-                                  BorderRadius.circular(AppDimens.radiusLg),
+                              borderRadius: BorderRadius.circular(
+                                AppDimens.radiusLg,
+                              ),
                             ),
                             child: Icon(
                               item.icon,
@@ -95,20 +96,20 @@ class CustomBottomNavBar extends StatelessWidget {
                               size: AppDimens.iconLg,
                             ),
                           ),
-                          if (isSelected)
-                            Transform.translate(
-                              offset: Offset(0, -4.h),
-                              child: Text(
-                                item.label,
-                                style: GoogleFonts.outfit(
-                                  fontSize: 11.sp,
-                                  color: tc.navSelectedText,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                          // if (isSelected)
+                          Transform.translate(
+                            offset: Offset(0, -4.h),
+                            child: Text(
+                              item.label,
+                              style: GoogleFonts.outfit(
+                                fontSize: 10.sp,
+                                color: tc.navSelectedText,
+                                fontWeight: FontWeight.bold,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
+                          ),
                         ],
                       ),
                     ),
