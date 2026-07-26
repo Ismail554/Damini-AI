@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -58,6 +59,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final colors = AppThemeColors.of(context);
 
     return CommonBackground(
       showGrid: false,
@@ -76,7 +78,7 @@ class _LoginViewState extends State<LoginView> {
                   style: GoogleFonts.outfit(
                     fontSize: 28.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: colors.textPrimary,
                   ),
                 ),
                 SizedBox(height: 8.h),
@@ -143,9 +145,7 @@ class _LoginViewState extends State<LoginView> {
                             onChanged: (val) =>
                                 setState(() => _rememberMe = val ?? false),
                             activeColor: AppColors.primaryColor,
-                            side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.3),
-                            ),
+                            side: BorderSide(color: colors.textPrimary),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4.r),
                             ),
@@ -156,7 +156,7 @@ class _LoginViewState extends State<LoginView> {
                           "Remember me",
                           style: GoogleFonts.outfit(
                             fontSize: 13.sp,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: colors.textPrimary,
                           ),
                         ),
                       ],
@@ -217,7 +217,7 @@ class _LoginViewState extends State<LoginView> {
                       text: TextSpan(
                         style: GoogleFonts.outfit(
                           fontSize: 14.sp,
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: colors.textPrimary,
                         ),
                         children: const [
                           TextSpan(text: "Don't have an account? "),

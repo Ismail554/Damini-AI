@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,10 +10,7 @@ import '../../../../core/utils/app_theme_colors.dart';
 class PublicViewImageHeader extends StatefulWidget {
   final List<String>? imageUrls;
 
-  const PublicViewImageHeader({
-    super.key,
-    this.imageUrls,
-  });
+  const PublicViewImageHeader({super.key, this.imageUrls});
 
   @override
   State<PublicViewImageHeader> createState() => _PublicViewImageHeaderState();
@@ -34,83 +32,115 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
     final totalCount = list.length;
     final displayIndex = (_currentIndex < totalCount) ? _currentIndex + 1 : 1;
 
-    return Stack(
-      children: [
-        // Image Carousel Header Banner
-        SizedBox(
-          height: 240.h,
-          width: double.infinity,
-          child: PageView.builder(
-            itemCount: totalCount,
-            onPageChanged: (index) {
-              setState(() => _currentIndex = index);
-            },
-            itemBuilder: (context, index) {
-              final url = list[index];
-              return Image.network(
-                url,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: tc.cardInner,
-                    child: Center(
-                      child: Icon(
-                        Icons.image_not_supported_outlined,
-                        color: tc.textTertiary,
-                        size: 32.r,
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Stack(
+        children: [
+          // Image Carousel Header Banner
+          SizedBox(
+            height: double.infinity,
+            width: double.infinity,
+            child: PageView.builder(
+              itemCount: totalCount,
+              onPageChanged: (index) {
+                setState(() => _currentIndex = index);
+              },
+              itemBuilder: (context, index) {
+                final url = list[index];
+                return Image.network(
+                  url,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: tc.cardInner,
+                      child: Center(
+                        child: Icon(
+                          Icons.image_not_supported_outlined,
+                          color: tc.textTertiary,
+                          size: 32.r,
+                        ),
                       ),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ),
-
-        // Floating Back Button (Top Left)
-        Positioned(
-          top: 12.h,
-          left: AppDimens.screenHorizontal,
-          child: _buildGlassIconButton(
-            tc: tc,
-            icon: Icons.arrow_back_rounded,
-            onTap: () => context.pop(),
-          ),
-        ),
-
-        // Floating Save / Bookmark Button (Top Right)
-        Positioned(
-          top: 12.h,
-          right: AppDimens.screenHorizontal,
-          child: _buildGlassIconButton(
-            tc: tc,
-            icon: Icons.bookmark_border_rounded,
-            onTap: () {},
-          ),
-        ),
-
-        // Image Index Badge (Bottom Right)
-        Positioned(
-          bottom: 16.h,
-          right: AppDimens.screenHorizontal,
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+                    );
+                  },
+                );
+              },
             ),
-            child: Text(
-              "$displayIndex / $totalCount",
-              style: GoogleFonts.outfit(
-                fontSize: 11.sp,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+          ),
+
+          // Top gradient scrim for clear status bar icon visibility
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: topPadding + 44.h,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.60),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+
+          // Floating Back Button (Top Left)
+          Positioned(
+            top: topPadding + 12.h,
+            left: AppDimens.screenHorizontal,
+            child: _buildGlassIconButton(
+              tc: tc,
+              icon: Icons.arrow_back_rounded,
+              onTap: () => context.pop(),
+            ),
+          ),
+
+          // Floating Save / Bookmark Button (Top Right)
+          Positioned(
+            top: topPadding + 12.h,
+            right: AppDimens.screenHorizontal,
+            child: _buildGlassIconButton(
+              tc: tc,
+              icon: Icons.bookmark_border_rounded,
+              onTap: () {},
+            ),
+          ),
+
+          // Image Index Badge (Bottom Right edge above sheet)
+          Positioned(
+            bottom: 24.h,
+            right: AppDimens.screenHorizontal,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Text(
+                "$displayIndex / $totalCount",
+                style: GoogleFonts.outfit(
+                  fontSize: 11.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -136,11 +166,7 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
                 width: AppDimens.borderThin,
               ),
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: AppDimens.iconSm + 2,
-            ),
+            child: Icon(icon, color: Colors.white, size: AppDimens.iconSm + 2),
           ),
         ),
       ),

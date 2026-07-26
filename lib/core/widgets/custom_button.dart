@@ -39,7 +39,8 @@ class CustomButton extends StatelessWidget {
     final effectiveHeight = height ?? AppDimens.buttonLg;
     final effectiveRadius = borderRadius ?? AppDimens.radiusPill;
 
-    if (variant == CustomButtonVariant.gradient || variant == CustomButtonVariant.primary) {
+    if (variant == CustomButtonVariant.gradient ||
+        variant == CustomButtonVariant.primary) {
       return SizedBox(
         width: width ?? double.infinity,
         height: effectiveHeight,
@@ -54,7 +55,9 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(effectiveRadius),
             boxShadow: [
               BoxShadow(
-                color: (backgroundColor ?? AppColors.primaryColor).withValues(alpha: 0.35),
+                color: (backgroundColor ?? AppColors.primaryColor).withValues(
+                  alpha: 0.35,
+                ),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -63,6 +66,7 @@ class CustomButton extends StatelessWidget {
           child: ElevatedButton(
             onPressed: isLoading ? null : onPressed,
             style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
@@ -75,11 +79,21 @@ class CustomButton extends StatelessWidget {
       );
     }
 
-    if (variant == CustomButtonVariant.outlined || variant == CustomButtonVariant.destructive) {
+    if (variant == CustomButtonVariant.outlined ||
+        variant == CustomButtonVariant.destructive) {
       final isDestructive = variant == CustomButtonVariant.destructive;
-      final borderC = borderColor ?? (isDestructive ? AppColors.accentRed.withValues(alpha: 0.4) : const Color(0xFF1E334D));
-      final textC = textColor ?? (isDestructive ? AppColors.accentRed : Colors.white);
-      final bgC = backgroundColor ?? (isDestructive ? AppColors.accentRed.withValues(alpha: 0.1) : Colors.transparent);
+      final borderC =
+          borderColor ??
+          (isDestructive
+              ? AppColors.accentRed.withValues(alpha: 0.4)
+              : const Color(0xFF1E334D));
+      final textC =
+          textColor ?? (isDestructive ? AppColors.accentRed : Colors.white);
+      final bgC =
+          backgroundColor ??
+          (isDestructive
+              ? AppColors.accentRed.withValues(alpha: 0.1)
+              : Colors.transparent);
 
       return SizedBox(
         width: width ?? double.infinity,
@@ -87,6 +101,7 @@ class CustomButton extends StatelessWidget {
         child: OutlinedButton(
           onPressed: isLoading ? null : onPressed,
           style: OutlinedButton.styleFrom(
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
             backgroundColor: bgC,
             side: BorderSide(color: borderC, width: AppDimens.borderThin),
             shape: RoundedRectangleBorder(
@@ -105,6 +120,7 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 4.w),
           backgroundColor: backgroundColor ?? const Color(0xFF132B47),
           foregroundColor: textColor ?? Colors.white,
           elevation: 0,
@@ -140,9 +156,20 @@ class CustomButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color ?? textColor ?? Colors.white, size: AppDimens.iconSm),
+          Icon(
+            icon,
+            color: color ?? textColor ?? Colors.white,
+            size: AppDimens.iconSm,
+          ),
           SizedBox(width: 6.w),
-          Text(text, style: style),
+          Flexible(
+            child: Text(
+              text,
+              style: style,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       );
     }

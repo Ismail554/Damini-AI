@@ -1,6 +1,8 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
@@ -11,11 +13,7 @@ class DocumentsTabContent extends StatelessWidget {
   final ProjectPublicViewModel project;
   final VoidCallback? onSignNda;
 
-  const DocumentsTabContent({
-    super.key,
-    required this.project,
-    this.onSignNda,
-  });
+  const DocumentsTabContent({super.key, required this.project, this.onSignNda});
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +108,12 @@ class DocumentsTabContent extends StatelessWidget {
                       variant: CustomButtonVariant.gradient,
                       width: 220.w,
                       height: 48.h,
-                      onPressed: onSignNda ?? () {},
+                      onPressed:
+                          onSignNda ??
+                          () => context.push(
+                            '/nda',
+                            extra: {'disclosingParty': project.sponsorName},
+                          ),
                     ),
                   ],
                 ),

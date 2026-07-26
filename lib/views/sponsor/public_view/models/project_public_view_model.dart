@@ -31,6 +31,11 @@ class ProjectPublicViewModel {
   final List<TeamMemberModel> teamMembers;
   final String businessDescription;
   final bool isNdaSigned;
+  final String minContribution;
+  final String expectedRoi;
+  final String monthlyRevenue;
+  final String holdPeriod;
+  final String timelineToOperations;
 
   const ProjectPublicViewModel({
     required this.id,
@@ -51,6 +56,11 @@ class ProjectPublicViewModel {
     required this.teamMembers,
     required this.businessDescription,
     this.isNdaSigned = false,
+    this.minContribution = "\$50,000",
+    this.expectedRoi = "18%",
+    this.monthlyRevenue = "\$18,000",
+    this.holdPeriod = "36 months",
+    this.timelineToOperations = "6 months",
   });
 
   static ProjectPublicViewModel mockData() {
@@ -101,6 +111,11 @@ class ProjectPublicViewModel {
       businessDescription:
           "Detailed explanation of the business model, market opportunity, and use of funds. The Austin market has seen a 40% year-over-year increase in demand for premium tech-focused commercial real estate. Our model leverages pre-leasing agreements to secure cash flow prior to completion.",
       isNdaSigned: false,
+      minContribution: "\$50,000",
+      expectedRoi: "18%",
+      monthlyRevenue: "\$18,000",
+      holdPeriod: "36 months",
+      timelineToOperations: "6 months",
     );
   }
 }

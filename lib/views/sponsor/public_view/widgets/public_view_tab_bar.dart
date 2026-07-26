@@ -15,7 +15,7 @@ class PublicViewTabBar extends StatelessWidget {
     required this.onTabSelected,
   });
 
-  static const _tabs = ["Overview", "Details", "Documents"];
+  static const _tabs = ["Overview", "Details", "Documents", "Financials"];
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,6 +28,7 @@ class LabeledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -35,7 +37,7 @@ class LabeledTextField extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 14.sp,
             fontWeight: FontWeight.w500,
-            color: Colors.white,
+            color: colors.textPrimary,
           ),
         ),
         SizedBox(height: 6.h),
@@ -44,17 +46,25 @@ class LabeledTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: GoogleFonts.outfit(color: Colors.white, fontSize: 14.sp),
+          style: GoogleFonts.outfit(color: colors.textPrimary, fontSize: 14.sp),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.outfit(color: AppColors.grey, fontSize: 14.sp),
+            hintStyle: GoogleFonts.outfit(
+              color: colors.textSecondary,
+              fontSize: 14.sp,
+            ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: const Color(0xFF0F1E2E).withValues(alpha: 0.6),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            fillColor: colors.navBg,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 14.h,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24.r),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+              borderSide: BorderSide(
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24.r),

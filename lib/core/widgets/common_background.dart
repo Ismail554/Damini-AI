@@ -5,11 +5,15 @@ import '../utils/app_colors.dart';
 class CommonBackground extends StatelessWidget {
   final Widget child;
   final bool showGrid;
+  final bool topSafeArea;
+  final bool bottomSafeArea;
 
   const CommonBackground({
     super.key,
     required this.child,
     this.showGrid = false,
+    this.topSafeArea = true,
+    this.bottomSafeArea = false,
   });
 
   @override
@@ -118,7 +122,8 @@ class CommonBackground extends StatelessWidget {
 
             // Screen Content
             SafeArea(
-              bottom: false,
+              top: topSafeArea,
+              bottom: bottomSafeArea,
               child: child,
             ),
           ],

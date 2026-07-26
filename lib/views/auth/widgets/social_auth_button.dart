@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,17 +17,19 @@ class SocialAuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return SizedBox(
       width: double.infinity,
       height: 42.h,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 12.w),
           side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(26.r),
           ),
-          backgroundColor: Colors.white.withValues(alpha: 0.02),
+          backgroundColor: colors.navBg,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -35,7 +38,7 @@ class SocialAuthButton extends StatelessWidget {
               label,
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
-                color: Colors.white,
+                color: colors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
             ),

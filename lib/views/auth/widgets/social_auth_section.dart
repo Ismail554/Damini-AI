@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,7 @@ class SocialAuthSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
     return Column(
       children: [
         SocialAuthButton(
@@ -27,9 +29,7 @@ class SocialAuthSection extends StatelessWidget {
         SizedBox(height: 24.h),
         Row(
           children: [
-            Expanded(
-              child: Divider(color: Colors.white.withValues(alpha: 0.1)),
-            ),
+            Expanded(child: Divider(color: colors.greenPillBg)),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Text(
@@ -41,9 +41,7 @@ class SocialAuthSection extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
-              child: Divider(color: Colors.white.withValues(alpha: 0.1)),
-            ),
+            Expanded(child: Divider(color: colors.greenPillBg)),
           ],
         ),
       ],

@@ -178,10 +178,7 @@ class OverviewTabContent extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.outfit(
-                    fontSize: 10.sp,
-                    color: tc.textTertiary,
-                  ),
+                  style: GoogleFonts.outfit(fontSize: 10.sp, color: tc.textTertiary),
                 ),
                 SizedBox(height: 2.h),
                 Text(

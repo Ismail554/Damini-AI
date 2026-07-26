@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/utils/app_theme_colors.dart';
 import '../../core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
 
@@ -51,6 +52,8 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeColors.of(context);
+
     return CommonBackground(
       showGrid: false,
       child: SafeArea(
@@ -59,7 +62,7 @@ class _OnboardingViewState extends State<OnboardingView> {
           child: Column(
             children: [
               // Top Action Header (Back & Skip)
-              _buildHeader(),
+              _buildHeader(colors),
               
               // Carousel content
               Expanded(
@@ -82,7 +85,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                               borderRadius: BorderRadius.circular(24.r),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.3),
+                                  color: colors.shadowColor,
                                   blurRadius: 15.r,
                                   offset: const Offset(0, 10),
                                 ),
@@ -105,19 +108,19 @@ class _OnboardingViewState extends State<OnboardingView> {
                                       width: 60.r,
                                       height: 60.r,
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: colors.cardBg,
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.2),
+                                            color: colors.shadowColor,
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           ),
                                         ],
                                       ),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.play_arrow_rounded,
-                                        color: Color(0xFF0F1E2E),
+                                        color: colors.textPrimary,
                                         size: 40,
                                       ),
                                     ),
@@ -135,7 +138,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                           style: GoogleFonts.outfit(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: colors.textPrimary,
                           ),
                         ),
                         SizedBox(height: 12.h),
@@ -143,7 +146,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                           slide["desc"]!,
                           style: GoogleFonts.outfit(
                             fontSize: 14.sp,
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: colors.textSecondary,
                             height: 1.5,
                           ),
                         ),
@@ -164,7 +167,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                     height: 6.h,
                     margin: EdgeInsets.symmetric(horizontal: 3.w),
                     decoration: BoxDecoration(
-                      color: _currentIndex == index ? AppColors.primaryColor : Colors.white.withValues(alpha: 0.3),
+                      color: _currentIndex == index ? AppColors.primaryColor : colors.textSecondary.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(3.r),
                     ),
                   ),
@@ -211,7 +214,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppThemeColors colors) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -226,7 +229,7 @@ class _OnboardingViewState extends State<OnboardingView> {
             child: Text(
               "Back",
               style: GoogleFonts.outfit(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: colors.textSecondary,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -240,7 +243,7 @@ class _OnboardingViewState extends State<OnboardingView> {
             child: Text(
               "Skip",
               style: GoogleFonts.outfit(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: colors.textSecondary,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
               ),

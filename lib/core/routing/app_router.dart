@@ -13,6 +13,7 @@ import '../../views/home/home_view.dart';
 import '../../views/sponsor/project_details/sponsor_project_details_view.dart';
 import '../../views/sponsor/collaboration_requests/collaboration_requests_view.dart';
 import '../../views/sponsor/public_view/project_public_view.dart';
+import '../../views/sponsor/nda/nda_view.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -82,6 +83,15 @@ class AppRouter {
       GoRoute(
         path: '/public-view',
         builder: (context, state) => const ProjectPublicView(),
+      ),
+      GoRoute(
+        path: '/nda',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final disclosingParty =
+              extra['disclosingParty'] as String? ?? 'Acme Corp';
+          return NdaView(disclosingParty: disclosingParty);
+        },
       ),
     ],
   );
