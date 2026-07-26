@@ -10,14 +10,18 @@ class NdaSignatureSection extends StatelessWidget {
   final bool isAgreed;
   final ValueChanged<bool?> onAgreementChanged;
   final TextEditingController signatureController;
+  final String? uploadedFileName;
   final VoidCallback onUploadSignature;
+  final VoidCallback? onRemoveSignature;
 
   const NdaSignatureSection({
     super.key,
     required this.isAgreed,
     required this.onAgreementChanged,
     required this.signatureController,
+    this.uploadedFileName,
     required this.onUploadSignature,
+    this.onRemoveSignature,
   });
 
   @override
@@ -70,7 +74,7 @@ class NdaSignatureSection extends StatelessWidget {
         ),
         SizedBox(height: AppDimens.spaceLg),
 
-        // Upload Signature (Optional)
+        // Upload Signature Header
         Text(
           "Upload Signature ( Optional )",
           style: GoogleFonts.outfit(
@@ -80,55 +84,117 @@ class NdaSignatureSection extends StatelessWidget {
           ),
         ),
         SizedBox(height: AppDimens.spaceSm),
-        GestureDetector(
-          onTap: onUploadSignature,
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 20.h),
+
+        // Show uploaded file card or upload dropzone
+        if (uploadedFileName != null)
+          Container(
+            padding: EdgeInsets.all(AppDimens.paddingMd),
             decoration: BoxDecoration(
-              color: tc.cardBg.withValues(alpha: 0.5),
+              color: AppColors.successGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               border: Border.all(
-                color: tc.borderColor,
+                color: AppColors.successGreen.withValues(alpha: 0.4),
                 width: AppDimens.borderThin,
-                style: BorderStyle.solid,
               ),
             ),
-            child: Column(
+            child: Row(
               children: [
-                Container(
-                  padding: EdgeInsets.all(10.r),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.cloud_upload_outlined,
-                    color: AppColors.primaryColor,
-                    size: 24.r,
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.successGreen,
+                  size: 22.r,
+                ),
+                SizedBox(width: AppDimens.spaceMd),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        uploadedFileName!,
+                        style: GoogleFonts.outfit(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
+                          color: tc.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        "Signature image attached",
+                        style: GoogleFonts.outfit(
+                          fontSize: 11.sp,
+                          color: AppColors.successGreen,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 8.h),
-                Text(
-                  "Upload Your Signature",
-                  style: GoogleFonts.outfit(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.bold,
-                    color: tc.textPrimary,
+                if (onRemoveSignature != null)
+                  IconButton(
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: tc.textTertiary,
+                      size: 18.r,
+                    ),
+                    onPressed: onRemoveSignature,
                   ),
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  "PDF, JPG or PNG (Max 5MB)",
-                  style: GoogleFonts.outfit(
-                    fontSize: 11.sp,
-                    color: tc.textTertiary,
-                  ),
-                ),
               ],
             ),
+          )
+        else
+          Material(
+            color: tc.cardBg.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            child: InkWell(
+              onTap: onUploadSignature,
+              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                  border: Border.all(
+                    color: tc.borderColor,
+                    width: AppDimens.borderThin,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10.r),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.cloud_upload_outlined,
+                        color: AppColors.primaryColor,
+                        size: 24.r,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "Upload Your Signature",
+                      style: GoogleFonts.outfit(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: tc.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      "PDF, JPG or PNG (Max 5MB)",
+                      style: GoogleFonts.outfit(
+                        fontSize: 11.sp,
+                        color: tc.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
       ],
     );
   }

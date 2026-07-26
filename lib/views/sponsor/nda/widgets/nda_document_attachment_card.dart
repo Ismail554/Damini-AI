@@ -21,73 +21,76 @@ class NdaDocumentAttachmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
-    return Container(
-      padding: EdgeInsets.all(AppDimens.paddingMd),
-      decoration: BoxDecoration(
-        color: tc.cardBg,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(
-          color: AppColors.primaryColor.withValues(alpha: 0.25),
-          width: AppDimens.borderThin,
+    return GestureDetector(
+      onTap: onDownload,
+      child: Container(
+        padding: EdgeInsets.all(AppDimens.paddingMd),
+        decoration: BoxDecoration(
+          color: tc.cardBg,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+          border: Border.all(
+            color: AppColors.primaryColor.withValues(alpha: 0.25),
+            width: AppDimens.borderThin,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10.r),
-            decoration: BoxDecoration(
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10.r),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+              ),
+              child: Icon(
+                Icons.description_outlined,
+                color: AppColors.primaryColor,
+                size: 22.r,
+              ),
+            ),
+            SizedBox(width: AppDimens.spaceMd),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    fileName,
+                    style: GoogleFonts.outfit(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: tc.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    fileSize,
+                    style: GoogleFonts.outfit(
+                      fontSize: 11.sp,
+                      color: tc.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Material(
               color: AppColors.primaryColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-            ),
-            child: Icon(
-              Icons.description_outlined,
-              color: AppColors.primaryColor,
-              size: 22.r,
-            ),
-          ),
-          SizedBox(width: AppDimens.spaceMd),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  fileName,
-                  style: GoogleFonts.outfit(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: tc.textPrimary,
+              child: InkWell(
+                onTap: onDownload,
+                borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+                child: Padding(
+                  padding: EdgeInsets.all(8.r),
+                  child: Icon(
+                    Icons.file_download_outlined,
+                    color: AppColors.primaryColor,
+                    size: 18.r,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  fileSize,
-                  style: GoogleFonts.outfit(
-                    fontSize: 11.sp,
-                    color: tc.textTertiary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Material(
-            color: AppColors.primaryColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-            child: InkWell(
-              onTap: onDownload,
-              borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-              child: Padding(
-                padding: EdgeInsets.all(8.r),
-                child: Icon(
-                  Icons.file_download_outlined,
-                  color: AppColors.primaryColor,
-                  size: 18.r,
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
