@@ -8,6 +8,7 @@ import '../../../../core/utils/app_theme_colors.dart';
 import '../../../../core/widgets/common_background.dart';
 import 'models/collaboration_request_model.dart';
 import 'widgets/collaboration_card.dart';
+import 'widgets/collaboration_confirmation_card.dart';
 import 'widgets/collaboration_tab_bar.dart';
 
 class CollaborationRequestsView extends StatefulWidget {
@@ -27,6 +28,8 @@ class _CollaborationRequestsViewState
       CollaborationRequestModel.mockPendingList();
   final List<CollaborationRequestModel> _historyList =
       CollaborationRequestModel.mockHistoryList();
+  final List<CollaborationRequestModel> _confirmationList =
+      CollaborationRequestModel.mockConfirmationList();
 
   @override
   void initState() {
@@ -58,7 +61,6 @@ class _CollaborationRequestsViewState
       child: SafeArea(
         child: Column(
           children: [
-            // Top Bar & Tab Header
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: AppDimens.screenHorizontal,
@@ -108,8 +110,6 @@ class _CollaborationRequestsViewState
                     ],
                   ),
                   SizedBox(height: AppDimens.spaceLg),
-
-                  // Tab Bar Switcher
                   CollaborationTabBar(
                     selectedIndex: _selectedTabIndex,
                     onTabSelected: _onTabSelected,
@@ -117,8 +117,6 @@ class _CollaborationRequestsViewState
                 ],
               ),
             ),
-
-            // Swipeable PageView Body Content
             Expanded(
               child: PageView(
                 controller: _pageController,
@@ -129,6 +127,7 @@ class _CollaborationRequestsViewState
                 children: [
                   _buildListView(_pendingList),
                   _buildListView(_historyList),
+                  _buildConfirmationListView(_confirmationList),
                 ],
               ),
             ),
@@ -169,6 +168,37 @@ class _CollaborationRequestsViewState
             });
           },
           onRightAction: () {},
+        );
+      },
+    );
+  }
+
+  Widget _buildConfirmationListView(List<CollaborationRequestModel> list) {
+    if (list.isEmpty) {
+      final tc = AppThemeColors.of(context);
+      return Center(
+        child: Text(
+          "No confirmations found",
+          style: GoogleFonts.outfit(
+            fontSize: 14.sp,
+            color: tc.textTertiary,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      physics: const BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.screenHorizontal,
+        vertical: AppDimens.paddingSm,
+      ),
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        final item = list[index];
+        return CollaborationConfirmationCard(
+          item: item,
+          onFundReceived: () {},
         );
       },
     );

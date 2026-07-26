@@ -13,8 +13,7 @@ class AppThemeColors {
   }
 
   // ── Text Colors ────────────────────────────────────────────────
-  Color get textPrimary =>
-      isDark ? Colors.white : const Color(0xFF0F172A);
+  Color get textPrimary => isDark ? Colors.white : const Color(0xFF0F172A);
 
   Color get textSecondary =>
       isDark ? const Color(0xFF6B8A9D) : const Color(0xFF475569);
@@ -22,15 +21,16 @@ class AppThemeColors {
   Color get textTertiary =>
       isDark ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF64748B);
 
-  Color get textInverse =>
-      isDark ? const Color(0xFF0F172A) : Colors.white;
+  Color get textInverse => isDark ? const Color(0xFF0F172A) : Colors.white;
 
   // ── Card Surfaces ──────────────────────────────────────────────
-  Color get cardBg =>
-      isDark ? AppColors.darkCardBg.withValues(alpha: 0.9) : const Color(0xFFFFFFFF);
+  Color get cardBg => isDark
+      ? AppColors.darkCardBg.withValues(alpha: 0.9)
+      : const Color(0xFFFFFFFF);
 
-  Color get cardHero =>
-      isDark ? AppColors.darkCardHero.withValues(alpha: 0.9) : const Color(0xFFF8FAFC);
+  Color get cardHero => isDark
+      ? AppColors.darkCardHero.withValues(alpha: 0.9)
+      : const Color(0xFFF8FAFC);
 
   Color get cardInner =>
       isDark ? AppColors.darkCardInner : const Color(0xFFF1F5F9);
@@ -40,7 +40,7 @@ class AppThemeColors {
 
   // ── Borders ────────────────────────────────────────────────────
   Color get borderColor =>
-      isDark ? Colors.white.withValues(alpha: 0.08) : const Color(0xFFE2E8F0);
+      isDark ? Colors.white.withValues(alpha: 0.2) : const Color(0xFFE2E8F0);
 
   Color get borderSubtle =>
       isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF1F5F9);
@@ -72,10 +72,9 @@ class AppThemeColors {
   Color get greenPillText => AppColors.successGreen;
 
   // ── Nav Bar ────────────────────────────────────────────────────
-  Color get navBg =>
-      isDark
-          ? AppColors.darkNavBg.withValues(alpha: 0.8)
-          : Colors.white.withValues(alpha: 0.9);
+  Color get navBg => isDark
+      ? AppColors.darkNavBg.withValues(alpha: 0.8)
+      : Colors.white.withValues(alpha: 0.9);
 
   Color get navBorder =>
       isDark ? Colors.white.withValues(alpha: 0.12) : const Color(0xFFE2E8F0);
@@ -86,11 +85,9 @@ class AppThemeColors {
   Color get navIcon =>
       isDark ? Colors.white.withValues(alpha: 0.5) : const Color(0xFF94A3B8);
 
-  Color get navSelectedIcon =>
-      isDark ? Colors.white : AppColors.primaryColor;
+  Color get navSelectedIcon => isDark ? Colors.white : AppColors.primaryColor;
 
-  Color get navSelectedText =>
-      isDark ? Colors.white : AppColors.primaryColor;
+  Color get navSelectedText => isDark ? Colors.white : AppColors.primaryColor;
 
   // ── Chat / Avatar ──────────────────────────────────────────────
   Color get chatAvatarBg =>
@@ -105,12 +102,10 @@ class AppThemeColors {
   Color get progressFill => AppColors.accentRed;
 
   // ── Shadow ─────────────────────────────────────────────────────
-  Color get shadowColor =>
-      isDark
-          ? Colors.black.withValues(alpha: 0.35)
-          : Colors.black.withValues(alpha: 0.08);
+  Color get shadowColor => isDark
+      ? Colors.black.withValues(alpha: 0.35)
+      : Colors.black.withValues(alpha: 0.08);
 
   // ── Modal / Sheet ──────────────────────────────────────────────
-  Color get sheetBg =>
-      isDark ? AppColors.darkCardHero : Colors.white;
+  Color get sheetBg => isDark ? AppColors.darkCardHero : Colors.white;
 }

@@ -49,7 +49,7 @@ class AppDimens {
   // ── Button Heights ─────────────────────────────────────────────
   static double buttonSm = 36.h;
   static double buttonMd = 48.h;
-  static double buttonLg = 52.h;
+  static double buttonLg = 46.h;
   static double buttonXl = 54.h;
 
   // ── Card border width ──────────────────────────────────────────

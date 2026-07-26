@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/auth_provider.dart';
@@ -163,8 +164,9 @@ class _HomeViewState extends State<HomeView> {
 
                     // Blue + Add Button (Sponsor role)
                     if (isSponsor)
+                    // create new project button 
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () => context.push('/create-project'),
                         child: Container(
                           padding: EdgeInsets.all(14.r),
                           decoration: BoxDecoration(

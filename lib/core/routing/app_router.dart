@@ -11,6 +11,7 @@ import '../../views/role_selection/role_selection_view.dart';
 import '../../views/role_selection/role_onboarding_view.dart';
 import '../../views/home/home_view.dart';
 import '../../views/sponsor/all_projects/sponsor_projects_view.dart';
+import '../../views/sponsor/create_project/create_project_view.dart';
 import '../../views/sponsor/project_details/sponsor_project_details_view.dart';
 import '../../views/sponsor/collaboration_requests/collaboration_requests_view.dart';
 import '../../views/sponsor/public_view/project_public_view.dart';
@@ -72,6 +73,10 @@ class AppRouter {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomeView(),
+      ),
+      GoRoute(
+        path: '/create-project',
+        builder: (context, state) => const CreateProjectView(),
       ),
       GoRoute(
         path: '/sponsor-projects',

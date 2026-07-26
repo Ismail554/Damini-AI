@@ -36,7 +36,7 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveHeight = height ?? AppDimens.buttonLg;
+    final effectiveHeight = height ?? AppDimens.buttonSm;
     final effectiveRadius = borderRadius ?? AppDimens.radiusPill;
 
     if (variant == CustomButtonVariant.gradient ||
@@ -66,7 +66,7 @@ class CustomButton extends StatelessWidget {
           child: ElevatedButton(
             onPressed: isLoading ? null : onPressed,
             style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(

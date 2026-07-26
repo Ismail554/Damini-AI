@@ -209,6 +209,8 @@ class CollaborationCard extends StatelessWidget {
   }
 
   Widget _buildBadge(AppThemeColors tc) {
+    if (item.badgeText == null) return const SizedBox.shrink();
+
     if (item.isApprovedBadge) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
@@ -217,7 +219,7 @@ class CollaborationCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimens.radiusSm),
         ),
         child: Text(
-          item.badgeText,
+          item.badgeText!,
           style: GoogleFonts.outfit(
             fontSize: 11.sp,
             color: AppColors.successGreen,
@@ -247,7 +249,7 @@ class CollaborationCard extends StatelessWidget {
           ),
           SizedBox(width: 4.w),
           Text(
-            item.badgeText,
+            item.badgeText!,
             style: GoogleFonts.outfit(
               fontSize: 11.sp,
               color: AppColors.accentOrange,

@@ -3,24 +3,30 @@ class CollaborationRequestModel {
   final String investorName;
   final String investorType;
   final String avatarUrl;
-  final String badgeText;
+  final String? badgeText;
   final bool isApprovedBadge;
   final String projectName;
   final String proposedBudget;
   final String proposalText;
   final bool isHistory;
+  final String? confirmedDate;
+  final String? projectStatusText;
+  final bool hasFundReceivedButton;
 
   const CollaborationRequestModel({
     required this.id,
     required this.investorName,
     required this.investorType,
     required this.avatarUrl,
-    required this.badgeText,
-    required this.isApprovedBadge,
+    this.badgeText,
+    this.isApprovedBadge = false,
     required this.projectName,
     required this.proposedBudget,
-    required this.proposalText,
+    this.proposalText = '',
     this.isHistory = false,
+    this.confirmedDate,
+    this.projectStatusText,
+    this.hasFundReceivedButton = false,
   });
 
   static List<CollaborationRequestModel> mockPendingList() {
@@ -71,6 +77,39 @@ class CollaborationRequestModel {
         proposalText:
             "\"We are prepared to fund the entire remaining balance pending due diligence.\"",
         isHistory: true,
+      ),
+    ];
+  }
+
+  static List<CollaborationRequestModel> mockConfirmationList() {
+    return const [
+      CollaborationRequestModel(
+        id: "conf_1",
+        investorName: "Global Horizons Fund",
+        investorType: "Private Equity",
+        avatarUrl:
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+        badgeText: "Received",
+        isApprovedBadge: true,
+        projectName: "Downtown Tech Hub",
+        proposedBudget: "\$5M",
+        confirmedDate: "Confirmed Apr 10, 2026",
+        projectStatusText: "Project in progress",
+        hasFundReceivedButton: false,
+      ),
+      CollaborationRequestModel(
+        id: "conf_2",
+        investorName: "Sarah Jenkins",
+        investorType: "Private Equity",
+        avatarUrl:
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
+        badgeText: null,
+        isApprovedBadge: false,
+        projectName: "Downtown Tech Hub",
+        proposedBudget: "\$5M",
+        confirmedDate: "Confirmed Apr 10, 2026",
+        projectStatusText: "Project in progress",
+        hasFundReceivedButton: true,
       ),
     ];
   }
