@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 import '../../../../core/widgets/common_background.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import 'controllers/project_draft_provider.dart';
+import 'models/project_draft_model.dart';
 import 'widgets/financials_section.dart';
 import 'widgets/project_details_section.dart';
 import 'widgets/project_dropdown_field.dart';
@@ -15,7 +18,9 @@ import 'widgets/project_form_field.dart';
 import 'widgets/upload_box.dart';
 
 class CreateProjectView extends StatefulWidget {
-  const CreateProjectView({super.key});
+  final ProjectDraftModel? initialDraft;
+
+  const CreateProjectView({super.key, this.initialDraft});
 
   @override
   State<CreateProjectView> createState() => _CreateProjectViewState();
@@ -23,39 +28,79 @@ class CreateProjectView extends StatefulWidget {
 
 class _CreateProjectViewState extends State<CreateProjectView> {
   final _formKey = GlobalKey<FormState>();
+  String? _draftId;
 
   // Basic Info Controllers
-  final _titleController = TextEditingController();
-  final _shortDescController = TextEditingController();
-  final _fullDescController = TextEditingController();
-  final _minInvestmentController = TextEditingController();
-  final _fundingGoalController = TextEditingController(text: '5000000');
-  final _targetRoiController = TextEditingController(text: '18');
+  late final TextEditingController _titleController;
+  late final TextEditingController _shortDescController;
+  late final TextEditingController _fullDescController;
+  late final TextEditingController _minInvestmentController;
+  late final TextEditingController _fundingGoalController;
+  late final TextEditingController _targetRoiController;
 
   // Details Controllers
-  final _statusController = TextEditingController();
-  final _milestonesController = TextEditingController();
-  final _useOfFundsController = TextEditingController();
-  final _sponsorInvestmentController = TextEditingController();
+  late final TextEditingController _statusController;
+  late final TextEditingController _milestonesController;
+  late final TextEditingController _useOfFundsController;
+  late final TextEditingController _sponsorInvestmentController;
 
   // Financials Controllers
-  final _minContributionController = TextEditingController();
-  final _expectedRoiController = TextEditingController();
-  final _monthlyRevenueController = TextEditingController();
-  final _holdPeriodController = TextEditingController();
-  final _timelineOpsController = TextEditingController();
+  late final TextEditingController _minContributionController;
+  late final TextEditingController _expectedRoiController;
+  late final TextEditingController _monthlyRevenueController;
+  late final TextEditingController _holdPeriodController;
+  late final TextEditingController _timelineOpsController;
 
   // Team & NDA Controllers
-  final _teamMembersController = TextEditingController();
-  final _ndaAgreementController = TextEditingController();
+  late final TextEditingController _teamMembersController;
+  late final TextEditingController _ndaAgreementController;
 
   // Dropdown States
   String? _selectedIndustry;
   String? _selectedCountry;
-  String? _selectedFundingStage = 'Seed';
-  String? _selectedTimeline = '36 months';
+  String? _selectedFundingStage;
+  String? _selectedTimeline;
 
   bool _isPublishing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final d = widget.initialDraft;
+    _draftId = d?.id;
+
+    _titleController = TextEditingController(text: d?.title ?? '');
+    _shortDescController = TextEditingController(text: d?.shortDesc ?? '');
+    _fullDescController = TextEditingController(text: d?.fullDesc ?? '');
+    _minInvestmentController =
+        TextEditingController(text: d?.minInvestment ?? '');
+    _fundingGoalController =
+        TextEditingController(text: d?.fundingGoal ?? '5000000');
+    _targetRoiController = TextEditingController(text: d?.targetRoi ?? '18');
+
+    _statusController = TextEditingController(text: d?.status ?? '');
+    _milestonesController = TextEditingController(text: d?.milestones ?? '');
+    _useOfFundsController = TextEditingController(text: d?.useOfFunds ?? '');
+    _sponsorInvestmentController =
+        TextEditingController(text: d?.sponsorInvestment ?? '');
+
+    _minContributionController =
+        TextEditingController(text: d?.minContribution ?? '');
+    _expectedRoiController = TextEditingController(text: d?.expectedRoi ?? '');
+    _monthlyRevenueController =
+        TextEditingController(text: d?.monthlyRevenue ?? '');
+    _holdPeriodController = TextEditingController(text: d?.holdPeriod ?? '');
+    _timelineOpsController = TextEditingController(text: d?.timelineOps ?? '');
+
+    _teamMembersController = TextEditingController(text: d?.teamMembers ?? '');
+    _ndaAgreementController =
+        TextEditingController(text: d?.ndaAgreement ?? '');
+
+    _selectedIndustry = d?.industry;
+    _selectedCountry = d?.country;
+    _selectedFundingStage = d?.fundingStage ?? 'Seed';
+    _selectedTimeline = d?.timeline ?? '36 months';
+  }
 
   @override
   void dispose() {
@@ -77,6 +122,43 @@ class _CreateProjectViewState extends State<CreateProjectView> {
     _teamMembersController.dispose();
     _ndaAgreementController.dispose();
     super.dispose();
+  }
+
+  void _onSaveDraft() async {
+    final title = _titleController.text.trim().isEmpty
+        ? "Untitled Project Draft"
+        : _titleController.text.trim();
+
+    final draft = ProjectDraftModel(
+      id: _draftId ?? 'draft_${DateTime.now().millisecondsSinceEpoch}',
+      title: title,
+      shortDesc: _shortDescController.text,
+      fullDesc: _fullDescController.text,
+      minInvestment: _minInvestmentController.text,
+      fundingGoal: _fundingGoalController.text,
+      targetRoi: _targetRoiController.text,
+      industry: _selectedIndustry,
+      country: _selectedCountry,
+      fundingStage: _selectedFundingStage ?? 'Seed',
+      timeline: _selectedTimeline ?? '36 months',
+      status: _statusController.text,
+      milestones: _milestonesController.text,
+      useOfFunds: _useOfFundsController.text,
+      sponsorInvestment: _sponsorInvestmentController.text,
+      minContribution: _minContributionController.text,
+      expectedRoi: _expectedRoiController.text,
+      monthlyRevenue: _monthlyRevenueController.text,
+      holdPeriod: _holdPeriodController.text,
+      timelineOps: _timelineOpsController.text,
+      teamMembers: _teamMembersController.text,
+      ndaAgreement: _ndaAgreementController.text,
+      lastEdited: 'Last edited just now',
+    );
+
+    await context.read<ProjectDraftProvider>().saveDraft(draft);
+    if (!mounted) return;
+    CustomSnackBar.success(context, "Draft saved locally!");
+    context.pop();
   }
 
   void _onPublish() async {
@@ -133,7 +215,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                       ProjectFormField(
                         label: "Full Description",
                         hint:
-                            "Detailed explanation of the business model, market opportunity, and use of funds...",
+                            "Detailed explanation of the business model...",
                         controller: _fullDescController,
                         maxLines: 4,
                       ),
@@ -202,6 +284,9 @@ class _CreateProjectViewState extends State<CreateProjectView> {
   }
 
   Widget _buildTopHeader(BuildContext context, AppThemeColors tc) {
+    final titleText =
+        widget.initialDraft != null ? "Edit Draft" : "Create Project";
+
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: AppDimens.screenHorizontal,
@@ -237,7 +322,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
           ),
           SizedBox(width: AppDimens.spaceMd),
           Text(
-            "Create Project",
+            titleText,
             style: GoogleFonts.outfit(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -346,9 +431,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
               child: CustomButton(
                 text: "Save Draft",
                 variant: CustomButtonVariant.outlined,
-                onPressed: () {
-                  CustomSnackBar.info(context, "Draft saved");
-                },
+                onPressed: _onSaveDraft,
               ),
             ),
             SizedBox(width: AppDimens.spaceSm),

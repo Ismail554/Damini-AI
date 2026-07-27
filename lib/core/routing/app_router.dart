@@ -18,6 +18,7 @@ import '../../views/sponsor/public_view/project_public_view.dart';
 import '../../views/sponsor/nda/nda_view.dart';
 import '../../views/sponsor/group_chat/group_chat_view.dart';
 import '../../views/sponsor/project_details/all_contributors_view.dart';
+import '../../views/sponsor/create_project/models/project_draft_model.dart';
 import '../../shared/screens/notifications/notifications_screen.dart';
 
 class AppRouter {
@@ -79,7 +80,13 @@ class AppRouter {
       ),
       GoRoute(
         path: '/create-project',
-        builder: (context, state) => const CreateProjectView(),
+        builder: (context, state) {
+          final draft = state.extra is ProjectDraftModel
+              ? state.extra as ProjectDraftModel
+              : (state.extra as Map<String, dynamic>?)?['draft']
+                  as ProjectDraftModel?;
+          return CreateProjectView(initialDraft: draft);
+        },
       ),
       GoRoute(
         path: '/sponsor-projects',

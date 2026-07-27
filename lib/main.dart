@@ -11,6 +11,8 @@ import 'controllers/sponsor_project_provider.dart';
 import 'core/services/app_service.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
+import 'views/sponsor/create_project/controllers/project_draft_provider.dart';
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -40,6 +42,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => OpportunityProvider()),
         ChangeNotifierProvider(create: (_) => SponsorProjectProvider()),
+        ChangeNotifierProvider(create: (_) => ProjectDraftProvider()),
       ],
       child: const MyApp(),
     ),
