@@ -1,15 +1,16 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../controllers/sponsor_project_provider.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 import '../../../../core/widgets/common_background.dart';
-import 'models/collaboration_request_model.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 import 'widgets/collaboration_card.dart';
 import 'widgets/collaboration_confirmation_card.dart';
-import 'widgets/collaboration_tab_bar.dart';
+import 'widgets/collaboration_requests_header.dart';
 
 class CollaborationRequestsView extends StatefulWidget {
   const CollaborationRequestsView({super.key});
@@ -23,13 +24,6 @@ class _CollaborationRequestsViewState
     extends State<CollaborationRequestsView> {
   int _selectedTabIndex = 0;
   late final PageController _pageController;
-
-  final List<CollaborationRequestModel> _pendingList =
-      CollaborationRequestModel.mockPendingList();
-  final List<CollaborationRequestModel> _historyList =
-      CollaborationRequestModel.mockHistoryList();
-  final List<CollaborationRequestModel> _confirmationList =
-      CollaborationRequestModel.mockConfirmationList();
 
   @override
   void initState() {
@@ -54,68 +48,16 @@ class _CollaborationRequestsViewState
 
   @override
   Widget build(BuildContext context) {
-    final tc = AppThemeColors.of(context);
+    final provider = context.watch<SponsorProjectProvider>();
 
     return CommonBackground(
       showGrid: false,
       child: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppDimens.screenHorizontal,
-                vertical: AppDimens.screenVertical,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => context.pop(),
-                        child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(AppDimens.radiusPill),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                            child: Container(
-                              width: 40.r,
-                              height: 40.r,
-                              decoration: BoxDecoration(
-                                color: tc.buttonSecondary,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: tc.borderColor,
-                                  width: AppDimens.borderThin,
-                                ),
-                              ),
-                              child: Icon(
-                                Icons.arrow_back_rounded,
-                                color: tc.textPrimary,
-                                size: AppDimens.iconMd,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: AppDimens.spaceMd),
-                      Text(
-                        "Collaboration Requests",
-                        style: GoogleFonts.outfit(
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.bold,
-                          color: tc.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: AppDimens.spaceLg),
-                  CollaborationTabBar(
-                    selectedIndex: _selectedTabIndex,
-                    onTabSelected: _onTabSelected,
-                  ),
-                ],
-              ),
+            CollaborationRequestsHeader(
+              selectedTabIndex: _selectedTabIndex,
+              onTabSelected: _onTabSelected,
             ),
             Expanded(
               child: PageView(
@@ -125,9 +67,9 @@ class _CollaborationRequestsViewState
                   setState(() => _selectedTabIndex = index);
                 },
                 children: [
-                  _buildListView(_pendingList),
-                  _buildListView(_historyList),
-                  _buildConfirmationListView(_confirmationList),
+                  _buildPendingListView(provider),
+                  _buildApprovedListView(provider),
+                  _buildConfirmationListView(provider),
                 ],
               ),
             ),
@@ -137,19 +79,9 @@ class _CollaborationRequestsViewState
     );
   }
 
-  Widget _buildListView(List<CollaborationRequestModel> list) {
-    if (list.isEmpty) {
-      final tc = AppThemeColors.of(context);
-      return Center(
-        child: Text(
-          "No requests found",
-          style: GoogleFonts.outfit(
-            fontSize: 14.sp,
-            color: tc.textTertiary,
-          ),
-        ),
-      );
-    }
+  Widget _buildPendingListView(SponsorProjectProvider provider) {
+    final list = provider.pendingList;
+    if (list.isEmpty) return _buildEmptyState("No pending requests");
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
@@ -162,30 +94,44 @@ class _CollaborationRequestsViewState
         final item = list[index];
         return CollaborationCard(
           item: item,
-          onLeftAction: () {
-            setState(() {
-              list.removeAt(index);
-            });
+          onLeftAction: () => provider.rejectPendingRequest(item.id),
+          onRightAction: () {
+            provider.approvePendingRequest(item);
+            CustomSnackBar.success(
+              context,
+              "Approved request from ${item.investorName}!",
+            );
           },
-          onRightAction: () {},
         );
       },
     );
   }
 
-  Widget _buildConfirmationListView(List<CollaborationRequestModel> list) {
-    if (list.isEmpty) {
-      final tc = AppThemeColors.of(context);
-      return Center(
-        child: Text(
-          "No confirmations found",
-          style: GoogleFonts.outfit(
-            fontSize: 14.sp,
-            color: tc.textTertiary,
-          ),
-        ),
-      );
-    }
+  Widget _buildApprovedListView(SponsorProjectProvider provider) {
+    final list = provider.approvedList;
+    if (list.isEmpty) return _buildEmptyState("No approved requests");
+
+    return ListView.builder(
+      physics: const BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDimens.screenHorizontal,
+        vertical: AppDimens.paddingSm,
+      ),
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        final item = list[index];
+        return CollaborationCard(
+          item: item,
+          onLeftAction: () {},
+          onRightAction: () => context.push('/group-chat'),
+        );
+      },
+    );
+  }
+
+  Widget _buildConfirmationListView(SponsorProjectProvider provider) {
+    final list = provider.confirmationList;
+    if (list.isEmpty) return _buildEmptyState("No confirmations found");
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
@@ -198,9 +144,28 @@ class _CollaborationRequestsViewState
         final item = list[index];
         return CollaborationConfirmationCard(
           item: item,
-          onFundReceived: () {},
+          onFundReceived: () {
+            provider.markFundReceived(item.id);
+            CustomSnackBar.success(
+              context,
+              "Fund received marked for ${item.investorName}!",
+            );
+          },
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState(String message) {
+    final tc = AppThemeColors.of(context);
+    return Center(
+      child: Text(
+        message,
+        style: GoogleFonts.outfit(
+          fontSize: 14.sp,
+          color: tc.textTertiary,
+        ),
+      ),
     );
   }
 }

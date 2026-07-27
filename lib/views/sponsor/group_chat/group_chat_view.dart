@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../controllers/sponsor_project_provider.dart';
 import 'controllers/group_chat_provider.dart';
@@ -9,6 +8,8 @@ import 'widgets/group_chat_ai_suggestions.dart';
 import 'widgets/group_chat_app_bar.dart';
 import 'widgets/group_chat_input_bar.dart';
 import 'widgets/group_chat_message_bubble.dart';
+
+import '../../../core/widgets/custom_snackbar.dart';
 
 class GroupChatView extends StatelessWidget {
   const GroupChatView({super.key});
@@ -67,19 +68,23 @@ class GroupChatView extends StatelessWidget {
   void _openConfirmModal(BuildContext context, GroupChatProvider provider) {
     ConfirmInvestorModal.show(
       context,
-      onConfirm: (contribution) {
-        context.read<SponsorProjectProvider>().addContribution(contribution);
+      onConfirm: (contributions) {
+        if (contributions.isEmpty) return;
+        final sponsorProvider = context.read<SponsorProjectProvider>();
+        for (final item in contributions) {
+          sponsorProvider.addContribution(item);
+        }
+
+        final names = contributions.map((c) => c.name).join(', ');
+        final amount = contributions.first.amount;
+
         provider.addSystemMessage(
-          '🎉 ${contribution.name} was confirmed as an investor with ${contribution.amount} contribution!',
+          '🎉 Confirmed investor${contributions.length > 1 ? 's' : ''}: $names with $amount budget each!',
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: const Color(0xFF10B981),
-            content: Text(
-              '${contribution.name} added to project contributions!',
-              style: GoogleFonts.outfit(color: Colors.white),
-            ),
-          ),
+
+        CustomSnackBar.success(
+          context,
+          'Added ${contributions.length} investor${contributions.length > 1 ? 's' : ''} to project contributions!',
         );
       },
     );

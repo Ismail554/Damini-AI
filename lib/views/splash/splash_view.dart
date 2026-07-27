@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:Braintech/controllers/auth_provider.dart';
 import 'package:Braintech/core/services/storage_service.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import '../../core/widgets/common_background.dart';
 
 class SplashView extends StatefulWidget {
@@ -23,6 +24,7 @@ class _SplashViewState extends State<SplashView>
   @override
   void initState() {
     super.initState();
+    FlutterNativeSplash.remove();
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
