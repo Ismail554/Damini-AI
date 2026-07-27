@@ -18,6 +18,7 @@ import '../../views/sponsor/public_view/project_public_view.dart';
 import '../../views/sponsor/nda/nda_view.dart';
 import '../../views/sponsor/group_chat/group_chat_view.dart';
 import '../../views/sponsor/project_details/all_contributors_view.dart';
+import '../../views/sponsor/project_details/models/sponsor_project_details_model.dart';
 import '../../views/sponsor/create_project/models/project_draft_model.dart';
 import '../../shared/screens/notifications/notifications_screen.dart';
 
@@ -94,7 +95,13 @@ class AppRouter {
       ),
       GoRoute(
         path: '/sponsor-project-details',
-        builder: (context, state) => const SponsorProjectDetailsView(),
+        builder: (context, state) {
+          final project = state.extra is SponsorProjectDetailsModel
+              ? state.extra as SponsorProjectDetailsModel
+              : (state.extra as Map<String, dynamic>?)?['project']
+                  as SponsorProjectDetailsModel?;
+          return SponsorProjectDetailsView(initialProject: project);
+        },
       ),
       GoRoute(
         path: '/collaboration-requests',
@@ -115,7 +122,12 @@ class AppRouter {
       ),
       GoRoute(
         path: '/group-chat',
-        builder: (context, state) => const GroupChatView(),
+        builder: (context, state) {
+          final title = state.extra is String
+              ? state.extra as String
+              : (state.extra as Map<String, dynamic>?)?['title'] as String?;
+          return GroupChatView(projectTitle: title);
+        },
       ),
       GoRoute(
         path: '/all-contributors',

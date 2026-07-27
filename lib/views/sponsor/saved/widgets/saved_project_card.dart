@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_colors.dart';
+import '../../project_details/models/sponsor_project_details_model.dart';
 import '../models/saved_item_model.dart';
 
 class SavedProjectCard extends StatelessWidget {
@@ -12,33 +14,54 @@ class SavedProjectCard extends StatelessWidget {
     required this.item,
   });
 
+  SponsorProjectDetailsModel get _projectDetails => SponsorProjectDetailsModel(
+        id: item.id,
+        title: item.title,
+        location: "${item.category} • ${item.date}",
+        badgeText:
+            item.statusText == 'Active' ? 'Funding Active' : item.statusText,
+        raisedAmount: item.investedAmount,
+        goalAmount: item.valueAmount,
+        percentage: item.fundingProgressText,
+        progress: item.fundingProgressValue,
+        remainingAmount: '\$500k',
+        investorsCount: 3,
+        targetRoi: item.targetRoi,
+        pendingReviewAmount: '\$0',
+        contributions: SponsorProjectDetailsModel.mockData().contributions,
+      );
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0C1D3A),
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.12),
-          width: 1.0,
+    return GestureDetector(
+      onTap: () =>
+          context.push('/sponsor-project-details', extra: _projectDetails),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 16.h),
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0C1D3A),
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.12),
+            width: 1.0,
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeaderRow(),
-          SizedBox(height: 14.h),
-          _buildMetricsRow(),
-          SizedBox(height: 14.h),
-          _buildProgressBar(),
-        ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeaderRow(context),
+            SizedBox(height: 14.h),
+            _buildMetricsRow(),
+            SizedBox(height: 14.h),
+            _buildProgressBar(),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeaderRow() {
+  Widget _buildHeaderRow(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,11 +76,8 @@ class SavedProjectCard extends StatelessWidget {
               width: 46.r,
               height: 46.r,
               color: const Color(0xFF172A46),
-              child: Icon(
-                Icons.business_rounded,
-                color: Colors.white,
-                size: 24.r,
-              ),
+              child: Icon(Icons.business_rounded,
+                  color: Colors.white, size: 24.r),
             ),
           ),
         ),
@@ -92,21 +112,27 @@ class SavedProjectCard extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8.w),
-        Container(
-          width: 40.r,
-          height: 40.r,
-          decoration: BoxDecoration(
-            color: const Color(0xFF0A332C),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: const Color(0xFF10B981).withValues(alpha: 0.3),
-              width: 1,
-            ),
+        GestureDetector(
+          onTap: () => context.push(
+            '/group-chat',
+            extra: "${item.title} || Group Chat with Ai",
           ),
-          child: Icon(
-            Icons.chat_bubble_outline_rounded,
-            color: const Color(0xFF10B981),
-            size: 18.r,
+          child: Container(
+            width: 40.w,
+            height: 40.h,
+            decoration: BoxDecoration(
+              color: const Color(0xFF0A332C),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              Icons.chat_bubble_outline_rounded,
+              color: const Color(0xFF10B981),
+              size: 18.r,
+            ),
           ),
         ),
       ],
@@ -115,12 +141,10 @@ class SavedProjectCard extends StatelessWidget {
 
   Widget _buildStatusBadge() {
     final isPending = item.isPendingStatus;
-    final bgColor = isPending
-        ? const Color(0xFF3D2E12)
-        : const Color(0xFF0F3B2E);
-    final textColor = isPending
-        ? const Color(0xFFF59E0B)
-        : const Color(0xFF10B981);
+    final bgColor =
+        isPending ? const Color(0xFF3D2E12) : const Color(0xFF0F3B2E);
+    final textColor =
+        isPending ? const Color(0xFFF59E0B) : const Color(0xFF10B981);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),

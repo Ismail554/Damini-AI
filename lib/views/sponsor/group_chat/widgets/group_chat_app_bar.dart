@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String? title;
   final VoidCallback? onMenuPressed;
 
   const GroupChatAppBar({
     super.key,
+    this.title,
     this.onMenuPressed,
   });
 
@@ -16,6 +18,8 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayTitle = title ?? 'Downtown Tech Hub || Group Chat with Ai';
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       color: const Color(0xFF071B33),
@@ -34,7 +38,6 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
               constraints: const BoxConstraints(),
             ),
             SizedBox(width: 8.w),
-            // Avatar Stack
             SizedBox(
               width: 54.w,
               height: 32.h,
@@ -86,14 +89,13 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
             SizedBox(width: 6.w),
-            // Title & Subtitle
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Downtown Tech Hub || Group Chat with Ai',
+                    displayTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.outfit(

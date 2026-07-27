@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../controllers/sponsor_project_provider.dart';
+import '../../../core/widgets/custom_snackbar.dart';
 import 'controllers/group_chat_provider.dart';
 import 'widgets/confirm_investor_modal.dart';
 import 'widgets/group_chat_ai_suggestions.dart';
@@ -9,10 +10,13 @@ import 'widgets/group_chat_app_bar.dart';
 import 'widgets/group_chat_input_bar.dart';
 import 'widgets/group_chat_message_bubble.dart';
 
-import '../../../core/widgets/custom_snackbar.dart';
-
 class GroupChatView extends StatelessWidget {
-  const GroupChatView({super.key});
+  final String? projectTitle;
+
+  const GroupChatView({
+    super.key,
+    this.projectTitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +27,7 @@ class GroupChatView extends StatelessWidget {
           return Scaffold(
             backgroundColor: const Color(0xFF061427),
             appBar: GroupChatAppBar(
+              title: projectTitle,
               onMenuPressed: () => _openConfirmModal(context, provider),
             ),
             body: SafeArea(

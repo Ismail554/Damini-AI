@@ -9,13 +9,19 @@ import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
 import '../../../core/widgets/common_background.dart';
+import 'models/sponsor_project_details_model.dart';
 import 'widgets/investor_contribution_card.dart';
 import 'widgets/sponsor_project_bottom_bar.dart';
 import 'widgets/sponsor_project_header.dart';
 import 'widgets/sponsor_project_stats_card.dart';
 
 class SponsorProjectDetailsView extends StatefulWidget {
-  const SponsorProjectDetailsView({super.key});
+  final SponsorProjectDetailsModel? initialProject;
+
+  const SponsorProjectDetailsView({
+    super.key,
+    this.initialProject,
+  });
 
   @override
   State<SponsorProjectDetailsView> createState() =>
@@ -29,7 +35,8 @@ class _SponsorProjectDetailsViewState
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
-    final project = context.watch<SponsorProjectProvider>().project;
+    final fallbackProject = context.watch<SponsorProjectProvider>().project;
+    final project = widget.initialProject ?? fallbackProject;
     final contributions = project.contributions;
     final displayCount = _isExpanded
         ? contributions.length
@@ -110,7 +117,7 @@ class _SponsorProjectDetailsViewState
                     ),
                   ),
 
-                  // Sliver List of Contributor Cards with animated transition
+                  // Sliver List of Contributor Cards
                   SliverPadding(
                     padding: EdgeInsets.symmetric(
                       horizontal: AppDimens.screenHorizontal,
@@ -144,7 +151,10 @@ class _SponsorProjectDetailsViewState
             SponsorProjectBottomBar(
               onViewRequests: () => context.push('/collaboration-requests'),
               onPublicView: () => context.push('/public-view'),
-              onGroupChatWithAi: () => context.push('/group-chat'),
+              onGroupChatWithAi: () => context.push(
+                '/group-chat',
+                extra: "${project.title} || Group Chat with Ai",
+              ),
             ),
           ],
         ),
