@@ -26,7 +26,7 @@ class SponsorDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildGreetingRow(tc),
+          _buildGreetingRow(context, tc),
           SizedBox(height: AppDimens.spaceXl),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -107,7 +107,7 @@ class SponsorDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildGreetingRow(AppThemeColors tc) {
+  Widget _buildGreetingRow(BuildContext context, AppThemeColors tc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -134,35 +134,38 @@ class SponsorDashboard extends StatelessWidget {
         ),
         Row(
           children: [
-            Stack(
-              children: [
-                Container(
-                  width: 44.r,
-                  height: 44.r,
-                  decoration: BoxDecoration(
-                    color: tc.buttonSecondary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: tc.borderColor),
-                  ),
-                  child: Icon(
-                    Icons.notifications_none_rounded,
-                    color: tc.textPrimary,
-                    size: AppDimens.iconLg,
-                  ),
-                ),
-                Positioned(
-                  top: 10.h,
-                  right: 12.w,
-                  child: Container(
-                    width: 8.r,
-                    height: 8.r,
-                    decoration: const BoxDecoration(
-                      color: AppColors.accentRed,
+            GestureDetector(
+              onTap: () => context.push('/notifications'),
+              child: Stack(
+                children: [
+                  Container(
+                    width: 44.r,
+                    height: 44.r,
+                    decoration: BoxDecoration(
+                      color: tc.buttonSecondary,
                       shape: BoxShape.circle,
+                      border: Border.all(color: tc.borderColor),
+                    ),
+                    child: Icon(
+                      Icons.notifications_none_rounded,
+                      color: tc.textPrimary,
+                      size: AppDimens.iconLg,
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    top: 10.h,
+                    right: 12.w,
+                    child: Container(
+                      width: 8.r,
+                      height: 8.r,
+                      decoration: const BoxDecoration(
+                        color: AppColors.accentRed,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             SizedBox(width: AppDimens.spaceMd),
             CircleAvatar(

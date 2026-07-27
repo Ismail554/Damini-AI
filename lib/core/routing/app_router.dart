@@ -17,6 +17,8 @@ import '../../views/sponsor/collaboration_requests/collaboration_requests_view.d
 import '../../views/sponsor/public_view/project_public_view.dart';
 import '../../views/sponsor/nda/nda_view.dart';
 import '../../views/sponsor/group_chat/group_chat_view.dart';
+import '../../views/sponsor/project_details/all_contributors_view.dart';
+import '../../shared/screens/notifications/notifications_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -107,6 +109,14 @@ class AppRouter {
       GoRoute(
         path: '/group-chat',
         builder: (context, state) => const GroupChatView(),
+      ),
+      GoRoute(
+        path: '/all-contributors',
+        builder: (context, state) => const AllContributorsView(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
     ],
   );

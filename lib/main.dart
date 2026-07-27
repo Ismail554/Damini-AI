@@ -9,7 +9,6 @@ import 'controllers/theme_provider.dart';
 import 'controllers/opportunity_provider.dart';
 import 'controllers/sponsor_project_provider.dart';
 import 'core/services/app_service.dart';
-
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {

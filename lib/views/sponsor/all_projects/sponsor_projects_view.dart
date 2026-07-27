@@ -61,20 +61,16 @@ class _SponsorProjectsViewState extends State<SponsorProjectsView> {
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: AppDimens.screenHorizontal,
-                vertical: AppDimens.screenVertical,
+                vertical: AppDimens.paddingSm,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context, tc),
-                  SizedBox(height: AppDimens.spaceLg),
-                  ProjectsTabBar(
-                    selectedIndex: _selectedTabIndex,
-                    onTabSelected: _onTabSelected,
-                  ),
-                ],
-              ),
+              child: _buildHeader(context, tc),
             ),
+            SizedBox(height: 8.h),
+            ProjectsTabBar(
+              selectedIndex: _selectedTabIndex,
+              onTabSelected: _onTabSelected,
+            ),
+            SizedBox(height: 12.h),
             Expanded(
               child: PageView(
                 controller: _pageController,
