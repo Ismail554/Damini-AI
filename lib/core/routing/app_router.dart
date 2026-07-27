@@ -16,6 +16,7 @@ import '../../views/sponsor/project_details/sponsor_project_details_view.dart';
 import '../../views/sponsor/collaboration_requests/collaboration_requests_view.dart';
 import '../../views/sponsor/public_view/project_public_view.dart';
 import '../../views/sponsor/nda/nda_view.dart';
+import '../../views/sponsor/group_chat/group_chat_view.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -102,6 +103,10 @@ class AppRouter {
               extra['disclosingParty'] as String? ?? 'Acme Corp';
           return NdaView(disclosingParty: disclosingParty);
         },
+      ),
+      GoRoute(
+        path: '/group-chat',
+        builder: (context, state) => const GroupChatView(),
       ),
     ],
   );

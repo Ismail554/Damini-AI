@@ -42,16 +42,13 @@ class ProjectFormField extends StatelessWidget {
             color: tc.textPrimary,
           ),
         ),
-        SizedBox(height: AppDimens.spaceXxs),
+        SizedBox(height: AppDimens.spaceSm),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           textInputAction: textInputAction ?? TextInputAction.next,
           maxLines: maxLines,
-          style: GoogleFonts.outfit(
-            fontSize: 14.sp,
-            color: tc.textPrimary,
-          ),
+          style: GoogleFonts.outfit(fontSize: 14.sp, color: tc.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.outfit(
@@ -87,9 +84,7 @@ class ProjectFormField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-              borderSide: const BorderSide(
-                color: AppColors.accentRed,
-              ),
+              borderSide: const BorderSide(color: AppColors.accentRed),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),

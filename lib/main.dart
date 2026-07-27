@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'controllers/auth_provider.dart';
 import 'controllers/theme_provider.dart';
 import 'controllers/opportunity_provider.dart';
+import 'controllers/sponsor_project_provider.dart';
 import 'core/services/app_service.dart';
 
 void main() async {
@@ -36,6 +37,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => NavigationProvider()),
         ChangeNotifierProvider(create: (_) => OpportunityProvider()),
+        ChangeNotifierProvider(create: (_) => SponsorProjectProvider()),
       ],
       child: const MyApp(),
     ),

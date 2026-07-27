@@ -8,11 +8,13 @@ import '../../../../core/widgets/custom_button.dart';
 class SponsorProjectBottomBar extends StatelessWidget {
   final VoidCallback onViewRequests;
   final VoidCallback onPublicView;
+  final VoidCallback? onGroupChatWithAi;
 
   const SponsorProjectBottomBar({
     super.key,
     required this.onViewRequests,
     required this.onPublicView,
+    this.onGroupChatWithAi,
   });
 
   @override
@@ -68,7 +70,7 @@ class SponsorProjectBottomBar extends StatelessWidget {
               CustomButton(
                 text: "Group Chat with AI",
                 variant: CustomButtonVariant.gradient,
-                onPressed: onPublicView,
+                onPressed: onGroupChatWithAi ?? onPublicView,
               ),
             ],
           ),
@@ -77,3 +79,4 @@ class SponsorProjectBottomBar extends StatelessWidget {
     );
   }
 }
+

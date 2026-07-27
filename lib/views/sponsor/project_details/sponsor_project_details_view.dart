@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../controllers/sponsor_project_provider.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
 import '../../../core/widgets/common_background.dart';
-import 'models/sponsor_project_details_model.dart';
 import 'widgets/investor_contribution_card.dart';
 import 'widgets/sponsor_project_bottom_bar.dart';
 import 'widgets/sponsor_project_header.dart';
@@ -18,7 +19,7 @@ class SponsorProjectDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
-    final project = SponsorProjectDetailsModel.mockData();
+    final project = context.watch<SponsorProjectProvider>().project;
 
     return CommonBackground(
       showGrid: false,
@@ -86,6 +87,7 @@ class SponsorProjectDetailsView extends StatelessWidget {
             SponsorProjectBottomBar(
               onViewRequests: () => context.push('/collaboration-requests'),
               onPublicView: () => context.push('/public-view'),
+              onGroupChatWithAi: () => context.push('/group-chat'),
             ),
           ],
         ),
