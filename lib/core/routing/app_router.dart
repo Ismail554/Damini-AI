@@ -17,10 +17,13 @@ import '../../views/sponsor/collaboration_requests/collaboration_requests_view.d
 import '../../views/sponsor/public_view/project_public_view.dart';
 import '../../views/sponsor/nda/nda_view.dart';
 import '../../views/sponsor/group_chat/group_chat_view.dart';
+import '../../views/sponsor/chat/direct_chat_view.dart';
+import '../../views/sponsor/chat/models/chat_item_model.dart';
 import '../../views/sponsor/project_details/all_contributors_view.dart';
 import '../../views/sponsor/project_details/models/sponsor_project_details_model.dart';
 import '../../views/sponsor/create_project/models/project_draft_model.dart';
 import '../../shared/screens/notifications/notifications_screen.dart';
+import 'custom_page_transition.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -28,114 +31,205 @@ class AppRouter {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const SplashView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const SplashView(),
+        ),
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const OnboardingView(),
+        ),
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const LoginView(),
+        ),
       ),
       GoRoute(
         path: '/signup',
-        builder: (context, state) => const SignUpView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const SignUpView(),
+        ),
       ),
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const ForgotPasswordView(),
+        ),
       ),
       GoRoute(
         path: '/otp',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final email = extra['email'] as String? ?? '';
           final isRecovery = extra['isRecovery'] as bool? ?? false;
-          return OtpVerificationView(email: email, isRecovery: isRecovery);
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: OtpVerificationView(email: email, isRecovery: isRecovery),
+          );
         },
       ),
       GoRoute(
         path: '/reset-password',
-        builder: (context, state) => const ResetPasswordView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const ResetPasswordView(),
+        ),
       ),
       GoRoute(
         path: '/success',
-        builder: (context, state) => const SuccessView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const SuccessView(),
+        ),
       ),
       GoRoute(
         path: '/role-selection',
-        builder: (context, state) => const RoleSelectionView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const RoleSelectionView(),
+        ),
       ),
       GoRoute(
         path: '/role-onboarding',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final role = extra['role'] as String? ?? 'investor';
-          return RoleOnboardingView(role: role);
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: RoleOnboardingView(role: role),
+          );
         },
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const HomeView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const HomeView(),
+        ),
       ),
       GoRoute(
         path: '/create-project',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final draft = state.extra is ProjectDraftModel
               ? state.extra as ProjectDraftModel
               : (state.extra as Map<String, dynamic>?)?['draft']
                   as ProjectDraftModel?;
-          return CreateProjectView(initialDraft: draft);
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: CreateProjectView(initialDraft: draft),
+          );
         },
       ),
       GoRoute(
         path: '/sponsor-projects',
-        builder: (context, state) => const SponsorProjectsView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const SponsorProjectsView(),
+        ),
       ),
       GoRoute(
         path: '/sponsor-project-details',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final project = state.extra is SponsorProjectDetailsModel
               ? state.extra as SponsorProjectDetailsModel
               : (state.extra as Map<String, dynamic>?)?['project']
                   as SponsorProjectDetailsModel?;
-          return SponsorProjectDetailsView(initialProject: project);
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: SponsorProjectDetailsView(initialProject: project),
+          );
         },
       ),
       GoRoute(
         path: '/collaboration-requests',
-        builder: (context, state) => const CollaborationRequestsView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const CollaborationRequestsView(),
+        ),
       ),
       GoRoute(
         path: '/public-view',
-        builder: (context, state) => const ProjectPublicView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const ProjectPublicView(),
+        ),
       ),
       GoRoute(
         path: '/nda',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final disclosingParty =
               extra['disclosingParty'] as String? ?? 'Acme Corp';
-          return NdaView(disclosingParty: disclosingParty);
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: NdaView(disclosingParty: disclosingParty),
+          );
         },
       ),
       GoRoute(
         path: '/group-chat',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final title = state.extra is String
               ? state.extra as String
               : (state.extra as Map<String, dynamic>?)?['title'] as String?;
-          return GroupChatView(projectTitle: title);
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: GroupChatView(projectTitle: title),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/direct-chat',
+        pageBuilder: (context, state) {
+          final item = state.extra as ChatItemModel;
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: DirectChatView(chatItem: item),
+          );
         },
       ),
       GoRoute(
         path: '/all-contributors',
-        builder: (context, state) => const AllContributorsView(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const AllContributorsView(),
+        ),
       ),
       GoRoute(
         path: '/notifications',
-        builder: (context, state) => const NotificationsScreen(),
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const NotificationsScreen(),
+        ),
       ),
     ],
   );

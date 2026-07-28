@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../core/utils/app_dimens.dart';
 import '../../core/utils/app_theme_colors.dart';
+import 'chat/controllers/sponsor_chat_provider.dart';
+import 'chat/widgets/chat_list_item_card.dart';
+import 'chat/widgets/chat_search_bar.dart';
 
 class SponsorChatView extends StatelessWidget {
   const SponsorChatView({super.key});
@@ -11,143 +16,92 @@ class SponsorChatView extends StatelessWidget {
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppDimens.screenHorizontal,
-        vertical: AppDimens.screenVertical,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Investor Messages",
-            style: GoogleFonts.outfit(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              color: tc.textPrimary,
+    return ChangeNotifierProvider(
+      create: (_) => SponsorChatProvider()..init(),
+      child: Consumer<SponsorChatProvider>(
+        builder: (context, provider, _) {
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppDimens.screenHorizontal,
+              vertical: AppDimens.screenVertical,
             ),
-          ),
-          SizedBox(height: AppDimens.spaceSm),
-          Text(
-            "Inquiries and discussions with potential investors.",
-            style: GoogleFonts.outfit(
-              fontSize: 13.sp,
-              color: tc.textTertiary,
-            ),
-          ),
-          SizedBox(height: AppDimens.spaceXl),
-
-          _buildChatItem(
-            tc: tc,
-            name: "John Doe (Investor)",
-            message: "We'd like to schedule a call regarding the Tech Hub deal.",
-            time: "11:15 AM",
-            unreadCount: 1,
-            avatarUrl:
-                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
-          ),
-          _buildChatItem(
-            tc: tc,
-            name: "Venture Partners LLC",
-            message: "NDA signed. Sent over company documents.",
-            time: "Yesterday",
-            unreadCount: 0,
-            avatarUrl:
-                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
-          ),
-          SizedBox(height: 90.h),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChatItem({
-    required AppThemeColors tc,
-    required String name,
-    required String message,
-    required String time,
-    required int unreadCount,
-    required String avatarUrl,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: AppDimens.spaceMd),
-      padding: EdgeInsets.all(AppDimens.paddingMd),
-      decoration: BoxDecoration(
-        color: tc.cardBg,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(
-          color: tc.borderColor,
-          width: AppDimens.borderThin,
-        ),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: AppDimens.avatarMd,
-            backgroundImage: NetworkImage(avatarUrl),
-          ),
-          SizedBox(width: AppDimens.spaceMd),
-          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        style: GoogleFonts.outfit(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: tc.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Text(
-                      time,
-                      style: GoogleFonts.outfit(
-                        fontSize: 11.sp,
-                        color: tc.textTertiary,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: AppDimens.spaceXs),
                 Text(
-                  message,
+                  "Messages",
                   style: GoogleFonts.outfit(
-                    fontSize: 12.sp,
-                    color: tc.textSecondary,
+                    fontSize: 26.sp,
+                    fontWeight: FontWeight.bold,
+                    color: tc.textPrimary,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: AppDimens.spaceMd),
+                ChatSearchBar(
+                  onChanged: provider.updateSearchQuery,
+                  hintText: "Search deals near you...",
+                ),
+                SizedBox(height: AppDimens.spaceLg),
+                if (provider.isLoading)
+                  Padding(
+                    padding: EdgeInsets.only(top: 40.h),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF006EDB),
+                      ),
+                    ),
+                  )
+                else if (provider.chats.isEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(top: 40.h),
+                    child: Center(
+                      child: Text(
+                        "No messages found",
+                        style: GoogleFonts.outfit(
+                          fontSize: 14.sp,
+                          color: tc.textTertiary,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: provider.chats.length,
+                    separatorBuilder: (context, index) => Divider(
+                      color: tc.isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.06),
+                      height: 1,
+                    ),
+                    itemBuilder: (context, index) {
+                      final chatItem = provider.chats[index];
+                      return ChatListItemCard(
+                        item: chatItem,
+                        onTap: () {
+                          provider.clearUnread(chatItem.id);
+                          if (chatItem.isGroupChat) {
+                            context.push(
+                              '/group-chat',
+                              extra: chatItem.name,
+                            );
+                          } else {
+                            context.push(
+                              '/direct-chat',
+                              extra: chatItem,
+                            );
+                          }
+                        },
+                      );
+                    },
+                  ),
+                SizedBox(height: 90.h),
               ],
             ),
-          ),
-          if (unreadCount > 0) ...[
-            SizedBox(width: AppDimens.paddingSm),
-            Container(
-              padding: EdgeInsets.all(6.r),
-              decoration: BoxDecoration(
-                color: tc.unreadBadge,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                "$unreadCount",
-                style: GoogleFonts.outfit(
-                  fontSize: 11.sp,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ],
+          );
+        },
       ),
     );
   }
