@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_dimens.dart';
 import '../../core/utils/app_theme_colors.dart';
+import '../../core/widgets/logout_dialog.dart';
 import '../profile/widgets/account_type_switcher_card.dart';
 import '../profile/widgets/profile_hero_card.dart';
 import '../profile/widgets/profile_menu_card.dart';
@@ -45,7 +46,7 @@ class SponsorProfileView extends StatelessWidget {
                   color: tc.textPrimary,
                   size: AppDimens.iconLg,
                 ),
-                onPressed: () {},
+                onPressed: () => context.push('/settings'),
               ),
             ],
           ),
@@ -74,6 +75,9 @@ class SponsorProfileView extends StatelessWidget {
 
           GestureDetector(
             onTap: () async {
+              final confirm = await LogoutDialog.show(context);
+              if (confirm != true) return;
+              if (!context.mounted) return;
               final authProvider = context.read<AuthProvider>();
               await authProvider.logout();
               if (context.mounted) {

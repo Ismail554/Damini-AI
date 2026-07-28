@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../controllers/auth_provider.dart';
+import '../../core/widgets/logout_dialog.dart';
 import 'widgets/account_type_switcher_card.dart';
 import 'widgets/profile_hero_card.dart';
 import 'widgets/profile_menu_card.dart';
@@ -40,7 +41,7 @@ class InvestorProfileView extends StatelessWidget {
                   color: Colors.white,
                   size: 22.r,
                 ),
-                onPressed: () {},
+                onPressed: () => context.push('/settings'),
               ),
             ],
           ),
@@ -73,6 +74,9 @@ class InvestorProfileView extends StatelessWidget {
           // Log Out Button
           GestureDetector(
             onTap: () async {
+              final confirm = await LogoutDialog.show(context);
+              if (confirm != true) return;
+              if (!context.mounted) return;
               final authProvider = context.read<AuthProvider>();
               await authProvider.logout();
               if (context.mounted) {

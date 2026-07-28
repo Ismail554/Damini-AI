@@ -23,6 +23,8 @@ import '../../views/sponsor/project_details/all_contributors_view.dart';
 import '../../views/sponsor/project_details/models/sponsor_project_details_model.dart';
 import '../../views/sponsor/create_project/models/project_draft_model.dart';
 import '../../shared/screens/notifications/notifications_screen.dart';
+import '../../views/settings/settings_view.dart';
+import '../../views/settings/change_password/change_password_view.dart';
 import 'custom_page_transition.dart';
 
 class AppRouter {
@@ -229,6 +231,22 @@ class AppRouter {
           context: context,
           state: state,
           child: const NotificationsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/settings',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const SettingsView(),
+        ),
+      ),
+      GoRoute(
+        path: '/change-password',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const ChangePasswordView(),
         ),
       ),
     ],
