@@ -151,16 +151,6 @@ class _NdaViewState extends State<NdaView> {
     setState(() => _signatureFileName = null);
   }
 
-  bool get _canSubmit =>
-      _isAgreed && _signatureController.text.trim().isNotEmpty;
-
-  void _handleSubmit() {
-    if (!_canSubmit) return;
-
-    CustomSnackBar.success(context, "NDA successfully signed!");
-    context.pop(true);
-  }
-
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
@@ -224,7 +214,7 @@ class _NdaViewState extends State<NdaView> {
               ),
             ),
 
-            // Bottom Submit Button
+            // Bottom Edit / Submit Button
             SafeArea(
               child: Container(
                 padding: EdgeInsets.all(AppDimens.screenHorizontal),
@@ -237,14 +227,12 @@ class _NdaViewState extends State<NdaView> {
                     ),
                   ),
                 ),
-                child: Opacity(
-                  opacity: _canSubmit ? 1.0 : 0.5,
-                  child: CustomButton(
-                    text: "Submit & Sign NDA",
-                    variant: CustomButtonVariant.gradient,
-                    width: double.infinity,
-                    onPressed: _canSubmit ? _handleSubmit : () {},
-                  ),
+                child: CustomButton(
+                  text: "Edit",
+                  icon: Icons.edit_outlined,
+                  variant: CustomButtonVariant.gradient,
+                  width: double.infinity,
+                  onPressed: () => context.push('/edit-nda'),
                 ),
               ),
             ),

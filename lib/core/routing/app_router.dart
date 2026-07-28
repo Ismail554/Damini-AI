@@ -25,6 +25,10 @@ import '../../views/sponsor/create_project/models/project_draft_model.dart';
 import '../../shared/screens/notifications/notifications_screen.dart';
 import '../../views/settings/settings_view.dart';
 import '../../views/settings/change_password/change_password_view.dart';
+import '../../views/profile/personal_info/personal_info_view.dart';
+import '../../views/profile/personal_info/edit_profile_view.dart';
+import '../../views/profile/company_verification/company_verification_view.dart';
+import '../../views/sponsor/nda/edit_nda_view.dart';
 import 'custom_page_transition.dart';
 
 class AppRouter {
@@ -247,6 +251,38 @@ class AppRouter {
           context: context,
           state: state,
           child: const ChangePasswordView(),
+        ),
+      ),
+      GoRoute(
+        path: '/personal-info',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const PersonalInformationView(),
+        ),
+      ),
+      GoRoute(
+        path: '/edit-profile',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const EditProfileView(),
+        ),
+      ),
+      GoRoute(
+        path: '/company-verification',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const CompanyVerificationView(),
+        ),
+      ),
+      GoRoute(
+        path: '/edit-nda',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const EditNdaView(),
         ),
       ),
     ],

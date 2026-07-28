@@ -1,3 +1,4 @@
+import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -8,10 +9,7 @@ import '../models/chat_item_model.dart';
 class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ChatItemModel chatItem;
 
-  const DirectChatAppBar({
-    super.key,
-    required this.chatItem,
-  });
+  const DirectChatAppBar({super.key, required this.chatItem});
 
   @override
   Size get preferredSize => Size.fromHeight(64.h);
@@ -25,11 +23,7 @@ class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       scrolledUnderElevation: 0,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_rounded,
-          color: tc.textPrimary,
-          size: 22.r,
-        ),
+        icon: Icon(Icons.arrow_back_rounded, color: tc.textPrimary, size: 22.r),
         onPressed: () => context.pop(),
       ),
       titleSpacing: 0,
@@ -38,8 +32,8 @@ class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
           Stack(
             children: [
               Container(
-                width: 38.r,
-                height: 38.r,
+                width: 38.w,
+                height: 38.h,
                 decoration: BoxDecoration(
                   color: chatItem.avatarColor,
                   shape: BoxShape.circle,

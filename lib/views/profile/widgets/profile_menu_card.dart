@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../controllers/theme_provider.dart';
 import '../../../core/utils/app_colors.dart';
@@ -36,7 +37,7 @@ class ProfileMenuCard extends StatelessWidget {
             tc: tc,
             title: "Personal Information",
             icon: Icons.person_outline_rounded,
-            onTap: () {},
+            onTap: () => context.push('/personal-info'),
           ),
           Divider(color: tc.borderSubtle, height: 1),
           _buildMenuItem(
