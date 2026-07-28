@@ -1,7 +1,9 @@
 import 'dart:ui';
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
@@ -40,7 +42,7 @@ class CollaborationConfirmationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeaderRow(tc),
+              _buildHeaderRow(tc, context),
               SizedBox(height: AppDimens.spaceMd),
               _buildInnerDetailsBox(tc),
               if (item.hasFundReceivedButton) ...[
@@ -54,35 +56,45 @@ class CollaborationConfirmationCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderRow(AppThemeColors tc) {
+  Widget _buildHeaderRow(AppThemeColors tc, BuildContext context) {
     return Row(
       children: [
-        CircleAvatar(
-          radius: 22.r,
-          backgroundImage: NetworkImage(item.avatarUrl),
-        ),
-        SizedBox(width: 12.w),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.investorName,
-                style: GoogleFonts.outfit(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: tc.textPrimary,
+          child: GestureDetector(
+            onTap: () => context.push('/public-view'),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 22.r,
+                  backgroundImage: NetworkImage(item.avatarUrl),
                 ),
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                item.investorType,
-                style: GoogleFonts.outfit(
-                  fontSize: 12.sp,
-                  color: tc.textSecondary,
+                AppSpacing.w12,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.investorName,
+                        style: GoogleFonts.outfit(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: tc.textPrimary,
+                        ),
+                      ),
+
+                      AppSpacing.h2, 
+                      Text(
+                        item.investorType,
+                        style: GoogleFonts.outfit(
+                          fontSize: 12.sp,
+                          color: tc.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         if (item.badgeText != null)
@@ -93,7 +105,7 @@ class CollaborationConfirmationCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               border: Border.all(
                 color: tc.greenPillText.withValues(alpha: 0.3),
-                width: 1,
+                width: 1.w,
               ),
             ),
             child: Text(
@@ -131,7 +143,7 @@ class CollaborationConfirmationCard extends StatelessWidget {
                       color: tc.textTertiary,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  AppSpacing.h4,
                   Text(
                     item.projectName,
                     style: GoogleFonts.outfit(
@@ -152,7 +164,7 @@ class CollaborationConfirmationCard extends StatelessWidget {
                       color: tc.textTertiary,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  AppSpacing.h4,
                   Text(
                     item.proposedBudget,
                     style: GoogleFonts.outfit(
@@ -165,9 +177,9 @@ class CollaborationConfirmationCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12.h),
+          AppSpacing.h12,
           Divider(color: tc.borderColor.withValues(alpha: 0.2), height: 1),
-          SizedBox(height: 12.h),
+          AppSpacing.h12,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

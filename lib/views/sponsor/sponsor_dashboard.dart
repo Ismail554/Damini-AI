@@ -206,10 +206,13 @@ class SponsorDashboard extends StatelessWidget {
               ),
             ),
             SizedBox(width: AppDimens.spaceMd),
-            CircleAvatar(
-              radius: AppDimens.avatarSm,
-              backgroundImage: const NetworkImage(
-                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
+            GestureDetector(
+              onTap: () => context.push('/personal-info'),
+              child: CircleAvatar(
+                radius: AppDimens.avatarSm,
+                backgroundImage: const NetworkImage(
+                  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
+                ),
               ),
             ),
           ],

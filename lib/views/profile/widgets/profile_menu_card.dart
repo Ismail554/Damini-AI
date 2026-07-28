@@ -27,17 +27,31 @@ class ProfileMenuCard extends StatelessWidget {
         children: [
           _buildMenuItem(
             tc: tc,
-            title: "Theme Settings",
-            subtitle: _getThemeLabel(themeProvider.themeMode),
-            icon: Icons.palette_outlined,
-            onTap: () => _showThemeSelectionSheet(context, themeProvider),
+            title: "Personal Information",
+            icon: Icons.person_outline_rounded,
+            onTap: () => context.push('/personal-info'),
           ),
           Divider(color: tc.borderSubtle, height: 1),
           _buildMenuItem(
             tc: tc,
-            title: "Personal Information",
-            icon: Icons.person_outline_rounded,
-            onTap: () => context.push('/personal-info'),
+            title: "Company Verification",
+            icon: Icons.verified_user_outlined,
+            onTap: () => context.push('/company-verification'),
+          ),
+          Divider(color: tc.borderSubtle, height: 1),
+          _buildMenuItem(
+            tc: tc,
+            title: "Non-Disclosure Agreement",
+            icon: Icons.assignment_outlined,
+            onTap: () => context.push('/nda'),
+          ),
+          Divider(color: tc.borderSubtle, height: 1),
+          _buildMenuItem(
+            tc: tc,
+            title: "Theme Settings",
+            subtitle: _getThemeLabel(themeProvider.themeMode),
+            icon: Icons.palette_outlined,
+            onTap: () => _showThemeSelectionSheet(context, themeProvider),
           ),
           Divider(color: tc.borderSubtle, height: 1),
           _buildMenuItem(

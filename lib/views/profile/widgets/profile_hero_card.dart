@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
@@ -35,57 +36,62 @@ class ProfileHeroCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Avatar with Verified Badge
-          Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
+          // Avatar & Info (Tap opens Personal Info)
+          GestureDetector(
+            onTap: () => context.push('/personal-info'),
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: tc.textPrimary,
+                          width: AppDimens.borderMedium,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 40.r,
+                        backgroundImage: NetworkImage(avatarUrl),
+                      ),
+                    ),
+                    Positioned(
+                      right: 2.w,
+                      bottom: 2.h,
+                      child: Container(
+                        padding: EdgeInsets.all(3.r),
+                        decoration: const BoxDecoration(
+                          color: AppColors.successGreen,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check_rounded,
+                          color: Colors.white,
+                          size: 12.r,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: AppDimens.spaceMd),
+                Text(
+                  name,
+                  style: GoogleFonts.outfit(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
                     color: tc.textPrimary,
-                    width: AppDimens.borderMedium,
                   ),
                 ),
-                child: CircleAvatar(
-                  radius: 40.r,
-                  backgroundImage: NetworkImage(avatarUrl),
-                ),
-              ),
-              Positioned(
-                right: 2.w,
-                bottom: 2.h,
-                child: Container(
-                  padding: EdgeInsets.all(3.r),
-                  decoration: const BoxDecoration(
-                    color: AppColors.successGreen,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_rounded,
-                    color: Colors.white,
-                    size: 12.r,
+                SizedBox(height: AppDimens.spaceXxs),
+                Text(
+                  title,
+                  style: GoogleFonts.outfit(
+                    fontSize: 13.sp,
+                    color: tc.textTertiary,
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppDimens.spaceMd),
-
-          // Name & Title
-          Text(
-            name,
-            style: GoogleFonts.outfit(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: tc.textPrimary,
-            ),
-          ),
-          SizedBox(height: AppDimens.spaceXxs),
-          Text(
-            title,
-            style: GoogleFonts.outfit(
-              fontSize: 13.sp,
-              color: tc.textTertiary,
+              ],
             ),
           ),
           SizedBox(height: AppDimens.spaceMd),
@@ -110,29 +116,32 @@ class ProfileHeroCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: tc.greenPillBg,
-                  borderRadius: BorderRadius.circular(AppDimens.radiusSm),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.verified_outlined,
-                      color: tc.greenPillText,
-                      size: 12.r,
-                    ),
-                    SizedBox(width: 4.w),
-                    Text(
-                      "Verified",
-                      style: GoogleFonts.outfit(
-                        fontSize: 11.sp,
+              GestureDetector(
+                onTap: () => context.push('/company-verification'),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: tc.greenPillBg,
+                    borderRadius: BorderRadius.circular(AppDimens.radiusSm),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.verified_outlined,
                         color: tc.greenPillText,
-                        fontWeight: FontWeight.bold,
+                        size: 12.r,
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 4.w),
+                      Text(
+                        "Verified",
+                        style: GoogleFonts.outfit(
+                          fontSize: 11.sp,
+                          color: tc.greenPillText,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -140,30 +149,33 @@ class ProfileHeroCard extends StatelessWidget {
           SizedBox(height: 10.h),
 
           // Free Member Pill
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: tc.textPrimary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(18.r),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.auto_awesome_rounded,
-                  color: tc.textSecondary,
-                  size: 14.r,
-                ),
-                SizedBox(width: 6.w),
-                Text(
-                  "Free Member",
-                  style: GoogleFonts.outfit(
-                    fontSize: 13.sp,
+          GestureDetector(
+            onTap: () => context.push('/subscription'),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+              decoration: BoxDecoration(
+                color: tc.textPrimary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(18.r),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.auto_awesome_rounded,
                     color: tc.textSecondary,
-                    fontWeight: FontWeight.w500,
+                    size: 14.r,
                   ),
-                ),
-              ],
+                  SizedBox(width: 6.w),
+                  Text(
+                    "Free Member",
+                    style: GoogleFonts.outfit(
+                      fontSize: 13.sp,
+                      color: tc.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(height: AppDimens.spaceXl),

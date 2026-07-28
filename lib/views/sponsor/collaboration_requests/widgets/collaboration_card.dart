@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
@@ -52,34 +53,43 @@ class CollaborationCard extends StatelessWidget {
               // Top Row: Avatar, Info, Badge
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: AppDimens.avatarMd,
-                    backgroundImage: NetworkImage(item.avatarUrl),
-                  ),
-                  SizedBox(width: AppDimens.spaceMd),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.investorName,
-                          style: GoogleFonts.outfit(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.bold,
-                            color: tc.textPrimary,
+                    child: GestureDetector(
+                      onTap: () => context.push('/public-view'),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: AppDimens.avatarMd,
+                            backgroundImage: NetworkImage(item.avatarUrl),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: AppDimens.spaceXxs),
-                        Text(
-                          item.investorType,
-                          style: GoogleFonts.outfit(
-                            fontSize: 12.sp,
-                            color: tc.textTertiary,
+                          SizedBox(width: AppDimens.spaceMd),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.investorName,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: tc.textPrimary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: AppDimens.spaceXxs),
+                                Text(
+                                  item.investorType,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 12.sp,
+                                    color: tc.textTertiary,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   _buildBadge(tc),

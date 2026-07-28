@@ -90,6 +90,24 @@ class SettingsView extends StatelessWidget {
       child: Column(
         children: [
           SettingsItemTile(
+            icon: Icons.person_outline_rounded,
+            title: "Personal Information",
+            onTap: () => context.push('/personal-info'),
+          ),
+          _divider(tc),
+          SettingsItemTile(
+            icon: Icons.verified_user_outlined,
+            title: "Company Verification",
+            onTap: () => context.push('/company-verification'),
+          ),
+          _divider(tc),
+          SettingsItemTile(
+            icon: Icons.assignment_outlined,
+            title: "Non-Disclosure Agreement",
+            onTap: () => context.push('/nda'),
+          ),
+          _divider(tc),
+          SettingsItemTile(
             icon: Icons.notifications_none_rounded,
             title: "Notifications",
             trailing: CupertinoSwitch(

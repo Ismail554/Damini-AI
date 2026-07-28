@@ -26,83 +26,86 @@ class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => context.pop(),
       ),
       titleSpacing: 0,
-      title: Row(
-        children: [
-          Stack(
-            children: [
-              Container(
-                width: 38.w,
-                height: 38.h,
-                decoration: BoxDecoration(
-                  color: chatItem.avatarColor,
-                  shape: BoxShape.circle,
-                  image: chatItem.avatarUrl != null
-                      ? DecorationImage(
-                          image: NetworkImage(chatItem.avatarUrl!),
-                          fit: BoxFit.cover,
+      title: GestureDetector(
+        onTap: () => context.push('/public-view'),
+        child: Row(
+          children: [
+            Stack(
+              children: [
+                Container(
+                  width: 38.w,
+                  height: 38.h,
+                  decoration: BoxDecoration(
+                    color: chatItem.avatarColor,
+                    shape: BoxShape.circle,
+                    image: chatItem.avatarUrl != null
+                        ? DecorationImage(
+                            image: NetworkImage(chatItem.avatarUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: chatItem.avatarUrl == null
+                      ? Center(
+                          child: Text(
+                            chatItem.initials,
+                            style: GoogleFonts.outfit(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         )
                       : null,
                 ),
-                child: chatItem.avatarUrl == null
-                    ? Center(
-                        child: Text(
-                          chatItem.initials,
-                          style: GoogleFonts.outfit(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                if (chatItem.isOnline)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 10.r,
+                      height: 10.r,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF061427),
+                          width: 1.5.r,
                         ),
-                      )
-                    : null,
-              ),
-              if (chatItem.isOnline)
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 10.r,
-                    height: 10.r,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF061427),
-                        width: 1.5.r,
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  chatItem.name,
-                  style: GoogleFonts.outfit(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: tc.textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  chatItem.isOnline ? "Online" : "Offline",
-                  style: GoogleFonts.outfit(
-                    fontSize: 11.sp,
-                    color: tc.textTertiary,
-                  ),
-                ),
               ],
             ),
-          ),
-        ],
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    chatItem.name,
+                    style: GoogleFonts.outfit(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      color: tc.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    chatItem.isOnline ? "Online" : "Offline",
+                    style: GoogleFonts.outfit(
+                      fontSize: 11.sp,
+                      color: tc.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       actions: [
         PopupMenuButton<String>(

@@ -232,6 +232,7 @@ class _NdaViewState extends State<NdaView> {
                   icon: Icons.edit_outlined,
                   variant: CustomButtonVariant.gradient,
                   width: double.infinity,
+                  height: 42.h,
                   onPressed: () => context.push('/edit-nda'),
                 ),
               ),

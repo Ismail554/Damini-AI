@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
@@ -21,7 +22,7 @@ class InvestorContributionCard extends StatelessWidget {
     final tc = AppThemeColors.of(context);
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap ?? () => context.push('/public-view'),
       child: Container(
         margin: EdgeInsets.only(bottom: AppDimens.spaceMd),
         padding: EdgeInsets.all(AppDimens.paddingMd),

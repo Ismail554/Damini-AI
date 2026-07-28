@@ -33,14 +33,14 @@ class _HomeViewState extends State<HomeView> {
     CustomNavItemData(label: "Dashboard", icon: Icons.home_rounded),
     CustomNavItemData(label: "Saved", icon: Icons.favorite_border_rounded),
     CustomNavItemData(label: "Chat", icon: Icons.chat_bubble_outline_rounded),
-    CustomNavItemData(label: "Person", icon: Icons.person_outline_rounded),
+    CustomNavItemData(label: "Profile", icon: Icons.person_outline_rounded),
   ];
 
   static const _investorNavItems = [
     CustomNavItemData(label: "Explore", icon: Icons.home_rounded),
     CustomNavItemData(label: "Saved", icon: Icons.favorite_border_rounded),
     CustomNavItemData(label: "Chat", icon: Icons.chat_bubble_outline_rounded),
-    CustomNavItemData(label: "Person", icon: Icons.person_outline_rounded),
+    CustomNavItemData(label: "Profile", icon: Icons.person_outline_rounded),
   ];
 
   Widget _buildBody(bool isSponsor) {
@@ -164,7 +164,7 @@ class _HomeViewState extends State<HomeView> {
 
                     // Blue + Add Button (Sponsor role)
                     if (isSponsor)
-                    // create new project button 
+                      // create new project button
                       GestureDetector(
                         onTap: () => context.push('/create-project'),
                         child: Container(
