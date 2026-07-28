@@ -102,7 +102,7 @@ class SettingsView extends StatelessWidget {
           SettingsItemTile(
             icon: Icons.auto_awesome_outlined,
             title: "Subscription Plan",
-            onTap: () {},
+            onTap: () => context.push('/subscription'),
           ),
           _divider(tc),
           SettingsItemTile(

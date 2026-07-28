@@ -13,10 +13,7 @@ import 'widgets/direct_chat_input_bar.dart';
 class DirectChatView extends StatelessWidget {
   final ChatItemModel chatItem;
 
-  const DirectChatView({
-    super.key,
-    required this.chatItem,
-  });
+  const DirectChatView({super.key, required this.chatItem});
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +23,12 @@ class DirectChatView extends StatelessWidget {
       create: (_) => DirectChatProvider()..init(chatItem),
       child: Consumer<DirectChatProvider>(
         builder: (context, provider, _) {
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: DirectChatAppBar(chatItem: provider.chatItem),
-            body: CommonBackground(
-              showGrid: false,
-              child: SafeArea(
+          return CommonBackground(
+            showGrid: false,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: DirectChatAppBar(chatItem: provider.chatItem),
+              body: SafeArea(
                 child: Column(
                   children: [
                     Expanded(
@@ -56,9 +53,7 @@ class DirectChatView extends StatelessWidget {
                                     itemCount: provider.messages.length,
                                     itemBuilder: (context, index) {
                                       final message = provider.messages[index];
-                                      return DirectChatBubble(
-                                        message: message,
-                                      );
+                                      return DirectChatBubble(message: message);
                                     },
                                   ),
                           ),
