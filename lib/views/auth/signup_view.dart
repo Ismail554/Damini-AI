@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,9 +42,9 @@ class _SignUpViewState extends State<SignUpView> {
   Future<void> _handleSignUp() async {
     if (!_formKey.currentState!.validate()) return;
     if (_passwordCtrl.text != _confirmPasswordCtrl.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
       return;
     }
 
@@ -75,14 +76,14 @@ class _SignUpViewState extends State<SignUpView> {
       showGrid: false,
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset(IconAssets.rawLogo, height: 60.h, width: 60.w),
-                SizedBox(height: 16.h),
+                AppSpacing.h8,
                 Text(
                   "Create Account",
                   style: GoogleFonts.outfit(
@@ -91,7 +92,7 @@ class _SignUpViewState extends State<SignUpView> {
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 8.h),
+                AppSpacing.h8,
                 Text(
                   "Join Nexus to start collaborating.",
                   style: GoogleFonts.outfit(
@@ -99,9 +100,9 @@ class _SignUpViewState extends State<SignUpView> {
                     color: AppColors.grey,
                   ),
                 ),
-                SizedBox(height: 24.h),
+                AppSpacing.h14,
                 const SocialAuthSection(),
-                SizedBox(height: 24.h),
+                AppSpacing.h12,
 
                 Row(
                   children: [
@@ -116,10 +117,10 @@ class _SignUpViewState extends State<SignUpView> {
                             : null,
                       ),
                     ),
-                    SizedBox(width: 12.w),
+                    AppSpacing.w12,
                     Expanded(
                       child: LabeledTextField(
-                              textInputAction: TextInputAction.next,
+                        textInputAction: TextInputAction.next,
                         label: "Last Name",
                         hint: "Enter name",
                         controller: _lastNameCtrl,
@@ -130,10 +131,9 @@ class _SignUpViewState extends State<SignUpView> {
                     ),
                   ],
                 ),
-                SizedBox(height: 16.h),
-
+                AppSpacing.h14,
                 LabeledTextField(
-                        textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction.next,
                   label: "Email",
                   hint: "Enter email",
                   controller: _emailCtrl,
@@ -148,10 +148,10 @@ class _SignUpViewState extends State<SignUpView> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16.h),
+                AppSpacing.h14,
 
                 LabeledTextField(
-                        textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction.next,
                   label: "Password",
                   hint: "••••••••",
                   controller: _passwordCtrl,
@@ -165,16 +165,16 @@ class _SignUpViewState extends State<SignUpView> {
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
                       color: AppColors.grey,
-                      size: 20.r,
+                      size: 20.sp,
                     ),
                     onPressed: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
-                SizedBox(height: 16.h),
+                AppSpacing.h14,
 
                 LabeledTextField(
-                        textInputAction: TextInputAction.done,
+                  textInputAction: TextInputAction.done,
                   label: "Confirm Password",
                   hint: "••••••••",
                   controller: _confirmPasswordCtrl,
@@ -199,7 +199,7 @@ class _SignUpViewState extends State<SignUpView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 28.h),
+                AppSpacing.h24,
 
                 SizedBox(
                   width: double.infinity,
@@ -231,7 +231,7 @@ class _SignUpViewState extends State<SignUpView> {
                           ),
                   ),
                 ),
-                SizedBox(height: 24.h),
+                AppSpacing.h22,
 
                 Center(
                   child: GestureDetector(

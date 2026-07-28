@@ -52,6 +52,8 @@ class PersonalInformationView extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
+                      _buildProfilePhotoHeader(info, tc),
+                      SizedBox(height: 20.h),
                       InfoSectionCard(
                         title: "Personal Information",
                         rows: [
@@ -79,6 +81,60 @@ class PersonalInformationView extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfilePhotoHeader(dynamic info, AppThemeColors tc) {
+    final photoUrl = info.profilePhotoUrl ??
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop";
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: tc.isDark ? const Color(0xFF092444) : Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: tc.isDark
+              ? Colors.white.withValues(alpha: 0.12)
+              : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(3.r),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFF006EDB),
+                width: 2.w,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 44.r,
+              backgroundImage: NetworkImage(photoUrl),
+            ),
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            info.fullName,
+            style: GoogleFonts.outfit(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: tc.textPrimary,
+            ),
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            "${info.position} • ${info.companyName}",
+            style: GoogleFonts.outfit(
+              fontSize: 13.sp,
+              color: tc.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }

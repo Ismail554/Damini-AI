@@ -137,7 +137,7 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     // Orange AI Robot Button
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => context.push('/ai-chat'),
                       child: Container(
                         padding: EdgeInsets.all(12.r),
                         decoration: BoxDecoration(

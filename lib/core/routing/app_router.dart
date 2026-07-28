@@ -31,6 +31,7 @@ import '../../views/profile/company_verification/company_verification_view.dart'
 import '../../views/sponsor/nda/edit_nda_view.dart';
 import '../../views/subscription/subscription_view.dart';
 import '../../views/profile/public_profile/public_profile_view.dart';
+import '../../views/ai_chat/ai_chat_view.dart';
 import 'custom_page_transition.dart';
 
 class AppRouter {
@@ -203,6 +204,14 @@ class AppRouter {
             ),
           );
         },
+      ),
+      GoRoute(
+        path: '/ai-chat',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const AiChatView(),
+        ),
       ),
       GoRoute(
         path: '/nda',

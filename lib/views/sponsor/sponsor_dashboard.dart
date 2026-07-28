@@ -1,3 +1,5 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
+import 'package:Braintech/core/utils/asset_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +12,7 @@ import 'create_project/controllers/project_draft_provider.dart';
 import 'widgets/sponsor_active_project_card.dart';
 import 'widgets/sponsor_draft_card.dart';
 import 'widgets/sponsor_metric_card.dart';
+import '../profile/widgets/profile_quick_view_sheet.dart';
 import 'widgets/sponsor_request_card.dart';
 
 class SponsorDashboard extends StatelessWidget {
@@ -149,24 +152,30 @@ class SponsorDashboard extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Text(
-              "Welcome back",
-              style: GoogleFonts.outfit(
-                fontSize: 13.sp,
-                color: tc.textTertiary,
-              ),
-            ),
-            SizedBox(height: AppDimens.spaceXxs),
-            Text(
-              "Shawn Blake",
-              style: GoogleFonts.outfit(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.bold,
-                color: tc.textPrimary,
-              ),
+            Image.asset(IconAssets.rawLogo, height: 46.h, width: 36.w),
+            AppSpacing.w6,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Welcome back",
+                  style: GoogleFonts.outfit(
+                    fontSize: 13.sp,
+                    color: tc.textTertiary,
+                  ),
+                ),
+                SizedBox(height: AppDimens.spaceXxs),
+                Text(
+                  "Shawn Blake",
+                  style: GoogleFonts.outfit(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.bold,
+                    color: tc.textPrimary,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -177,8 +186,8 @@ class SponsorDashboard extends StatelessWidget {
               child: Stack(
                 children: [
                   Container(
-                    width: 44.r,
-                    height: 44.r,
+                    width: 44.w,
+                    height: 44.h,
                     decoration: BoxDecoration(
                       color: tc.buttonSecondary,
                       shape: BoxShape.circle,
@@ -194,8 +203,8 @@ class SponsorDashboard extends StatelessWidget {
                     top: 10.h,
                     right: 12.w,
                     child: Container(
-                      width: 8.r,
-                      height: 8.r,
+                      width: 8.w,
+                      height: 8.h,
                       decoration: const BoxDecoration(
                         color: AppColors.accentRed,
                         shape: BoxShape.circle,
@@ -207,7 +216,7 @@ class SponsorDashboard extends StatelessWidget {
             ),
             SizedBox(width: AppDimens.spaceMd),
             GestureDetector(
-              onTap: () => context.push('/personal-info'),
+              onTap: () => ProfileQuickViewSheet.show(context),
               child: CircleAvatar(
                 radius: AppDimens.avatarSm,
                 backgroundImage: const NetworkImage(

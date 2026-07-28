@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
 import 'package:flutter/material.dart';
@@ -20,13 +21,13 @@ class SocialAuthSection extends StatelessWidget {
           icon: SvgPicture.asset(SvgAssets.google, height: 18.r, width: 18.r),
           onPressed: () {},
         ),
-        SizedBox(height: 12.h),
+        AppSpacing.h12,
         SocialAuthButton(
           label: "Continue with Apple",
           icon: Icon(Icons.apple, color: Colors.white, size: 22.r),
           onPressed: () {},
         ),
-        SizedBox(height: 24.h),
+        AppSpacing.h12,
         Row(
           children: [
             Expanded(child: Divider(color: colors.greenPillBg)),
