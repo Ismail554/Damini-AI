@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,14 +37,22 @@ class SponsorSavedProfileCard extends StatelessWidget {
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () => context.push('/public-view'),
+                onTap: () => context.push(
+                  '/public-profile',
+                  extra: {
+                    'name': item.name,
+                    'title': item.title,
+                    'company': item.company,
+                    'avatarUrl': item.avatarUrl,
+                  },
+                ),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 28.r,
                       backgroundImage: NetworkImage(item.avatarUrl),
                     ),
-                    SizedBox(width: 14.w),
+                    AppSpacing.w14,
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

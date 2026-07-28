@@ -61,7 +61,14 @@ class CollaborationConfirmationCard extends StatelessWidget {
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => context.push('/public-view'),
+            onTap: () => context.push(
+              '/public-profile',
+              extra: {
+                'name': item.investorName,
+                'title': item.investorType,
+                'avatarUrl': item.avatarUrl,
+              },
+            ),
             child: Row(
               children: [
                 CircleAvatar(

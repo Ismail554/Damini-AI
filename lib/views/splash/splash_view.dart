@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -91,7 +92,7 @@ class _SplashViewState extends State<SplashView>
                       width: 160.r,
                       height: 160.r,
                     ),
-                    SizedBox(height: 20.h),
+                    AppSpacing.h20,
                   ],
                 ),
               ),

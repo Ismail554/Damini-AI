@@ -30,6 +30,7 @@ import '../../views/profile/personal_info/edit_profile_view.dart';
 import '../../views/profile/company_verification/company_verification_view.dart';
 import '../../views/sponsor/nda/edit_nda_view.dart';
 import '../../views/subscription/subscription_view.dart';
+import '../../views/profile/public_profile/public_profile_view.dart';
 import 'custom_page_transition.dart';
 
 class AppRouter {
@@ -184,6 +185,24 @@ class AppRouter {
           state: state,
           child: const ProjectPublicView(),
         ),
+      ),
+      GoRoute(
+        path: '/public-profile',
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: PublicProfileView(
+              name: extra?['name'] as String?,
+              title: extra?['title'] as String?,
+              company: extra?['company'] as String?,
+              avatarUrl: extra?['avatarUrl'] as String?,
+              country: extra?['country'] as String?,
+              phone: extra?['phone'] as String?,
+            ),
+          );
+        },
       ),
       GoRoute(
         path: '/nda',

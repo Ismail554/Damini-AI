@@ -27,7 +27,13 @@ class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       titleSpacing: 0,
       title: GestureDetector(
-        onTap: () => context.push('/public-view'),
+        onTap: () => context.push(
+          '/public-profile',
+          extra: {
+            'name': chatItem.name,
+            'avatarUrl': chatItem.avatarUrl,
+          },
+        ),
         child: Row(
           children: [
             Stack(
