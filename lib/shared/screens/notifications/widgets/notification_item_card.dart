@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,8 @@ class NotificationItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: Material(
@@ -27,7 +30,7 @@ class NotificationItemCard extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF0C1C30),
+              color: tc.cardBg,
               borderRadius: BorderRadius.circular(16.r),
               border: Border.all(
                 color: item.isUnread
@@ -46,7 +49,7 @@ class NotificationItemCard extends StatelessWidget {
                       child: Text(
                         item.title,
                         style: GoogleFonts.outfit(
-                          color: Colors.white,
+                          color: tc.textPrimary,
                           fontSize: 15.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -58,7 +61,7 @@ class NotificationItemCard extends StatelessWidget {
                         Text(
                           item.timeAgo,
                           style: GoogleFonts.outfit(
-                            color: const Color(0xFF6B8A9D),
+                            color: tc.textPrimary,
                             fontSize: 11.5.sp,
                             fontWeight: FontWeight.w400,
                           ),

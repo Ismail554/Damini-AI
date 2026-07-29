@@ -144,7 +144,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       final matchesCat =
           selectedCategory == "All" || deal.category == selectedCategory;
       final q = _searchQuery.trim().toLowerCase();
-      final matchesSearch = q.isEmpty ||
+      final matchesSearch =
+          q.isEmpty ||
           deal.title.toLowerCase().contains(q) ||
           deal.location.toLowerCase().contains(q) ||
           deal.category.toLowerCase().contains(q);
@@ -178,7 +179,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             SizedBox(height: 14.h),
             Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: AppDimens.screenHorizontal),
+                horizontal: AppDimens.screenHorizontal,
+              ),
               child: _buildSubHeader(tc, deals.length),
             ),
             SizedBox(height: 10.h),
@@ -194,8 +196,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                       itemCount: deals.length,
                       itemBuilder: (context, index) {
                         final item = deals[index];
-                        final isBookmarked =
-                            _bookmarkedIds.contains(item.id);
+                        final isBookmarked = _bookmarkedIds.contains(item.id);
                         return _buildDealCard(context, tc, item, isBookmarked);
                       },
                     ),
@@ -211,37 +212,32 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(
-        top: topInset + 4.h,
-        bottom: 18.h,
-      ),
+      padding: EdgeInsets.only(top: topInset + 4.h, bottom: 18.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF07295F),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF0B3A82),
-            Color(0xFF052152),
-          ],
-        ),
+        color: tc.isDark ? const Color(0xFF07295F) : Colors.white,
+        gradient: tc.isDark
+            ? const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF0B3A82), Color(0xFF052152)],
+              )
+            : const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFFFFFFFF), Color(0xFFF8FAFC)],
+              ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(28.r),
           bottomRight: Radius.circular(28.r),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: tc.shadowColor,
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.white.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: tc.borderColor, width: 1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,7 +246,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           SizedBox(height: 10.h),
           Padding(
             padding: EdgeInsets.symmetric(
-                horizontal: AppDimens.screenHorizontal),
+              horizontal: AppDimens.screenHorizontal,
+            ),
             child: _buildSearchBar(tc),
           ),
           SizedBox(height: 16.h),
@@ -272,7 +269,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             onPressed: () => context.pop(),
             icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: Colors.white,
+              color: tc.textPrimary,
               size: 20.r,
             ),
           ),
@@ -282,7 +279,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
             style: GoogleFonts.outfit(
               fontSize: 24.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: tc.textPrimary,
             ),
           ),
         ],
@@ -295,18 +292,15 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       height: 48.h,
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: tc.isDark ? Colors.white.withValues(alpha: 0.08) : tc.cardInner,
         borderRadius: BorderRadius.circular(24.r),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.35),
-          width: 1,
-        ),
+        border: Border.all(color: tc.borderColor, width: 1),
       ),
       child: Row(
         children: [
           Icon(
             Icons.search_rounded,
-            color: Colors.white.withValues(alpha: 0.8),
+            color: tc.textSecondary,
             size: AppDimens.iconMd,
           ),
           SizedBox(width: 10.w),
@@ -318,14 +312,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   _searchQuery = val;
                 });
               },
-              style: GoogleFonts.outfit(
-                color: Colors.white,
-                fontSize: 14.sp,
-              ),
+              style: GoogleFonts.outfit(color: tc.textPrimary, fontSize: 14.sp),
               decoration: InputDecoration(
                 hintText: "Search deals near you...",
                 hintStyle: GoogleFonts.outfit(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: tc.textTertiary,
                   fontSize: 14.sp,
                 ),
                 border: InputBorder.none,
@@ -343,7 +334,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               },
               child: Icon(
                 Icons.close_rounded,
-                color: Colors.white.withValues(alpha: 0.8),
+                color: tc.textSecondary,
                 size: AppDimens.iconSm,
               ),
             ),
@@ -378,12 +369,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.accentRed
-                    : Colors.white.withValues(alpha: 0.12),
+                    : (tc.isDark
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : tc.cardInner),
                 borderRadius: BorderRadius.circular(19.r),
                 border: Border.all(
-                  color: isSelected
-                      ? AppColors.accentRed
-                      : Colors.white.withValues(alpha: 0.2),
+                  color: isSelected ? AppColors.accentRed : tc.borderColor,
                   width: 1,
                 ),
               ),
@@ -392,11 +383,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   catLabel,
                   style: GoogleFonts.outfit(
                     fontSize: 13.sp,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.w500,
-                    color: isSelected
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.9),
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected ? Colors.white : tc.textSecondary,
                   ),
                 ),
               ),
@@ -413,10 +401,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       children: [
         Text(
           "$count results",
-          style: GoogleFonts.outfit(
-            fontSize: 13.sp,
-            color: tc.textTertiary,
-          ),
+          style: GoogleFonts.outfit(fontSize: 13.sp, color: tc.textTertiary),
         ),
         PopupMenuButton<String>(
           onSelected: (val) {
@@ -486,10 +471,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       decoration: BoxDecoration(
         color: tc.cardBg,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: tc.borderColor,
-          width: AppDimens.borderThin,
-        ),
+        border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16.r),
@@ -548,8 +530,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   top: 12.h,
                   left: 12.w,
                   child: Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 5.h,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.55),
                       borderRadius: BorderRadius.circular(14.r),
@@ -587,7 +571,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         isBookmarked
                             ? Icons.bookmark_rounded
                             : Icons.bookmark_border_rounded,
-                        color: isBookmarked ? AppColors.accentRed : Colors.white,
+                        color: isBookmarked
+                            ? AppColors.accentRed
+                            : Colors.white,
                         size: AppDimens.iconSm,
                       ),
                     ),
@@ -717,11 +703,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 48.r,
-              color: tc.textTertiary,
-            ),
+            Icon(Icons.search_off_rounded, size: 48.r, color: tc.textTertiary),
             SizedBox(height: 12.h),
             Text(
               "No deals found",

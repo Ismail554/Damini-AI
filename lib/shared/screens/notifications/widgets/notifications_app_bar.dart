@@ -1,22 +1,22 @@
+import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_colors.dart';
 
-class NotificationsAppBar extends StatelessWidget implements PreferredSizeWidget {
+class NotificationsAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   final VoidCallback onMarkAllRead;
 
-  const NotificationsAppBar({
-    super.key,
-    required this.onMarkAllRead,
-  });
+  const NotificationsAppBar({super.key, required this.onMarkAllRead});
 
   @override
   Size get preferredSize => Size.fromHeight(56.h);
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -30,7 +30,7 @@ class NotificationsAppBar extends StatelessWidget implements PreferredSizeWidget
                   onPressed: () => context.pop(),
                   icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: Colors.white,
+                    color: tc.textPrimary,
                     size: 22.sp,
                   ),
                   padding: EdgeInsets.zero,
@@ -40,7 +40,7 @@ class NotificationsAppBar extends StatelessWidget implements PreferredSizeWidget
                 Text(
                   'Notifications',
                   style: GoogleFonts.outfit(
-                    color: Colors.white,
+                    color: tc.textPrimary,
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
                   ),
