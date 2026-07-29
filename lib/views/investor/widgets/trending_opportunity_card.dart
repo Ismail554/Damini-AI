@@ -32,10 +32,7 @@ class TrendingOpportunityCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: tc.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        border: Border.all(
-          color: tc.borderColor,
-          width: AppDimens.borderThin,
-        ),
+        border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,16 +55,19 @@ class TrendingOpportunityCard extends StatelessWidget {
                 top: 12.h,
                 left: 12.w,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
                   decoration: BoxDecoration(
                     color: tc.pillBg,
                     borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                   ),
                   child: Text(
-                    "Funding Active",
+                    "Ongoing",
                     style: GoogleFonts.outfit(
                       fontSize: 12.sp,
-                      color: tc.pillText,
+                      color: Colors.green,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -176,8 +176,9 @@ class TrendingOpportunityCard extends StatelessWidget {
                           value: progress,
                           minHeight: 6.h,
                           backgroundColor: tc.progressBg,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(tc.progressFill),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            tc.progressFill,
+                          ),
                         ),
                       ),
                     ],

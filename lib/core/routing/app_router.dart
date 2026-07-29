@@ -33,6 +33,8 @@ import '../../views/sponsor/nda/edit_nda_view.dart';
 import '../../views/subscription/subscription_view.dart';
 import '../../views/profile/public_profile/public_profile_view.dart';
 import '../../views/ai_chat/ai_chat_view.dart';
+import '../../views/investor/discover_screen.dart';
+import '../../views/investor/request_collaboration/request_collaboration_screen.dart';
 import 'custom_page_transition.dart';
 
 class AppRouter {
@@ -272,6 +274,27 @@ class AppRouter {
           state: state,
           child: const NotificationsScreen(),
         ),
+      ),
+      GoRoute(
+        path: '/discover',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const DiscoverScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/request-collaboration',
+        pageBuilder: (context, state) {
+          final project = state.extra is ProjectPublicViewModel
+              ? state.extra as ProjectPublicViewModel
+              : null;
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: RequestCollaborationScreen(project: project),
+          );
+        },
       ),
       GoRoute(
         path: '/settings',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 import 'circle_action_button.dart';
@@ -11,6 +12,7 @@ class ProjectPublicCompactAppBar extends StatelessWidget {
   final double appBarOpacity;
   final double statusBarHeight;
   final Color backgroundColor;
+  final bool isBookmarked;
   final VoidCallback onBackTap;
   final VoidCallback onBookmarkTap;
 
@@ -20,6 +22,7 @@ class ProjectPublicCompactAppBar extends StatelessWidget {
     required this.appBarOpacity,
     required this.statusBarHeight,
     required this.backgroundColor,
+    this.isBookmarked = false,
     required this.onBackTap,
     required this.onBookmarkTap,
   });
@@ -78,10 +81,13 @@ class ProjectPublicCompactAppBar extends StatelessWidget {
                 ),
                 SizedBox(width: AppDimens.spaceMd),
                 CircleActionButton(
-                  icon: Icons.bookmark_border_rounded,
+                  icon: isBookmarked
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
                   background: tc.cardInner,
                   borderColor: tc.borderColor,
-                  iconColor: tc.textPrimary,
+                  iconColor:
+                      isBookmarked ? AppColors.accentRed : tc.textPrimary,
                   onTap: onBookmarkTap,
                 ),
               ],

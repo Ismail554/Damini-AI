@@ -4,13 +4,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 
 class PublicViewImageHeader extends StatefulWidget {
   final List<String>? imageUrls;
+  final bool isBookmarked;
+  final VoidCallback? onBookmarkTap;
 
-  const PublicViewImageHeader({super.key, this.imageUrls});
+  const PublicViewImageHeader({
+    super.key,
+    this.imageUrls,
+    this.isBookmarked = false,
+    this.onBookmarkTap,
+  });
 
   @override
   State<PublicViewImageHeader> createState() => _PublicViewImageHeaderState();
@@ -41,55 +49,44 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
         statusBarBrightness: Brightness.dark,
       ),
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          // Image Carousel Header Banner
-          SizedBox(
-            height: double.infinity,
-            width: double.infinity,
-            child: PageView.builder(
-              itemCount: totalCount,
-              onPageChanged: (index) {
-                setState(() => _currentIndex = index);
-              },
-              itemBuilder: (context, index) {
-                final url = list[index];
-                return Image.network(
-                  url,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: tc.cardInner,
-                      child: Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          color: tc.textTertiary,
-                          size: 32.r,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+          // Image PageView Carousel
+          PageView.builder(
+            itemCount: totalCount,
+            onPageChanged: (idx) => setState(() => _currentIndex = idx),
+            itemBuilder: (context, index) {
+              return Image.network(
+                list[index],
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: tc.cardInner,
+                  child: Center(
+                    child: Icon(
+                      Icons.image_not_supported_outlined,
+                      color: tc.textTertiary,
+                      size: AppDimens.iconLg,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
 
-          // Top gradient scrim for clear status bar icon visibility
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: topPadding + 44.h,
+          // Gradient scrim overlay for icon clarity
+          Positioned.fill(
             child: IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
+                    stops: const [0.0, 0.30, 0.70, 1.0],
                     colors: [
-                      Colors.black.withValues(alpha: 0.60),
+                      Colors.black.withValues(alpha: 0.55),
                       Colors.transparent,
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.40),
                     ],
                   ),
                 ),
@@ -114,14 +111,19 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
             right: AppDimens.screenHorizontal,
             child: _buildGlassIconButton(
               tc: tc,
-              icon: Icons.bookmark_border_rounded,
-              onTap: () {},
+              icon: widget.isBookmarked
+                  ? Icons.bookmark_rounded
+                  : Icons.bookmark_border_rounded,
+              iconColor: widget.isBookmarked
+                  ? AppColors.accentRed
+                  : Colors.white,
+              onTap: widget.onBookmarkTap ?? () {},
             ),
           ),
 
           // Image Index Badge (Bottom Right edge above sheet)
           Positioned(
-            bottom: 24.h,
+            bottom: 32.h,
             right: AppDimens.screenHorizontal,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
@@ -148,6 +150,7 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
     required AppThemeColors tc,
     required IconData icon,
     required VoidCallback onTap,
+    Color iconColor = Colors.white,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -156,8 +159,8 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
-            width: 38.r,
-            height: 38.r,
+            width: 38.w,
+            height: 38.h,
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.4),
               shape: BoxShape.circle,
@@ -166,7 +169,7 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
                 width: AppDimens.borderThin,
               ),
             ),
-            child: Icon(icon, color: Colors.white, size: AppDimens.iconSm + 2),
+            child: Icon(icon, color: iconColor, size: AppDimens.iconSm + 2.sp),
           ),
         ),
       ),

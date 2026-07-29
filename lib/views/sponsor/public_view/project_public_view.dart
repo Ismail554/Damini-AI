@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../controllers/auth_provider.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
 import '../../../core/widgets/common_background.dart';
+import '../../../core/widgets/custom_snackbar.dart';
+import '../../../shared/global_key.dart';
 import 'models/project_public_view_model.dart';
 import 'widgets/project_public_compact_app_bar.dart';
 import 'widgets/project_public_sheet_content.dart';
@@ -48,6 +54,20 @@ class _ProjectPublicViewState extends State<ProjectPublicView> {
     _sheetController.dispose();
     _pageController.dispose();
     super.dispose();
+  }
+
+  bool _isBookmarked = false;
+
+  void _toggleBookmark() {
+    HapticFeedback.lightImpact();
+    setState(() {
+      _isBookmarked = !_isBookmarked;
+    });
+    if (_isBookmarked) {
+      CustomSnackBar.success(context, "Project added to your saved list!");
+    } else {
+      CustomSnackBar.info(context, "Project removed from your saved list.");
+    }
   }
 
   void _onSheetMoved() {
@@ -96,6 +116,12 @@ class _ProjectPublicViewState extends State<ProjectPublicView> {
     final appBarOpacity = ((expand - 0.72) / 0.28).clamp(0.0, 1.0);
 
     final isDark = tc.isDark;
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final userRole = auth.userRole;
+    final isInvestor =
+        userRole == GlobalKeys.investorRole ||
+        (userRole != GlobalKeys.sponsorRole);
+
     final sheetGradient = isDark
         ? const LinearGradient(
             begin: Alignment.topCenter,
@@ -125,7 +151,11 @@ class _ProjectPublicViewState extends State<ProjectPublicView> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  PublicViewImageHeader(imageUrls: _project.imageUrls),
+                  PublicViewImageHeader(
+                    imageUrls: _project.imageUrls,
+                    isBookmarked: _isBookmarked,
+                    onBookmarkTap: _toggleBookmark,
+                  ),
                   if (headerDim > 0)
                     IgnorePointer(
                       child: ColoredBox(
@@ -196,18 +226,63 @@ class _ProjectPublicViewState extends State<ProjectPublicView> {
             appBarOpacity: appBarOpacity,
             statusBarHeight: statusBarHeight,
             backgroundColor: sheetSolidBg,
+            isBookmarked: _isBookmarked,
             onBackTap: () => Navigator.of(context).maybePop(),
-            onBookmarkTap: () {},
+            onBookmarkTap: _toggleBookmark,
           ),
 
-          // Keeps bottom row clear of gesture bar
-          if (bottomInset > 0)
+          // Request Collaboration Button (Investor Role)
+          if (isInvestor)
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              height: bottomInset,
-              child: IgnorePointer(child: ColoredBox(color: sheetSolidBg)),
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: AppDimens.screenHorizontal,
+                  right: AppDimens.screenHorizontal,
+                  top: 12.h,
+                  bottom: bottomInset > 0 ? bottomInset + 8.h : 16.h,
+                ),
+                decoration: BoxDecoration(
+                  color: sheetSolidBg,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                  border: Border(
+                    top: BorderSide(
+                      color: tc.borderColor,
+                      width: AppDimens.borderThin,
+                    ),
+                  ),
+                ),
+                child: SizedBox(
+                  height: 48.h,
+                  child: ElevatedButton(
+                    onPressed: () =>
+                        context.push('/request-collaboration', extra: _project),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0066FF),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.r),
+                      ),
+                    ),
+                    child: Text(
+                      "Request Collaboration",
+                      style: GoogleFonts.outfit(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
         ],
       ),
