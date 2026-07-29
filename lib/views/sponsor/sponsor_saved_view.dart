@@ -40,7 +40,7 @@ class SponsorSavedView extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 16.h),
-                    _buildTabPills(provider),
+                    _buildTabPills(provider, tc),
                     SizedBox(height: 20.h),
                     _buildSortRow(context, tc, provider),
                     SizedBox(height: 16.h),
@@ -56,7 +56,7 @@ class SponsorSavedView extends StatelessWidget {
     );
   }
 
-  Widget _buildTabPills(SponsorSavedProvider provider) {
+  Widget _buildTabPills(SponsorSavedProvider provider, AppThemeColors tc) {
     final isProjects = provider.currentTab == SavedTab.projects;
 
     return Row(
@@ -67,14 +67,16 @@ class SponsorSavedView extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
             decoration: BoxDecoration(
               color: isProjects
-                  ? const Color(0xFF006EDB)
-                  : Colors.transparent,
+                  ? tc.buttonPrimary
+                  : (tc.isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : tc.cardInner),
               borderRadius: BorderRadius.circular(22.r),
               border: isProjects
                   ? null
                   : Border.all(
-                      color: const Color(0xFF2563EB).withValues(alpha: 0.6),
-                      width: 1.5.w,
+                      color: tc.borderColor,
+                      width: 1.w,
                     ),
             ),
             child: Text(
@@ -82,7 +84,7 @@ class SponsorSavedView extends StatelessWidget {
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
                 fontWeight: isProjects ? FontWeight.bold : FontWeight.w500,
-                color: Colors.white,
+                color: isProjects ? Colors.white : tc.textSecondary,
               ),
             ),
           ),
@@ -94,14 +96,16 @@ class SponsorSavedView extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
             decoration: BoxDecoration(
               color: !isProjects
-                  ? const Color(0xFF006EDB)
-                  : Colors.transparent,
+                  ? tc.buttonPrimary
+                  : (tc.isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : tc.cardInner),
               borderRadius: BorderRadius.circular(22.r),
               border: !isProjects
                   ? null
                   : Border.all(
-                      color: const Color(0xFF2563EB).withValues(alpha: 0.6),
-                      width: 1.5.w,
+                      color: tc.borderColor,
+                      width: 1.w,
                     ),
             ),
             child: Text(
@@ -109,7 +113,7 @@ class SponsorSavedView extends StatelessWidget {
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
                 fontWeight: !isProjects ? FontWeight.bold : FontWeight.w500,
-                color: Colors.white,
+                color: !isProjects ? Colors.white : tc.textSecondary,
               ),
             ),
           ),

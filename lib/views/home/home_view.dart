@@ -88,33 +88,24 @@ class _HomeViewState extends State<HomeView> {
   ];
 
   Widget _buildBody(bool isSponsor) {
-    if (isSponsor) {
-      switch (_currentIndex) {
-        case 0:
-          return const SponsorDashboard();
-        case 1:
-          return const SponsorSavedView();
-        case 2:
-          return const SponsorChatView();
-        case 3:
-          return const SponsorProfileView();
-        default:
-          return const SponsorDashboard();
-      }
-    } else {
-      switch (_currentIndex) {
-        case 0:
-          return const InvestorDashboard();
-        case 1:
-          return const InvestorSavedView();
-        case 2:
-          return const InvestorChatView();
-        case 3:
-          return const InvestorProfileView();
-        default:
-          return const InvestorDashboard();
-      }
-    }
+    final pages = isSponsor
+        ? const [
+            SponsorDashboard(),
+            SponsorSavedView(),
+            SponsorChatView(),
+            SponsorProfileView(),
+          ]
+        : const [
+            InvestorDashboard(),
+            InvestorSavedView(),
+            InvestorChatView(),
+            InvestorProfileView(),
+          ];
+
+    return IndexedStack(
+      index: _currentIndex,
+      children: pages,
+    );
   }
 
   void _handlePopInvoked(bool didPop) {
@@ -171,73 +162,104 @@ class _HomeViewState extends State<HomeView> {
         child: SafeArea(
           child: Stack(
             children: [
-              // Body Content
-              Positioned.fill(child: _buildBody(isSponsor)),
-
-              // Floating Action Buttons (Right) - Hidden on Profile tab (index 3)
-              if (_currentIndex != 3)
-                Positioned(
-                  right: 20.w,
-                  bottom: 100.h,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      // Orange AI Robot Button
-                      GestureDetector(
-                        onTap: () => context.push('/ai-chat'),
-                        child: Container(
-                          padding: EdgeInsets.all(12.r),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFD34E27),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFFD34E27,
-                                ).withValues(alpha: 0.4),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.smart_toy_outlined,
-                            color: Colors.white,
-                            size: 22.r,
-                          ),
-                        ),
+              // Body Content with smooth cross-fade & micro-scale transitions
+              Positioned.fill(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 280),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: ScaleTransition(
+                        scale: Tween<double>(begin: 0.97, end: 1.0)
+                            .animate(animation),
+                        child: child,
                       ),
-                      SizedBox(height: 12.h),
-
-                      // Blue + Add Button (Sponsor role) with Horizontal Expansion
-                      if (isSponsor)
-                        BubbleFab(
-                          items: [
-                            BubbleMenuItem(
-                              icon: Icons.auto_awesome,
-                              label: "Create with AI",
-                              color: const Color(0xFF9333EA),
-                              onTap: () {
-                                context.push(
-                                  '/create-project',
-                                  extra: {'isAiMode': true},
-                                );
-                              },
-                            ),
-                            BubbleMenuItem(
-                              icon: Icons.edit_note_rounded,
-                              label: "Create Myself",
-                              color: const Color(0xFF006EDB),
-                              onTap: () {
-                                context.push('/create-project');
-                              },
-                            ),
-                          ],
-                        ),
-                    ],
+                    );
+                  },
+                  child: KeyedSubtree(
+                    key: ValueKey<int>(_currentIndex),
+                    child: _buildBody(isSponsor),
                   ),
                 ),
+              ),
+
+              // Floating Action Buttons (Right) - Smooth fade & scale when switching tabs
+              Positioned(
+                right: 20.w,
+                bottom: 100.h,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 220),
+                  opacity: _currentIndex != 3 ? 1.0 : 0.0,
+                  child: AnimatedScale(
+                    duration: const Duration(milliseconds: 220),
+                    scale: _currentIndex != 3 ? 1.0 : 0.8,
+                    child: IgnorePointer(
+                      ignoring: _currentIndex == 3,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          // Orange AI Robot Button
+                          GestureDetector(
+                            onTap: () => context.push('/ai-chat'),
+                            child: Container(
+                              padding: EdgeInsets.all(12.r),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD34E27),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFFD34E27,
+                                    ).withValues(alpha: 0.4),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.smart_toy_outlined,
+                                color: Colors.white,
+                                size: 22.r,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+
+                          // Blue + Add Button (Sponsor role) with Horizontal Expansion
+                          if (isSponsor)
+                            BubbleFab(
+                              items: [
+                                BubbleMenuItem(
+                                  icon: Icons.auto_awesome,
+                                  label: "Create with AI",
+                                  color: const Color(0xFF9333EA),
+                                  onTap: () {
+                                    context.push(
+                                      '/create-project',
+                                      extra: {'isAiMode': true},
+                                    );
+                                  },
+                                ),
+                                BubbleMenuItem(
+                                  icon: Icons.edit_note_rounded,
+                                  label: "Create Myself",
+                                  color: const Color(0xFF006EDB),
+                                  onTap: () {
+                                    context.push('/create-project');
+                                  },
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
               // Bottom Navigation Bar
               Positioned(

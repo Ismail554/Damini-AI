@@ -71,7 +71,7 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
     final tc = AppThemeColors.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: tc.isDark ? const Color(0xFF0F1E2E) : Colors.white,
+      backgroundColor: tc.sheetBg,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -92,11 +92,20 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
                     children: [
                       CircleAvatar(
                         radius: 28.r,
-                        backgroundColor: const Color(0xFF2563EB),
-                        child: const Icon(Icons.camera_alt_rounded, color: Colors.white),
+                        backgroundColor: const Color(0xFF006EDB),
+                        child: const Icon(
+                          Icons.camera_alt_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                       SizedBox(height: 8.h),
-                      Text("Camera", style: GoogleFonts.outfit(color: tc.textPrimary, fontSize: 13.sp)),
+                      Text(
+                        "Camera",
+                        style: GoogleFonts.outfit(
+                          color: tc.textPrimary,
+                          fontSize: 13.sp,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -111,10 +120,19 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
                       CircleAvatar(
                         radius: 28.r,
                         backgroundColor: const Color(0xFF10B981),
-                        child: const Icon(Icons.photo_library_rounded, color: Colors.white),
+                        child: const Icon(
+                          Icons.photo_library_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                       SizedBox(height: 8.h),
-                      Text("Gallery", style: GoogleFonts.outfit(color: tc.textPrimary, fontSize: 13.sp)),
+                      Text(
+                        "Gallery",
+                        style: GoogleFonts.outfit(
+                          color: tc.textPrimary,
+                          fontSize: 13.sp,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -179,17 +197,16 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
                 decoration: BoxDecoration(
                   color: tc.isDark
                       ? const Color(0xFF0C1D2F).withValues(alpha: 0.9)
-                      : const Color(0xFFE2E8F0),
+                      : const Color(0xFFF1F5F9),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: tc.isDark
-                        ? Colors.white.withValues(alpha: 0.12)
-                        : Colors.black.withValues(alpha: 0.08),
+                    color: tc.borderColor,
+                    width: 1,
                   ),
                 ),
                 child: Icon(
                   Icons.add_photo_alternate_rounded,
-                  color: const Color(0xFF2563EB),
+                  color: const Color(0xFF006EDB),
                   size: 22.r,
                 ),
               ),
@@ -204,15 +221,16 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
                 decoration: BoxDecoration(
                   color: tc.isDark
                       ? const Color(0xFF0C1D2F).withValues(alpha: 0.9)
-                      : const Color(0xFFE2E8F0),
+                      : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(24.r),
                   border: Border.all(
-                    color: tc.isDark
-                        ? Colors.white.withValues(alpha: 0.12)
-                        : Colors.black.withValues(alpha: 0.08),
+                    color: tc.borderColor,
+                    width: 1,
                   ),
                 ),
-                child: _isRecording ? _buildRecordingBar(tc) : _buildInputContent(tc),
+                child: _isRecording
+                    ? _buildRecordingBar(tc)
+                    : _buildInputContent(tc),
               ),
             ),
             SizedBox(width: 8.w),
@@ -230,10 +248,7 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
       child: TextField(
         controller: widget.controller,
         onSubmitted: (_) => widget.onSend(),
-        style: GoogleFonts.outfit(
-          fontSize: 14.sp,
-          color: tc.textPrimary,
-        ),
+        style: GoogleFonts.outfit(fontSize: 14.sp, color: tc.textPrimary),
         decoration: InputDecoration(
           hintText: "Type a message...",
           hintStyle: GoogleFonts.outfit(
@@ -276,7 +291,7 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
           onTap: _cancelRecording,
           child: Icon(
             Icons.delete_outline_rounded,
-            color: Colors.grey,
+            color: tc.textTertiary,
             size: 22.r,
           ),
         ),
@@ -295,11 +310,7 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
             color: Color(0xFF10B981),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.check_rounded,
-            color: Colors.white,
-            size: 22.r,
-          ),
+          child: Icon(Icons.check_rounded, color: Colors.white, size: 22.r),
         ),
       );
     }
@@ -311,14 +322,10 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
           width: 48.r,
           height: 48.r,
           decoration: const BoxDecoration(
-            color: Color(0xFF2563EB),
+            color: Color(0xFF006EDB),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            Icons.send_rounded,
-            color: Colors.white,
-            size: 20.r,
-          ),
+          child: Icon(Icons.send_rounded, color: Colors.white, size: 20.r),
         ),
       );
     }
@@ -329,14 +336,10 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
         width: 48.r,
         height: 48.r,
         decoration: const BoxDecoration(
-          color: Color(0xFF2563EB),
+          color: Color(0xFF006EDB),
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          Icons.mic_rounded,
-          color: Colors.white,
-          size: 22.r,
-        ),
+        child: Icon(Icons.mic_rounded, color: Colors.white, size: 22.r),
       ),
     );
   }

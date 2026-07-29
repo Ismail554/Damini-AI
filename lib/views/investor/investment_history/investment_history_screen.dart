@@ -1,8 +1,10 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 import '../../../../core/widgets/common_background.dart';
@@ -106,8 +108,9 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
   List<InvestmentRecordModel> get _filteredRecords {
     if (_selectedFilter == "All") return _allRecords;
     return _allRecords
-        .where((item) =>
-            item.status.toLowerCase() == _selectedFilter.toLowerCase())
+        .where(
+          (item) => item.status.toLowerCase() == _selectedFilter.toLowerCase(),
+        )
         .toList();
   }
 
@@ -127,7 +130,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
           backgroundColor: Colors.transparent,
           body: Column(
             children: [
-              _buildTopHeader(context, topInset),
+              _buildTopHeader(context, tc, topInset),
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -141,9 +144,9 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildSummaryCard(tc),
-                      SizedBox(height: 20.h),
+                      AppSpacing.h20,
                       _buildFilterChips(tc),
-                      SizedBox(height: 16.h),
+                      AppSpacing.h16,
                       if (records.isEmpty)
                         _buildEmptyState(tc)
                       else
@@ -152,7 +155,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: records.length,
                           separatorBuilder: (context, index) =>
-                              SizedBox(height: 14.h),
+                              AppSpacing.h14,
                           itemBuilder: (context, index) {
                             return _buildRecordCard(tc, records[index]);
                           },
@@ -168,7 +171,11 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
     );
   }
 
-  Widget _buildTopHeader(BuildContext context, double topInset) {
+  Widget _buildTopHeader(
+    BuildContext context,
+    AppThemeColors tc,
+    double topInset,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(
@@ -178,10 +185,10 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
         right: 16.w,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF062248),
+        color: tc.isDark ? const Color(0xFF062248) : tc.cardBg,
         border: Border(
           bottom: BorderSide(
-            color: Colors.white.withValues(alpha: 0.12),
+            color: tc.borderColor,
             width: 1,
           ),
         ),
@@ -190,19 +197,15 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
         children: [
           IconButton(
             onPressed: () => context.pop(),
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-              size: 22.r,
-            ),
+            icon: Icon(Icons.arrow_back, color: tc.textPrimary, size: 22.sp),
           ),
-          SizedBox(width: 4.w),
+          AppSpacing.w4,
           Text(
             "Investment History",
             style: GoogleFonts.outfit(
               fontSize: 20.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: tc.textPrimary,
             ),
           ),
         ],
@@ -215,15 +218,15 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C2240),
+        color: tc.isDark ? const Color(0xFF0C2240) : tc.cardBg,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.18),
+          color: tc.borderColor,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: tc.shadowColor,
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -241,16 +244,16 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                   fontSize: 11.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: tc.textTertiary,
                 ),
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.2),
+                  color: tc.greenPillBg,
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
-                    color: Colors.green.withValues(alpha: 0.4),
+                    color: AppColors.successGreen.withValues(alpha: 0.4),
                     width: 1,
                   ),
                 ),
@@ -259,7 +262,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 11.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: AppColors.successGreen,
                   ),
                 ),
               ),
@@ -271,7 +274,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
             style: GoogleFonts.outfit(
               fontSize: 28.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: tc.textPrimary,
             ),
           ),
           SizedBox(height: 4.h),
@@ -279,11 +282,11 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
             "Total Capital Deployed",
             style: GoogleFonts.outfit(
               fontSize: 12.sp,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: tc.textSecondary,
             ),
           ),
           SizedBox(height: 16.h),
-          Divider(color: Colors.white.withValues(alpha: 0.1), height: 1),
+          Divider(color: tc.borderColor, height: 1),
           SizedBox(height: 14.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -295,7 +298,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                     "Current Value",
                     style: GoogleFonts.outfit(
                       fontSize: 11.sp,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: tc.textTertiary,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -304,7 +307,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                     style: GoogleFonts.outfit(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: tc.textPrimary,
                     ),
                   ),
                 ],
@@ -316,7 +319,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                     "Total Profit / Return",
                     style: GoogleFonts.outfit(
                       fontSize: 11.sp,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: tc.textTertiary,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -325,7 +328,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                     style: GoogleFonts.outfit(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green,
+                      color: AppColors.successGreen,
                     ),
                   ),
                 ],
@@ -359,13 +362,11 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                 color: isSelected
                     ? const Color(0xFF0066FF)
                     : tc.isDark
-                        ? const Color(0xFF0A1D36)
-                        : Colors.white,
+                    ? const Color(0xFF0A1D36)
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(18.r),
                 border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFF0066FF)
-                      : tc.borderColor,
+                  color: isSelected ? const Color(0xFF0066FF) : tc.borderColor,
                   width: 1,
                 ),
               ),
@@ -374,8 +375,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
                   filter,
                   style: GoogleFonts.outfit(
                     fontSize: 13.sp,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                     color: isSelected ? Colors.white : tc.textSecondary,
                   ),
                 ),
@@ -407,10 +407,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
       decoration: BoxDecoration(
         color: tc.isDark ? const Color(0xFF0A1D36) : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: tc.borderColor,
-          width: AppDimens.borderThin,
-        ),
+        border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
         boxShadow: [
           BoxShadow(
             color: tc.shadowColor,
@@ -592,11 +589,7 @@ class _InvestmentHistoryScreenState extends State<InvestmentHistoryScreen> {
       child: Center(
         child: Column(
           children: [
-            Icon(
-              Icons.trending_up_rounded,
-              size: 48.r,
-              color: tc.textTertiary,
-            ),
+            Icon(Icons.trending_up_rounded, size: 48.r, color: tc.textTertiary),
             SizedBox(height: 12.h),
             Text(
               "No investment records found",

@@ -9,7 +9,7 @@ class ThemeService {
   }
 
   static String getThemeModeString() {
-    return _prefs?.getString(_key) ?? 'system';
+    return _prefs?.getString(_key) ?? 'dark';
   }
 
   static Future<void> setThemeModeString(String mode) async {

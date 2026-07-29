@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_dimens.dart';
 import '../../core/utils/app_theme_colors.dart';
+import '../../core/widgets/custom_snackbar.dart';
 import 'create_project/controllers/project_draft_provider.dart';
 import 'widgets/sponsor_active_project_card.dart';
 import 'widgets/sponsor_draft_card.dart';
@@ -136,9 +137,16 @@ class SponsorDashboard extends StatelessWidget {
               (draft) => Padding(
                 padding: EdgeInsets.only(bottom: AppDimens.paddingSm),
                 child: SponsorDraftCard(
+                  dismissKey: ValueKey(draft.id),
                   title: draft.title,
                   lastEdited: draft.lastEdited,
                   onTap: () => context.push('/create-project', extra: draft),
+                  onDelete: () async {
+                    await draftProvider.deleteDraft(draft.id);
+                    if (context.mounted) {
+                      CustomSnackBar.success(context, "Draft deleted");
+                    }
+                  },
                 ),
               ),
             ),

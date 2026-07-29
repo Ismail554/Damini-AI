@@ -8,19 +8,23 @@ class SponsorDraftCard extends StatelessWidget {
   final String title;
   final String lastEdited;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
+  final Key? dismissKey;
 
   const SponsorDraftCard({
     super.key,
     required this.title,
     required this.lastEdited,
     this.onTap,
+    this.onDelete,
+    this.dismissKey,
   });
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
-    return GestureDetector(
+    final cardContent = GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
@@ -71,9 +75,57 @@ class SponsorDraftCard extends StatelessWidget {
                 ],
               ),
             ),
+            if (onDelete != null)
+              IconButton(
+                icon: Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.redAccent.withValues(alpha: 0.8),
+                  size: 20.r,
+                ),
+                onPressed: onDelete,
+                tooltip: 'Delete Draft',
+              ),
           ],
         ),
       ),
+    );
+
+    if (dismissKey == null || onDelete == null) {
+      return cardContent;
+    }
+
+    return Dismissible(
+      key: dismissKey!,
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) => onDelete?.call(),
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 20.w),
+        decoration: BoxDecoration(
+          color: Colors.redAccent.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              "Delete",
+              style: GoogleFonts.outfit(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Icon(
+              Icons.delete_forever_rounded,
+              color: Colors.white,
+              size: 24.r,
+            ),
+          ],
+        ),
+      ),
+      child: cardContent,
     );
   }
 }

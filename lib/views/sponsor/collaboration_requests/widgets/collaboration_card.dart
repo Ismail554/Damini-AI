@@ -249,7 +249,7 @@ class CollaborationCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: const Color(0xFF3B1E19).withValues(alpha: 0.8),
+        color: tc.logoutBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
         border: Border.all(
           color: AppColors.accentOrange.withValues(alpha: 0.3),

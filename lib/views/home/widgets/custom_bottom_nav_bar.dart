@@ -35,8 +35,50 @@ class CustomBottomNavBar extends StatefulWidget {
   State<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
 }
 
-class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
+class _CustomBottomNavBarState extends State<CustomBottomNavBar>
+    with SingleTickerProviderStateMixin {
   double? _dragX;
+  late AnimationController _indicatorController;
+  late Animation<double> _indicatorAnimation;
+  double _currentPosition = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _indicatorController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _currentPosition = widget.currentIndex.toDouble();
+    _indicatorAnimation = AlwaysStoppedAnimation(_currentPosition);
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomBottomNavBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      _animateToIndex(widget.currentIndex);
+    }
+  }
+
+  void _animateToIndex(int index) {
+    _indicatorAnimation = Tween<double>(
+      begin: _currentPosition,
+      end: index.toDouble(),
+    ).animate(CurvedAnimation(
+      parent: _indicatorController,
+      curve: Curves.easeOutCubic,
+    ));
+    _indicatorController.forward(from: 0).then((_) {
+      _currentPosition = index.toDouble();
+    });
+  }
+
+  @override
+  void dispose() {
+    _indicatorController.dispose();
+    super.dispose();
+  }
 
   int _indexAt(double x, double barWidth) {
     final itemWidth = barWidth / widget.items.length;
@@ -49,14 +91,21 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAndroid = PlatformUtils.isAndroid;
 
-    // Platform & Theme-adaptive colors
+    if (isAndroid) {
+      return _buildAndroidNavBar(tc, isDark);
+    }
+    return _buildIOSNavBar(tc, isDark);
+  }
+
+  // ── iOS: Liquid glass nav bar (unchanged) ──────────────────────
+  Widget _buildIOSNavBar(AppThemeColors tc, bool isDark) {
     final glassColor = isDark
-        ? (isAndroid ? const Color(0xE60D1F30) : const Color(0x730D1F30))
-        : (isAndroid ? const Color(0xF2FFFFFF) : const Color(0x99F5F7FA));
+        ? const Color(0x730D1F30)
+        : const Color(0x99F5F7FA);
 
     final glassBorder = isDark
-        ? Colors.white.withValues(alpha: isAndroid ? 0.12 : 0.18)
-        : (isAndroid ? const Color(0xFFE2E8F0) : Colors.white.withValues(alpha: 0.65));
+        ? Colors.white.withValues(alpha: 0.18)
+        : Colors.white.withValues(alpha: 0.65);
 
     final glassGlow = isDark
         ? AppColors.primaryColor.withValues(alpha: 0.25)
@@ -80,10 +129,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             decoration: BoxDecoration(
               color: glassColor,
               borderRadius: BorderRadius.circular(AppDimens.radiusPill),
-              border: Border.all(
-                color: glassBorder,
-                width: 1.2,
-              ),
+              border: Border.all(color: glassBorder, width: 1.2),
               boxShadow: [
                 BoxShadow(
                   color: tc.shadowColor.withValues(alpha: 0.3),
@@ -95,7 +141,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
                   color: glassGlow,
                   blurRadius: 15,
                   spreadRadius: -2,
-                  offset: const Offset(0, 0),
                 ),
               ],
             ),
@@ -114,22 +159,22 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
 
                 return GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTapUp: (details) =>
-                      widget.onTap(_indexAt(details.localPosition.dx, barWidth)),
-                  onHorizontalDragStart: (details) =>
-                      setState(() => _dragX = details.localPosition.dx),
-                  onHorizontalDragUpdate: (details) => setState(
-                    () => _dragX = details.localPosition.dx.clamp(0.0, barWidth),
+                  onTapUp: (d) =>
+                      widget.onTap(_indexAt(d.localPosition.dx, barWidth)),
+                  onHorizontalDragStart: (d) =>
+                      setState(() => _dragX = d.localPosition.dx),
+                  onHorizontalDragUpdate: (d) => setState(
+                    () => _dragX = d.localPosition.dx.clamp(0.0, barWidth),
                   ),
                   onHorizontalDragEnd: (_) {
-                    final index = _indexAt(_dragX!, barWidth);
+                    final idx = _indexAt(_dragX!, barWidth);
                     setState(() => _dragX = null);
-                    widget.onTap(index);
+                    widget.onTap(idx);
                   },
-                  onHorizontalDragCancel: () => setState(() => _dragX = null),
+                  onHorizontalDragCancel: () =>
+                      setState(() => _dragX = null),
                   child: Stack(
                     children: [
-                      // Smooth fluid capsule indicator slider
                       AnimatedPositioned(
                         duration: dragging
                             ? Duration.zero
@@ -144,54 +189,19 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
                             color: pillColor,
                             borderRadius: BorderRadius.circular(24.r),
                             border: Border.all(
-                              color: AppColors.primaryColor.withValues(alpha: 0.35),
+                              color: AppColors.primaryColor
+                                  .withValues(alpha: 0.35),
                               width: 1,
                             ),
                           ),
                         ),
                       ),
                       Row(
-                        children: List.generate(widget.items.length, (index) {
-                          final isSelected = index == activeIndex;
-                          final item = widget.items[index];
-                          final iconData = (isSelected && item.activeIcon != null)
-                              ? item.activeIcon!
-                              : item.icon;
-
-                          return Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                AnimatedScale(
-                                  duration: const Duration(milliseconds: 200),
-                                  scale: isSelected ? 1.15 : 1.0,
-                                  child: Icon(
-                                    iconData,
-                                    color: isSelected
-                                        ? tc.navSelectedIcon
-                                        : tc.navIcon.withValues(alpha: 0.7),
-                                    size: 22.r,
-                                  ),
-                                ),
-                                SizedBox(height: 3.h),
-                                Text(
-                                  item.label,
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 10.sp,
-                                    color: isSelected
-                                        ? tc.navSelectedText
-                                        : tc.navIcon.withValues(alpha: 0.7),
-                                    fontWeight: isSelected
-                                        ? FontWeight.w700
-                                        : FontWeight.w500,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
+                        children: List.generate(
+                          widget.items.length,
+                          (i) => _buildIOSItem(tc, widget.items[i],
+                              i == activeIndex),
+                        ),
                       ),
                     ],
                   ),
@@ -200,6 +210,217 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIOSItem(AppThemeColors tc, CustomNavItemData item, bool sel) {
+    final iconData =
+        (sel && item.activeIcon != null) ? item.activeIcon! : item.icon;
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedScale(
+            duration: const Duration(milliseconds: 200),
+            scale: sel ? 1.15 : 1.0,
+            child: Icon(
+              iconData,
+              color: sel ? tc.navSelectedIcon : tc.navIcon.withValues(alpha: 0.7),
+              size: 22.r,
+            ),
+          ),
+          SizedBox(height: 3.h),
+          Text(
+            item.label,
+            style: GoogleFonts.outfit(
+              fontSize: 10.sp,
+              color: sel
+                  ? tc.navSelectedText
+                  : tc.navIcon.withValues(alpha: 0.7),
+              fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Android: Material 3 floating nav bar ───────────────────────
+  Widget _buildAndroidNavBar(AppThemeColors tc, bool isDark) {
+    final surfaceColor = isDark
+        ? const Color(0xFF0F1E2F)
+        : Colors.white;
+
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.10)
+        : const Color(0xFFE2E8F0);
+
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: 20.w,
+        vertical: AppDimens.navBarMarginV,
+      ),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(28.r),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.50)
+                : Colors.black.withValues(alpha: 0.10),
+            blurRadius: 20,
+            spreadRadius: 0,
+            offset: const Offset(0, 8),
+          ),
+          if (!isDark)
+            BoxShadow(
+              color: AppColors.primaryColor.withValues(alpha: 0.06),
+              blurRadius: 30,
+              spreadRadius: -4,
+              offset: const Offset(0, 4),
+            ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28.r),
+        child: SizedBox(
+          height: 64.h,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final barWidth = constraints.maxWidth;
+              final itemWidth = barWidth / widget.items.length;
+
+              return AnimatedBuilder(
+                animation: _indicatorAnimation,
+                builder: (context, _) {
+                  final dragging = _dragX != null;
+                  final activeIndex = dragging
+                      ? _indexAt(_dragX!, barWidth)
+                      : widget.currentIndex;
+
+                  final indicatorPos = dragging
+                      ? (_dragX! / itemWidth - 0.5)
+                          .clamp(0.0, widget.items.length - 1.0)
+                      : _indicatorAnimation.value;
+
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapUp: (d) =>
+                        widget.onTap(_indexAt(d.localPosition.dx, barWidth)),
+                    onHorizontalDragStart: (d) =>
+                        setState(() => _dragX = d.localPosition.dx),
+                    onHorizontalDragUpdate: (d) => setState(
+                      () => _dragX =
+                          d.localPosition.dx.clamp(0.0, barWidth),
+                    ),
+                    onHorizontalDragEnd: (_) {
+                      final idx = _indexAt(_dragX!, barWidth);
+                      setState(() => _dragX = null);
+                      widget.onTap(idx);
+                    },
+                    onHorizontalDragCancel: () =>
+                        setState(() => _dragX = null),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // ── Animated indicator pill ──
+                        Positioned(
+                          left: indicatorPos * itemWidth +
+                              (itemWidth - 48.w) / 2,
+                          top: 8.h,
+                          child: Container(
+                            width: 48.w,
+                            height: 32.h,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.primaryColor
+                                      .withValues(alpha: 0.20)
+                                  : AppColors.primaryColor
+                                      .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                          ),
+                        ),
+                        // ── Nav items row ──
+                        Row(
+                          children: List.generate(
+                            widget.items.length,
+                            (i) => _buildAndroidItem(
+                              tc,
+                              isDark,
+                              widget.items[i],
+                              i == activeIndex,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAndroidItem(
+    AppThemeColors tc,
+    bool isDark,
+    CustomNavItemData item,
+    bool sel,
+  ) {
+    final iconData =
+        (sel && item.activeIcon != null) ? item.activeIcon! : item.icon;
+
+    final activeColor = isDark
+        ? AppColors.activeBlue
+        : AppColors.primaryColor;
+
+    final inactiveColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : const Color(0xFF94A3B8);
+
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 32.h,
+            child: Center(
+              child: AnimatedScale(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutBack,
+                scale: sel ? 1.12 : 1.0,
+                child: Icon(
+                  iconData,
+                  color: sel ? activeColor : inactiveColor,
+                  size: 22.sp,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 1.h),
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: GoogleFonts.outfit(
+              fontSize: sel ? 10.sp : 10.sp,
+              color: sel ? activeColor : inactiveColor,
+              fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+              height: 1.2,
+            ),
+            child: Text(
+              item.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -35,24 +35,34 @@ class InvestorContributionCard extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: GestureDetector(
-              onTap: onTap ??
-                  () => context.push(
-                        '/public-profile',
-                        extra: {
-                          'name': contribution.name,
-                          'title': contribution.type,
-                          'avatarUrl': contribution.avatarUrl,
-                        },
-                      ),
-              child: Row(
-                children: [
-                  CircleAvatar(
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => context.push(
+                    '/public-profile',
+                    extra: {
+                      'name': contribution.name,
+                      'title': contribution.type,
+                      'avatarUrl': contribution.avatarUrl,
+                    },
+                  ),
+                  child: CircleAvatar(
                     radius: AppDimens.avatarMd,
                     backgroundImage: NetworkImage(contribution.avatarUrl),
                   ),
-                  SizedBox(width: AppDimens.spaceMd),
-                  Expanded(
+                ),
+                SizedBox(width: AppDimens.spaceMd),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: onTap ??
+                        () => context.push(
+                              '/public-profile',
+                              extra: {
+                                'name': contribution.name,
+                                'title': contribution.type,
+                                'avatarUrl': contribution.avatarUrl,
+                              },
+                            ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -109,8 +119,8 @@ class InvestorContributionCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           SizedBox(width: AppDimens.spaceSm),

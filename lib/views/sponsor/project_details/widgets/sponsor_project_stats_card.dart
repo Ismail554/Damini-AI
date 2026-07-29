@@ -10,10 +10,7 @@ import '../models/sponsor_project_details_model.dart';
 class SponsorProjectStatsCard extends StatelessWidget {
   final SponsorProjectDetailsModel project;
 
-  const SponsorProjectStatsCard({
-    super.key,
-    required this.project,
-  });
+  const SponsorProjectStatsCard({super.key, required this.project});
 
   @override
   Widget build(BuildContext context) {
@@ -146,10 +143,10 @@ class SponsorProjectStatsCard extends StatelessWidget {
                   vertical: AppDimens.paddingSm + 2,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF331B19).withValues(alpha: 0.5),
+                  color: tc.logoutBg,
                   borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                   border: Border.all(
-                    color: AppColors.accentOrange.withValues(alpha: 0.3),
+                    color: tc.logoutText.withValues(alpha: 0.3),
                     width: AppDimens.borderThin,
                   ),
                 ),
@@ -222,10 +219,7 @@ class SponsorProjectStatsCard extends StatelessWidget {
           SizedBox(height: 2.h),
           Text(
             label,
-            style: GoogleFonts.outfit(
-              fontSize: 10.sp,
-              color: tc.textTertiary,
-            ),
+            style: GoogleFonts.outfit(fontSize: 10.sp, color: tc.textTertiary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

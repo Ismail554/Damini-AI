@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,10 +9,7 @@ import '../models/chat_message_model.dart';
 class DirectChatBubble extends StatefulWidget {
   final ChatMessageModel message;
 
-  const DirectChatBubble({
-    super.key,
-    required this.message,
-  });
+  const DirectChatBubble({super.key, required this.message});
 
   @override
   State<DirectChatBubble> createState() => _DirectChatBubbleState();
@@ -36,8 +34,10 @@ class _DirectChatBubbleState extends State<DirectChatBubble> {
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
         decoration: BoxDecoration(
           color: isMe
-              ? const Color(0xFF2563EB)
-              : (tc.isDark ? const Color(0xFF3B4D63) : const Color(0xFFE2E8F0)),
+              ? tc.buttonPrimary
+              : (tc.isDark
+                    ? const Color(0xFF1E2D3D)
+                    : const Color.fromARGB(255, 162, 196, 240)),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16.r),
             topRight: Radius.circular(16.r),
@@ -46,21 +46,20 @@ class _DirectChatBubbleState extends State<DirectChatBubble> {
           ),
         ),
         child: Column(
-          crossAxisAlignment:
-              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildContent(tc),
-            SizedBox(height: 6.h),
+            AppSpacing.h6,
             Text(
               widget.message.timestamp,
               style: GoogleFonts.outfit(
                 fontSize: 10.sp,
                 color: isMe
                     ? Colors.white.withValues(alpha: 0.7)
-                    : (tc.isDark
-                        ? Colors.white.withValues(alpha: 0.5)
-                        : const Color(0xFF64748B)),
+                    : tc.textTertiary,
               ),
             ),
           ],
@@ -89,22 +88,28 @@ class _DirectChatBubbleState extends State<DirectChatBubble> {
               radius: 18.r,
               backgroundColor: isMe
                   ? Colors.white.withValues(alpha: 0.2)
-                  : (tc.isDark ? Colors.white.withValues(alpha: 0.15) : const Color(0xFF2563EB)),
+                  : (tc.isDark
+                        ? Colors.white.withValues(alpha: 0.15)
+                        : tc.buttonPrimary),
               child: Icon(
-                _isPlayingVoice ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                _isPlayingVoice
+                    ? Icons.pause_rounded
+                    : Icons.play_arrow_rounded,
                 color: Colors.white,
-                size: 20.r,
+                size: 20.sp,
               ),
             ),
           ),
-          SizedBox(width: 10.w),
+
+          AppSpacing.w10,
           _buildWaveformUI(isMe),
-          SizedBox(width: 8.w),
+
+          AppSpacing.w8,
           Text(
             widget.message.voiceDuration ?? "0:15",
             style: GoogleFonts.outfit(
               fontSize: 12.sp,
-              color: isMe ? Colors.white : (tc.isDark ? Colors.white : const Color(0xFF0F172A)),
+              color: isMe ? Colors.white : tc.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -116,9 +121,7 @@ class _DirectChatBubbleState extends State<DirectChatBubble> {
       widget.message.text,
       style: GoogleFonts.outfit(
         fontSize: 14.sp,
-        color: isMe
-            ? Colors.white
-            : (tc.isDark ? Colors.white : const Color(0xFF0F172A)),
+        color: isMe ? Colors.white : tc.textPrimary,
         height: 1.35,
       ),
     );
@@ -127,21 +130,11 @@ class _DirectChatBubbleState extends State<DirectChatBubble> {
   Widget _buildImageWidget() {
     final path = widget.message.mediaUrl ?? '';
     if (path.startsWith('assets/')) {
-      return Image.asset(
-        path,
-        width: 200.w,
-        height: 140.h,
-        fit: BoxFit.cover,
-      );
+      return Image.asset(path, width: 200.w, height: 140.h, fit: BoxFit.cover);
     }
     final file = File(path);
     if (file.existsSync()) {
-      return Image.file(
-        file,
-        width: 200.w,
-        height: 140.h,
-        fit: BoxFit.cover,
-      );
+      return Image.file(file, width: 200.w, height: 140.h, fit: BoxFit.cover);
     }
     return Image.asset(
       'assets/images/onboarding1.png',
@@ -163,7 +156,9 @@ class _DirectChatBubbleState extends State<DirectChatBubble> {
           decoration: BoxDecoration(
             color: isMe
                 ? Colors.white.withValues(alpha: _isPlayingVoice ? 0.9 : 0.6)
-                : Colors.blueAccent.withValues(alpha: _isPlayingVoice ? 0.9 : 0.6),
+                : Colors.blueAccent.withValues(
+                    alpha: _isPlayingVoice ? 0.9 : 0.6,
+                  ),
             borderRadius: BorderRadius.circular(2.r),
           ),
         );
