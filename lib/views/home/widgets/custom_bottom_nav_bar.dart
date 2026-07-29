@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
+import '../../../core/utils/platform_utils.dart';
 
 class CustomNavItemData {
   final String label;
@@ -46,23 +47,24 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isAndroid = PlatformUtils.isAndroid;
 
-    // Liquid glass color configurations for iOS style glassmorphism
+    // Platform & Theme-adaptive colors
     final glassColor = isDark
-        ? const Color(0x730D1F30) // Semi-transparent glass navy dark
-        : const Color(0x99F5F7FA); // Semi-transparent ultra light glass
+        ? (isAndroid ? const Color(0xE60D1F30) : const Color(0x730D1F30))
+        : (isAndroid ? const Color(0xF2FFFFFF) : const Color(0x99F5F7FA));
 
     final glassBorder = isDark
-        ? Colors.white.withValues(alpha: 0.18)
-        : Colors.white.withValues(alpha: 0.65);
+        ? Colors.white.withValues(alpha: isAndroid ? 0.12 : 0.18)
+        : (isAndroid ? const Color(0xFFE2E8F0) : Colors.white.withValues(alpha: 0.65));
 
     final glassGlow = isDark
         ? AppColors.primaryColor.withValues(alpha: 0.25)
-        : AppColors.primaryColor.withValues(alpha: 0.15);
+        : AppColors.primaryColor.withValues(alpha: 0.12);
 
     final pillColor = isDark
-        ? AppColors.primaryColor.withValues(alpha: 0.25)
-        : AppColors.primaryColor.withValues(alpha: 0.18);
+        ? tc.navSelectedPill
+        : AppColors.primaryColor.withValues(alpha: 0.15);
 
     return Container(
       margin: EdgeInsets.symmetric(

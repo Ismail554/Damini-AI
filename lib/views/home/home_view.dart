@@ -1,5 +1,4 @@
 import 'package:cupertino_native/cupertino_native.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../controllers/auth_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_theme_colors.dart';
+import '../../core/utils/platform_utils.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
 import '../investor/investor_chat_view.dart';
@@ -160,7 +160,7 @@ class _HomeViewState extends State<HomeView> {
     final isSponsor = auth.userRole == GlobalKeys.sponsorRole;
     final navItems = isSponsor ? _sponsorNavItems : _investorNavItems;
     final cnItems = isSponsor ? _sponsorCNItems : _investorCNItems;
-    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    final isIOS = PlatformUtils.isIOS;
 
     return PopScope(
       canPop: false,

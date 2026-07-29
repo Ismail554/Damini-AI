@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,18 +11,19 @@ import 'sponsor_profile_card.dart';
 class PublicViewStatsCard extends StatelessWidget {
   final ProjectPublicViewModel project;
 
-  const PublicViewStatsCard({
-    super.key,
-    required this.project,
-  });
+  const PublicViewStatsCard({super.key, required this.project});
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
     final title = project.title.isNotEmpty ? project.title : "Untitled Project";
-    final location = project.location.isNotEmpty ? project.location : "Location N/A";
-    final targetRaise = project.targetRaise.isNotEmpty ? project.targetRaise : "\$0";
+    final location = project.location.isNotEmpty
+        ? project.location
+        : "Location N/A";
+    final targetRaise = project.targetRaise.isNotEmpty
+        ? project.targetRaise
+        : "\$0";
     final targetRoi = project.targetRoi.isNotEmpty ? project.targetRoi : "0%";
 
     return Column(
@@ -49,7 +51,9 @@ class PublicViewStatsCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
               decoration: BoxDecoration(
-                color: const Color(0xFF3B1E19).withValues(alpha: 0.8),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.accentOrange.withValues(alpha: 0.15)
+                    : AppColors.accentOrange.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(AppDimens.radiusSm),
               ),
               child: Text(
@@ -80,9 +84,9 @@ class PublicViewStatsCard extends StatelessWidget {
             Icon(
               Icons.location_on_outlined,
               color: tc.textTertiary,
-              size: 14.r,
+              size: 14.sp,
             ),
-            SizedBox(width: 4.w),
+            AppSpacing.w4,
             Expanded(
               child: Text(
                 location,
@@ -148,17 +152,14 @@ class PublicViewStatsCard extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.outfit(
-              fontSize: 11.sp,
-              color: tc.textTertiary,
-            ),
+            style: GoogleFonts.outfit(fontSize: 11.sp, color: tc.textTertiary),
           ),
-          SizedBox(height: 4.h),
+          AppSpacing.h4,
           Row(
             children: [
               if (icon != null) ...[
                 Icon(icon, color: valueColor, size: AppDimens.iconSm),
-                SizedBox(width: 4.w),
+                AppSpacing.w4,
               ],
               Expanded(
                 child: Text(
