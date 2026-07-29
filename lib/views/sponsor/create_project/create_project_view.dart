@@ -79,29 +79,35 @@ class _CreateProjectViewState extends State<CreateProjectView> {
     _titleController = TextEditingController(text: d?.title ?? '');
     _shortDescController = TextEditingController(text: d?.shortDesc ?? '');
     _fullDescController = TextEditingController(text: d?.fullDesc ?? '');
-    _minInvestmentController =
-        TextEditingController(text: d?.minInvestment ?? '');
-    _fundingGoalController =
-        TextEditingController(text: d?.fundingGoal ?? '5000000');
+    _minInvestmentController = TextEditingController(
+      text: d?.minInvestment ?? '',
+    );
+    _fundingGoalController = TextEditingController(
+      text: d?.fundingGoal ?? '5000000',
+    );
     _targetRoiController = TextEditingController(text: d?.targetRoi ?? '18');
 
     _statusController = TextEditingController(text: d?.status ?? '');
     _milestonesController = TextEditingController(text: d?.milestones ?? '');
     _useOfFundsController = TextEditingController(text: d?.useOfFunds ?? '');
-    _sponsorInvestmentController =
-        TextEditingController(text: d?.sponsorInvestment ?? '');
+    _sponsorInvestmentController = TextEditingController(
+      text: d?.sponsorInvestment ?? '',
+    );
 
-    _minContributionController =
-        TextEditingController(text: d?.minContribution ?? '');
+    _minContributionController = TextEditingController(
+      text: d?.minContribution ?? '',
+    );
     _expectedRoiController = TextEditingController(text: d?.expectedRoi ?? '');
-    _monthlyRevenueController =
-        TextEditingController(text: d?.monthlyRevenue ?? '');
+    _monthlyRevenueController = TextEditingController(
+      text: d?.monthlyRevenue ?? '',
+    );
     _holdPeriodController = TextEditingController(text: d?.holdPeriod ?? '');
     _timelineOpsController = TextEditingController(text: d?.timelineOps ?? '');
 
     _teamMembersController = TextEditingController(text: d?.teamMembers ?? '');
-    _ndaAgreementController =
-        TextEditingController(text: d?.ndaAgreement ?? '');
+    _ndaAgreementController = TextEditingController(
+      text: d?.ndaAgreement ?? '',
+    );
 
     _selectedIndustry = d?.industry;
     _selectedCountry = d?.country;
@@ -307,8 +313,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                       SizedBox(height: AppDimens.spaceMd),
                       ProjectFormField(
                         label: "Full Description",
-                        hint:
-                            "Detailed explanation of the business model...",
+                        hint: "Detailed explanation of the business model...",
                         controller: _fullDescController,
                         maxLines: 4,
                       ),
@@ -377,8 +382,9 @@ class _CreateProjectViewState extends State<CreateProjectView> {
   }
 
   Widget _buildTopHeader(BuildContext context, AppThemeColors tc) {
-    final titleText =
-        widget.initialDraft != null ? "Edit Draft" : "Create Project";
+    final titleText = widget.initialDraft != null
+        ? "Edit Draft"
+        : "Create Project";
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -439,7 +445,11 @@ class _CreateProjectViewState extends State<CreateProjectView> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.auto_awesome, color: const Color(0xFFC026D3), size: 16.r),
+                  Icon(
+                    Icons.auto_awesome,
+                    color: const Color(0xFFC026D3),
+                    size: 16.r,
+                  ),
                   SizedBox(width: 4.w),
                   Text(
                     "AI Fill",
@@ -471,7 +481,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
               "Clean Energy",
               "Real Estate",
               "Healthcare",
-              "Fintech"
+              "Fintech",
             ],
             onChanged: (val) => setState(() => _selectedIndustry = val),
           ),
@@ -487,7 +497,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
               "United Kingdom",
               "Germany",
               "Canada",
-              "Australia"
+              "Australia",
             ],
             onChanged: (val) => setState(() => _selectedCountry = val),
           ),
@@ -571,6 +581,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
         SizedBox(height: AppDimens.spaceMd),
         CustomButton(
           text: "Publish project",
+          textColor: Colors.white,
           variant: CustomButtonVariant.primary,
           isLoading: _isPublishing,
           onPressed: _onPublish,

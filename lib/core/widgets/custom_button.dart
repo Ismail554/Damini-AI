@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_dimens.dart';
+import '../utils/app_theme_colors.dart';
 
 enum CustomButtonVariant { primary, secondary, outlined, destructive, gradient }
 
@@ -73,7 +74,7 @@ class CustomButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(effectiveRadius),
               ),
             ),
-            child: _buildChild(),
+            child: _buildChild(context),
           ),
         ),
       );
@@ -108,7 +109,7 @@ class CustomButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(effectiveRadius),
             ),
           ),
-          child: _buildChild(color: textC),
+          child: _buildChild(context, color: textC),
         ),
       );
     }
@@ -128,27 +129,27 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(effectiveRadius),
           ),
         ),
-        child: _buildChild(color: textColor ?? Colors.white),
+        child: _buildChild(context, color: textColor ?? Colors.white),
       ),
     );
   }
 
-  Widget _buildChild({Color? color}) {
+  Widget _buildChild(BuildContext context, {Color? color}) {
+    final tc = AppThemeColors.of(context);
+    final effectiveColor = color ?? textColor ?? tc.textPrimary;
+
     if (isLoading) {
       return SizedBox(
         width: 20.r,
         height: 20.r,
-        child: CircularProgressIndicator(
-          color: color ?? Colors.white,
-          strokeWidth: 2,
-        ),
+        child: CircularProgressIndicator(color: effectiveColor, strokeWidth: 2),
       );
     }
 
     final style = GoogleFonts.outfit(
       fontSize: 14.sp,
       fontWeight: FontWeight.w600,
-      color: color ?? textColor ?? Colors.white,
+      color: tc.textPrimary,
     );
 
     if (icon != null) {
@@ -156,11 +157,7 @@ class CustomButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: color ?? textColor ?? Colors.white,
-            size: AppDimens.iconSm,
-          ),
+          Icon(icon, color: effectiveColor, size: AppDimens.iconSm),
           SizedBox(width: 6.w),
           Flexible(
             child: Text(

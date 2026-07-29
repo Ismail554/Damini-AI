@@ -162,28 +162,38 @@ class _HomeViewState extends State<HomeView> {
         child: SafeArea(
           child: Stack(
             children: [
-              // Body Content with smooth cross-fade & micro-scale transitions
+              // Body Content with Material 3 Fade-Through transition for Android & native switching for iOS
               Positioned.fill(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 280),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(
-                        scale: Tween<double>(begin: 0.97, end: 1.0)
-                            .animate(animation),
-                        child: child,
+                child: isIOS
+                    ? _buildBody(isSponsor)
+                    : AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        switchInCurve: Curves.fastOutSlowIn,
+                        switchOutCurve: Curves.fastOutSlowIn,
+                        transitionBuilder:
+                            (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOut,
+                            ),
+                            child: ScaleTransition(
+                              scale: Tween<double>(begin: 0.95, end: 1.0)
+                                  .animate(
+                                CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.fastOutSlowIn,
+                                ),
+                              ),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: KeyedSubtree(
+                          key: ValueKey<int>(_currentIndex),
+                          child: _buildBody(isSponsor),
+                        ),
                       ),
-                    );
-                  },
-                  child: KeyedSubtree(
-                    key: ValueKey<int>(_currentIndex),
-                    child: _buildBody(isSponsor),
-                  ),
-                ),
               ),
 
               // Floating Action Buttons (Right) - Smooth fade & scale when switching tabs

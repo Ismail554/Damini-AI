@@ -43,10 +43,7 @@ class PublicProfileHeroCard extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2.w,
-                  ),
+                  border: Border.all(color: Colors.white, width: 2.w),
                 ),
                 child: CircleAvatar(
                   radius: 44.r,
@@ -84,10 +81,7 @@ class PublicProfileHeroCard extends StatelessWidget {
           SizedBox(height: 4.h),
           Text(
             title,
-            style: GoogleFonts.outfit(
-              fontSize: 14.sp,
-              color: tc.textSecondary,
-            ),
+            style: GoogleFonts.outfit(fontSize: 14.sp, color: tc.textSecondary),
           ),
           SizedBox(height: 14.h),
 
@@ -118,7 +112,7 @@ class PublicProfileHeroCard extends StatelessWidget {
                     vertical: 6.h,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF064E3B),
+                    color: tc.greenPillBg,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: Row(
