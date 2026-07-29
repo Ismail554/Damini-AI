@@ -50,26 +50,28 @@ class AccountTypeSwitcherCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 10.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Account Type",
-                    style: GoogleFonts.outfit(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                      color: tc.textPrimary,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Account Type",
+                      style: GoogleFonts.outfit(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: tc.textPrimary,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: AppDimens.spaceXxs),
-                  Text(
-                    "Switch your active experience at any time",
-                    style: GoogleFonts.outfit(
-                      fontSize: 11.sp,
-                      color: tc.textTertiary,
+                    SizedBox(height: AppDimens.spaceXxs),
+                    Text(
+                      "Switch your active experience at any time",
+                      style: GoogleFonts.outfit(
+                        fontSize: 11.sp,
+                        color: tc.textTertiary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

@@ -30,48 +30,52 @@ class PublicViewTabBar extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        children: List.generate(_tabs.length, (index) {
-          final isSelected = selectedIndex == index;
-          final label = _tabs[index];
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: List.generate(_tabs.length, (index) {
+            final isSelected = selectedIndex == index;
+            final label = _tabs[index];
 
-          return GestureDetector(
-            onTap: () => onTabSelected(index),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              margin: EdgeInsets.only(right: AppDimens.spaceLg),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: Text(
-                      label,
-                      style: GoogleFonts.outfit(
-                        fontSize: 14.sp,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected ? tc.textPrimary : tc.textTertiary,
+            return GestureDetector(
+              onTap: () => onTabSelected(index),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                margin: EdgeInsets.only(right: AppDimens.spaceLg),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                      child: Text(
+                        label,
+                        style: GoogleFonts.outfit(
+                          fontSize: 14.sp,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected ? tc.textPrimary : tc.textTertiary,
+                        ),
                       ),
                     ),
-                  ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    height: 3.h,
-                    width: isSelected ? 48.w : 0,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.accentOrange
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(2.r),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      height: 3.h,
+                      width: isSelected ? 48.w : 0,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.accentOrange
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(2.r),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }

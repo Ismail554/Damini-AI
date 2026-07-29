@@ -1,3 +1,5 @@
+import 'package:cupertino_native/cupertino_native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/auth_provider.dart';
+import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_theme_colors.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
@@ -37,10 +40,50 @@ class _HomeViewState extends State<HomeView> {
   ];
 
   static const _investorNavItems = [
-    CustomNavItemData(label: "Explore", icon: Icons.home_rounded),
+    CustomNavItemData(label: "Explore", icon: Icons.home_filled),
     CustomNavItemData(label: "Saved", icon: Icons.favorite_border_rounded),
     CustomNavItemData(label: "Chat", icon: Icons.chat_bubble_outline_rounded),
     CustomNavItemData(label: "Profile", icon: Icons.person_outline_rounded),
+    // CustomNavItemData(
+    //   label: "Explore",
+    //   icon: CupertinoIcons.compass,
+    //   activeIcon: CupertinoIcons.compass_fill,
+    // ),
+    // CustomNavItemData(
+    //   label: "Saved",
+    //   icon: CupertinoIcons.heart,
+    //   activeIcon: CupertinoIcons.heart_fill,
+    // ),
+    // CustomNavItemData(
+    //   label: "Chat",
+    //   icon: CupertinoIcons.chat_bubble_2,
+    //   activeIcon: CupertinoIcons.chat_bubble_2_fill,
+    // ),
+    // CustomNavItemData(
+    //   label: "Profile",
+    //   icon: CupertinoIcons.person,
+    //   activeIcon: CupertinoIcons.person_fill,
+    // ),
+  ];
+
+  static const _sponsorCNItems = [
+    CNTabBarItem(label: "Dashboard", icon: CNSymbol("house.fill")),
+    CNTabBarItem(label: "Saved", icon: CNSymbol("heart.fill")),
+    CNTabBarItem(
+      label: "Chat",
+      icon: CNSymbol("bubble.left.and.bubble.right.fill"),
+    ),
+    CNTabBarItem(label: "Profile", icon: CNSymbol("person.fill")),
+  ];
+
+  static const _investorCNItems = [
+    CNTabBarItem(label: "Explore", icon: CNSymbol("compass.drawing")),
+    CNTabBarItem(label: "Saved", icon: CNSymbol("heart.fill")),
+    CNTabBarItem(
+      label: "Chat",
+      icon: CNSymbol("bubble.left.and.bubble.right.fill"),
+    ),
+    CNTabBarItem(label: "Profile", icon: CNSymbol("person.fill")),
   ];
 
   Widget _buildBody(bool isSponsor) {
@@ -116,6 +159,8 @@ class _HomeViewState extends State<HomeView> {
     final auth = context.watch<AuthProvider>();
     final isSponsor = auth.userRole == GlobalKeys.sponsorRole;
     final navItems = isSponsor ? _sponsorNavItems : _investorNavItems;
+    final cnItems = isSponsor ? _sponsorCNItems : _investorCNItems;
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
 
     return PopScope(
       canPop: false,
@@ -128,81 +173,93 @@ class _HomeViewState extends State<HomeView> {
               // Body Content
               Positioned.fill(child: _buildBody(isSponsor)),
 
-              // Floating Action Buttons (Right)
-              Positioned(
-                right: 20.w,
-                bottom: 100.h,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Orange AI Robot Button
-                    GestureDetector(
-                      onTap: () => context.push('/ai-chat'),
-                      child: Container(
-                        padding: EdgeInsets.all(12.r),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD34E27),
-                          borderRadius: BorderRadius.circular(16.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFFD34E27,
-                              ).withValues(alpha: 0.4),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          Icons.smart_toy_outlined,
-                          color: Colors.white,
-                          size: 22.r,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-
-                    // Blue + Add Button (Sponsor role)
-                    if (isSponsor)
-                      // create new project button
+              // Floating Action Buttons (Right) - Hidden on Profile tab (index 3)
+              if (_currentIndex != 3)
+                Positioned(
+                  right: 20.w,
+                  bottom: 100.h,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Orange AI Robot Button
                       GestureDetector(
-                        onTap: () => context.push('/create-project'),
+                        onTap: () => context.push('/ai-chat'),
                         child: Container(
-                          padding: EdgeInsets.all(14.r),
+                          padding: EdgeInsets.all(12.r),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF006EDB),
-                            shape: BoxShape.circle,
+                            color: const Color(0xFFD34E27),
+                            borderRadius: BorderRadius.circular(16.r),
                             boxShadow: [
                               BoxShadow(
                                 color: const Color(
-                                  0xFF006EDB,
+                                  0xFFD34E27,
                                 ).withValues(alpha: 0.4),
-                                blurRadius: 12,
+                                blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                           ),
                           child: Icon(
-                            Icons.add_rounded,
+                            Icons.smart_toy_outlined,
                             color: Colors.white,
-                            size: 26.r,
+                            size: 22.r,
                           ),
                         ),
                       ),
-                  ],
+                      SizedBox(height: 12.h),
+
+                      // Blue + Add Button (Sponsor role)
+                      if (isSponsor)
+                        // create new project button
+                        GestureDetector(
+                          onTap: () => context.push('/create-project'),
+                          child: Container(
+                            padding: EdgeInsets.all(14.r),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF006EDB),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFF006EDB,
+                                  ).withValues(alpha: 0.4),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.add_rounded,
+                              color: Colors.white,
+                              size: 26.r,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
 
               // Bottom Navigation Bar
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: CustomBottomNavBar(
-                  currentIndex: _currentIndex,
-                  items: navItems,
-                  onTap: (index) => setState(() => _currentIndex = index),
-                ),
+                child: isIOS
+                    ? Padding(
+                        padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 10.h),
+                        child: CNTabBar(
+                          items: cnItems,
+                          currentIndex: _currentIndex,
+                          tint: AppColors.primaryColor,
+                          onTap: (index) =>
+                              setState(() => _currentIndex = index),
+                        ),
+                      )
+                    : CustomBottomNavBar(
+                        currentIndex: _currentIndex,
+                        items: navItems,
+                        onTap: (index) => setState(() => _currentIndex = index),
+                      ),
               ),
             ],
           ),

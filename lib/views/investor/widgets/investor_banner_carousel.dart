@@ -191,7 +191,10 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
           Expanded(
             flex: 5,
             child: Container(
-              padding: EdgeInsets.all(AppDimens.paddingMd),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppDimens.paddingMd,
+                vertical: AppDimens.paddingSm,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.primaryColor,
                 borderRadius: BorderRadius.only(
@@ -209,14 +212,14 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                       Text(
                         item.title,
                         style: GoogleFonts.outfit(
-                          fontSize: 15.sp,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: AppDimens.spaceXxs),
+                      SizedBox(height: 2.h),
                       Row(
                         children: [
                           Icon(
@@ -246,14 +249,14 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                       Text(
                         item.targetRaise,
                         style: GoogleFonts.outfit(
-                          fontSize: 12.sp,
+                          fontSize: 11.sp,
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: AppDimens.spaceSm),
+                      SizedBox(height: 4.h),
                       SizedBox(
-                        height: AppDimens.buttonSm - 4,
+                        height: 26.h,
                         child: ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
@@ -261,7 +264,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                             foregroundColor: Colors.white,
                             elevation: 0,
                             padding: EdgeInsets.symmetric(
-                              horizontal: AppDimens.paddingLg - 4,
+                              horizontal: AppDimens.paddingMd,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius:
@@ -271,7 +274,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                           child: Text(
                             "Request",
                             style: GoogleFonts.outfit(
-                              fontSize: 12.sp,
+                              fontSize: 11.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

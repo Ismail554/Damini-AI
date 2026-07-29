@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,7 @@ class InvestorProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final currentRole = auth.userRole ?? 'investor';
+    final tc = AppThemeColors.of(context);
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -32,13 +34,13 @@ class InvestorProfileView extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 24.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: tc.textPrimary,
                 ),
               ),
               IconButton(
                 icon: Icon(
                   Icons.settings_outlined,
-                  color: Colors.white,
+                  color: tc.textPrimary,
                   size: 22.r,
                 ),
                 onPressed: () => context.push('/settings'),
@@ -87,28 +89,24 @@ class InvestorProfileView extends StatelessWidget {
               width: double.infinity,
               height: 52.h,
               decoration: BoxDecoration(
-                color: const Color(0xFF2E1220),
+                color: tc.logoutBg,
                 borderRadius: BorderRadius.circular(26.r),
                 border: Border.all(
-                  color: const Color(0xFFFF5252).withValues(alpha: 0.3),
+                  color: tc.logoutText.withValues(alpha: 0.3),
                   width: 1.w,
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.logout_rounded,
-                    color: const Color(0xFFFF5252),
-                    size: 20.r,
-                  ),
+                  Icon(Icons.logout_rounded, color: tc.logoutText, size: 20.r),
                   SizedBox(width: 8.w),
                   Text(
                     "Log Out",
                     style: GoogleFonts.outfit(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFFFF5252),
+                      color: tc.logoutText,
                     ),
                   ),
                 ],
