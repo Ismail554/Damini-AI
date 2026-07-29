@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_theme_colors.dart';
+import '../../public_view/models/project_public_view_model.dart';
 import '../models/sponsor_saved_project_model.dart';
 
 class SponsorSavedProjectCard extends StatelessWidget {
@@ -20,7 +22,35 @@ class SponsorSavedProjectCard extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.only(bottom: 20.h),
-      child: Container(
+      child: GestureDetector(
+        onTap: () {
+          final publicProject = ProjectPublicViewModel(
+            id: item.id,
+            title: item.title,
+            location: item.location,
+            category: item.category,
+            stage: "Active Raising",
+            targetRaise: item.targetRaise,
+            targetRoi: item.targetRoi,
+            sponsorName: "Acme Corp",
+            sponsorTagline: "Verified Sponsor · 3 Projects",
+            imageUrls: [
+              item.imageUrl,
+              "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&auto=format&fit=crop",
+            ],
+            overviewText:
+                "${item.title} located in ${item.location} is a high-yield ${item.category} project with a target raise of ${item.targetRaise} and minimum contribution of ${item.minInvestmentAmt}.",
+            timeline: "24 Months",
+            teamSize: "4 Members",
+            teamMembers: ProjectPublicViewModel.mockData().teamMembers,
+            businessDescription:
+                "Detailed opportunity analysis for ${item.title}. Minimum investment amount starts at ${item.minInvestmentAmt} with projected ROI of ${item.targetRoi}.",
+            minContribution: item.minInvestmentAmt,
+            expectedRoi: item.targetRoi,
+          );
+          context.push('/public-view', extra: publicProject);
+        },
+        child: Container(
         decoration: BoxDecoration(
           color: tc.isDark ? const Color(0xFF092444) : Colors.white,
           borderRadius: BorderRadius.circular(20.r),
@@ -235,6 +265,7 @@ class SponsorSavedProjectCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

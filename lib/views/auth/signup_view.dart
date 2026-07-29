@@ -200,7 +200,6 @@ class _SignUpViewState extends State<SignUpView> {
                   ),
                 ),
                 AppSpacing.h24,
-
                 SizedBox(
                   width: double.infinity,
                   height: 56.h,

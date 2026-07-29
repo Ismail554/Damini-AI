@@ -232,7 +232,7 @@ class _InvestorDashboardState extends State<InvestorDashboard> {
 
   Widget _buildFeaturedList() {
     return SizedBox(
-      height: 235.h,
+      height: 270.h,
       child: ListView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),

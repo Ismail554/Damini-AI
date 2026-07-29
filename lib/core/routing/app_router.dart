@@ -15,6 +15,7 @@ import '../../views/sponsor/create_project/create_project_view.dart';
 import '../../views/sponsor/project_details/sponsor_project_details_view.dart';
 import '../../views/sponsor/collaboration_requests/collaboration_requests_view.dart';
 import '../../views/sponsor/public_view/project_public_view.dart';
+import '../../views/sponsor/public_view/models/project_public_view_model.dart';
 import '../../views/sponsor/nda/nda_view.dart';
 import '../../views/sponsor/group_chat/group_chat_view.dart';
 import '../../views/sponsor/chat/direct_chat_view.dart';
@@ -181,11 +182,17 @@ class AppRouter {
       ),
       GoRoute(
         path: '/public-view',
-        pageBuilder: (context, state) => buildNativePage(
-          context: context,
-          state: state,
-          child: const ProjectPublicView(),
-        ),
+        pageBuilder: (context, state) {
+          final project = state.extra is ProjectPublicViewModel
+              ? state.extra as ProjectPublicViewModel
+              : (state.extra as Map<String, dynamic>?)?['project']
+                  as ProjectPublicViewModel?;
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: ProjectPublicView(project: project),
+          );
+        },
       ),
       GoRoute(
         path: '/public-profile',
