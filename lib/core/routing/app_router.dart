@@ -142,14 +142,21 @@ class AppRouter {
       GoRoute(
         path: '/create-project',
         pageBuilder: (context, state) {
+          final extraMap = state.extra is Map<String, dynamic>
+              ? state.extra as Map<String, dynamic>
+              : null;
           final draft = state.extra is ProjectDraftModel
               ? state.extra as ProjectDraftModel
-              : (state.extra as Map<String, dynamic>?)?['draft']
-                  as ProjectDraftModel?;
+              : extraMap?['draft'] as ProjectDraftModel?;
+          final autoOpenAi = extraMap?['isAiMode'] == true;
+
           return buildNativePage(
             context: context,
             state: state,
-            child: CreateProjectView(initialDraft: draft),
+            child: CreateProjectView(
+              initialDraft: draft,
+              autoOpenAiModal: autoOpenAi,
+            ),
           );
         },
       ),

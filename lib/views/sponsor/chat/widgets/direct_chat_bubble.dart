@@ -1,10 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 import '../models/chat_message_model.dart';
 
-class DirectChatBubble extends StatelessWidget {
+class DirectChatBubble extends StatefulWidget {
   final ChatMessageModel message;
 
   const DirectChatBubble({
@@ -13,9 +14,16 @@ class DirectChatBubble extends StatelessWidget {
   });
 
   @override
+  State<DirectChatBubble> createState() => _DirectChatBubbleState();
+}
+
+class _DirectChatBubbleState extends State<DirectChatBubble> {
+  bool _isPlayingVoice = false;
+
+  @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
-    final isMe = message.isMe;
+    final isMe = widget.message.isMe;
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -25,7 +33,7 @@ class DirectChatBubble extends StatelessWidget {
           left: isMe ? 48.w : 0,
           right: isMe ? 0 : 48.w,
         ),
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
         decoration: BoxDecoration(
           color: isMe
               ? const Color(0xFF2563EB)
@@ -42,19 +50,10 @@ class DirectChatBubble extends StatelessWidget {
               isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              message.text,
-              style: GoogleFonts.outfit(
-                fontSize: 14.sp,
-                color: isMe
-                    ? Colors.white
-                    : (tc.isDark ? Colors.white : const Color(0xFF0F172A)),
-                height: 1.35,
-              ),
-            ),
+            _buildContent(tc),
             SizedBox(height: 6.h),
             Text(
-              message.timestamp,
+              widget.message.timestamp,
               style: GoogleFonts.outfit(
                 fontSize: 10.sp,
                 color: isMe
@@ -67,6 +66,108 @@ class DirectChatBubble extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildContent(AppThemeColors tc) {
+    final isMe = widget.message.isMe;
+
+    if (widget.message.type == ChatMessageType.image) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12.r),
+        child: _buildImageWidget(),
+      );
+    }
+
+    if (widget.message.type == ChatMessageType.voice) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: () => setState(() => _isPlayingVoice = !_isPlayingVoice),
+            child: CircleAvatar(
+              radius: 18.r,
+              backgroundColor: isMe
+                  ? Colors.white.withValues(alpha: 0.2)
+                  : (tc.isDark ? Colors.white.withValues(alpha: 0.15) : const Color(0xFF2563EB)),
+              child: Icon(
+                _isPlayingVoice ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                color: Colors.white,
+                size: 20.r,
+              ),
+            ),
+          ),
+          SizedBox(width: 10.w),
+          _buildWaveformUI(isMe),
+          SizedBox(width: 8.w),
+          Text(
+            widget.message.voiceDuration ?? "0:15",
+            style: GoogleFonts.outfit(
+              fontSize: 12.sp,
+              color: isMe ? Colors.white : (tc.isDark ? Colors.white : const Color(0xFF0F172A)),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Text(
+      widget.message.text,
+      style: GoogleFonts.outfit(
+        fontSize: 14.sp,
+        color: isMe
+            ? Colors.white
+            : (tc.isDark ? Colors.white : const Color(0xFF0F172A)),
+        height: 1.35,
+      ),
+    );
+  }
+
+  Widget _buildImageWidget() {
+    final path = widget.message.mediaUrl ?? '';
+    if (path.startsWith('assets/')) {
+      return Image.asset(
+        path,
+        width: 200.w,
+        height: 140.h,
+        fit: BoxFit.cover,
+      );
+    }
+    final file = File(path);
+    if (file.existsSync()) {
+      return Image.file(
+        file,
+        width: 200.w,
+        height: 140.h,
+        fit: BoxFit.cover,
+      );
+    }
+    return Image.asset(
+      'assets/images/onboarding1.png',
+      width: 200.w,
+      height: 140.h,
+      fit: BoxFit.cover,
+    );
+  }
+
+  Widget _buildWaveformUI(bool isMe) {
+    final heights = [12.h, 20.h, 8.h, 24.h, 16.h, 28.h, 14.h, 22.h, 10.h, 18.h];
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: heights.map((h) {
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: 1.5.w),
+          width: 3.w,
+          height: h,
+          decoration: BoxDecoration(
+            color: isMe
+                ? Colors.white.withValues(alpha: _isPlayingVoice ? 0.9 : 0.6)
+                : Colors.blueAccent.withValues(alpha: _isPlayingVoice ? 0.9 : 0.6),
+            borderRadius: BorderRadius.circular(2.r),
+          ),
+        );
+      }).toList(),
     );
   }
 }

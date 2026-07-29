@@ -42,10 +42,53 @@ class DirectChatProvider extends ChangeNotifier {
       text: text,
       timestamp: timeStr,
       isMe: true,
+      type: ChatMessageType.text,
     );
 
     _messages.add(newMessage);
     textController.clear();
+    notifyListeners();
+    _scrollToBottom();
+  }
+
+  void sendImageMessage(String imagePath) {
+    if (imagePath.isEmpty) return;
+
+    final now = DateTime.now();
+    final timeStr =
+        "${now.hour % 12 == 0 ? 12 : now.hour % 12}:${now.minute.toString().padLeft(2, '0')} ${now.hour >= 12 ? 'PM' : 'AM'}";
+
+    final newMessage = ChatMessageModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      chatId: _chatItem.id,
+      text: "Photo",
+      timestamp: timeStr,
+      isMe: true,
+      type: ChatMessageType.image,
+      mediaUrl: imagePath,
+    );
+
+    _messages.add(newMessage);
+    notifyListeners();
+    _scrollToBottom();
+  }
+
+  void sendVoiceMessage(String duration) {
+    final now = DateTime.now();
+    final timeStr =
+        "${now.hour % 12 == 0 ? 12 : now.hour % 12}:${now.minute.toString().padLeft(2, '0')} ${now.hour >= 12 ? 'PM' : 'AM'}";
+
+    final newMessage = ChatMessageModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      chatId: _chatItem.id,
+      text: "Voice message",
+      timestamp: timeStr,
+      isMe: true,
+      type: ChatMessageType.voice,
+      voiceDuration: duration,
+    );
+
+    _messages.add(newMessage);
     notifyListeners();
     _scrollToBottom();
   }

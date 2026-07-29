@@ -32,6 +32,7 @@ class AuthProvider extends ChangeNotifier {
     await StorageService.saveToken("mock_jwt_token");
     await StorageService.saveUuid("mock_uuid");
     await StorageService.saveIsApiConnected(true);
+    await StorageService.saveHasSeenOnboarding();
     _isApiConnected = true;
 
     final cleanEmail = email.trim().toLowerCase();
@@ -64,6 +65,7 @@ class AuthProvider extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 1));
     await StorageService.saveToken("mock_jwt_token");
     await StorageService.saveUuid("mock_uuid");
+    await StorageService.saveHasSeenOnboarding();
     _isAuthenticated = true;
     _isLoading = false;
     notifyListeners();

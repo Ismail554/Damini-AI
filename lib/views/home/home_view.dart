@@ -19,6 +19,7 @@ import '../sponsor/sponsor_chat_view.dart';
 import '../sponsor/sponsor_dashboard.dart';
 import '../sponsor/sponsor_profile_view.dart';
 import '../sponsor/sponsor_saved_view.dart';
+import 'widgets/bubble_fab.dart';
 import 'widgets/custom_bottom_nav_bar.dart';
 
 class HomeView extends StatefulWidget {
@@ -180,6 +181,7 @@ class _HomeViewState extends State<HomeView> {
                   bottom: 100.h,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       // Orange AI Robot Button
                       GestureDetector(
@@ -188,7 +190,7 @@ class _HomeViewState extends State<HomeView> {
                           padding: EdgeInsets.all(12.r),
                           decoration: BoxDecoration(
                             color: const Color(0xFFD34E27),
-                            borderRadius: BorderRadius.circular(16.r),
+                            shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
                                 color: const Color(
@@ -208,32 +210,30 @@ class _HomeViewState extends State<HomeView> {
                       ),
                       SizedBox(height: 12.h),
 
-                      // Blue + Add Button (Sponsor role)
+                      // Blue + Add Button (Sponsor role) with Horizontal Expansion
                       if (isSponsor)
-                        // create new project button
-                        GestureDetector(
-                          onTap: () => context.push('/create-project'),
-                          child: Container(
-                            padding: EdgeInsets.all(14.r),
-                            decoration: BoxDecoration(
+                        BubbleFab(
+                          items: [
+                            BubbleMenuItem(
+                              icon: Icons.auto_awesome,
+                              label: "Create with AI",
+                              color: const Color(0xFF9333EA),
+                              onTap: () {
+                                context.push(
+                                  '/create-project',
+                                  extra: {'isAiMode': true},
+                                );
+                              },
+                            ),
+                            BubbleMenuItem(
+                              icon: Icons.edit_note_rounded,
+                              label: "Create Myself",
                               color: const Color(0xFF006EDB),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFF006EDB,
-                                  ).withValues(alpha: 0.4),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                              onTap: () {
+                                context.push('/create-project');
+                              },
                             ),
-                            child: Icon(
-                              Icons.add_rounded,
-                              color: Colors.white,
-                              size: 26.r,
-                            ),
-                          ),
+                          ],
                         ),
                     ],
                   ),

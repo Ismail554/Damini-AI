@@ -5,6 +5,7 @@ class GlobalKeys {
   static const String userRoleKey = 'user_role';
   static const String isRoleSelectedKey = 'is_role_selected';
   static const String isApiConnectedKey = 'is_api_connected';
+  static const String hasSeenOnboardingKey = 'has_seen_onboarding';
 
   // Role Constants
   static const String investorRole = 'investor';

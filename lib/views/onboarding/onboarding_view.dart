@@ -44,7 +44,7 @@ class _OnboardingViewState extends State<OnboardingView> {
   }
 
   Future<void> _onFinishOnboarding() async {
-    await StorageService.saveUuid("completed_onboarding");
+    await StorageService.saveHasSeenOnboarding();
     if (mounted) {
       context.go('/login');
     }

@@ -7,6 +7,7 @@ import 'package:Braintech/controllers/auth_provider.dart';
 import 'package:Braintech/core/services/storage_service.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
+import '../../shared/global_key.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -49,12 +50,13 @@ class _SplashViewState extends State<SplashView>
       if (status == AnimationStatus.completed) {
         final auth = context.read<AuthProvider>();
         final hasToken = await auth.checkAuthStatus();
-        final hasSeenOnboarding = (await StorageService.getUuid()) != null;
+        final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
 
         if (mounted) {
           String nextRoute;
-          if (hasToken) {
-            nextRoute = auth.userRole == null ? '/role-selection' : '/home';
+          if (hasToken && auth.isAuthenticated) {
+            nextRoute =
+                GlobalKeys.isValidRole(auth.userRole) ? '/home' : '/role-selection';
           } else if (hasSeenOnboarding) {
             nextRoute = '/login';
           } else {

@@ -63,6 +63,8 @@ class DirectChatView extends StatelessWidget {
                     DirectChatInputBar(
                       controller: provider.textController,
                       onSend: provider.sendMessage,
+                      onSendImage: provider.sendImageMessage,
+                      onSendVoice: provider.sendVoiceMessage,
                     ),
                   ],
                 ),

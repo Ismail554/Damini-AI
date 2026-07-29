@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -151,7 +152,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           deal.category.toLowerCase().contains(q);
       return matchesCat && matchesSearch;
     }).toList();
-
     if (_selectedSort == "Highest ROI") {
       deals.sort((a, b) => b.roiValue.compareTo(a.roiValue));
     } else if (_selectedSort == "Target Raise") {
@@ -176,7 +176,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         body: Column(
           children: [
             _buildTopGlassCard(context, tc),
-            SizedBox(height: 14.h),
+            AppSpacing.h14,
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: AppDimens.screenHorizontal,
@@ -243,14 +243,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context, tc),
-          SizedBox(height: 10.h),
+          AppSpacing.h10,
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: AppDimens.screenHorizontal,
             ),
             child: _buildSearchBar(tc),
           ),
-          SizedBox(height: 16.h),
+          AppSpacing.h16,
           _buildTagChips(tc),
         ],
       ),

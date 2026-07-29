@@ -1,3 +1,5 @@
+import '../../chat/models/chat_message_model.dart';
+
 enum ChatAvatarType { ai, investor, sponsor }
 
 class GroupChatMessage {
@@ -10,6 +12,9 @@ class GroupChatMessage {
   final bool isMe;
   final String text;
   final String time;
+  final ChatMessageType type;
+  final String? mediaUrl;
+  final String? voiceDuration;
 
   const GroupChatMessage({
     required this.id,
@@ -21,6 +26,9 @@ class GroupChatMessage {
     required this.isMe,
     required this.text,
     required this.time,
+    this.type = ChatMessageType.text,
+    this.mediaUrl,
+    this.voiceDuration,
   });
 
   factory GroupChatMessage.fromJson(Map<String, dynamic> json) {
@@ -37,6 +45,12 @@ class GroupChatMessage {
       isMe: json['isMe'] as bool? ?? false,
       text: json['text'] as String? ?? '',
       time: json['time'] as String? ?? '',
+      type: ChatMessageType.values.firstWhere(
+        (e) => e.name == (json['type'] as String? ?? 'text'),
+        orElse: () => ChatMessageType.text,
+      ),
+      mediaUrl: json['mediaUrl'] as String?,
+      voiceDuration: json['voiceDuration'] as String?,
     );
   }
 }

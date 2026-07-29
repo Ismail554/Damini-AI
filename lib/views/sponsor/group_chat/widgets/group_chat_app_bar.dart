@@ -5,12 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
-  final VoidCallback? onMenuPressed;
+  final int activeMemberCount;
+  final Function(String action)? onMenuSelected;
 
   const GroupChatAppBar({
     super.key,
     this.title,
-    this.onMenuPressed,
+    this.activeMemberCount = 3,
+    this.onMenuSelected,
   });
 
   @override
@@ -106,7 +108,7 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    '3 members active',
+                    '$activeMemberCount members active',
                     style: GoogleFonts.outfit(
                       color: const Color(0xFF6B8A9D),
                       fontSize: 11.sp,
@@ -116,15 +118,63 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
             ),
-            IconButton(
-              onPressed: onMenuPressed,
+            PopupMenuButton<String>(
+              onSelected: (action) {
+                if (onMenuSelected != null) {
+                  onMenuSelected!(action);
+                }
+              },
+              color: const Color(0xFF0C1D2F),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
               icon: Icon(
                 Icons.more_vert_rounded,
                 color: Colors.white,
                 size: 20.sp,
               ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'confirm_investor',
+                  child: Row(
+                    children: [
+                      Icon(Icons.verified_user_outlined, color: const Color(0xFF006EDB), size: 18.r),
+                      SizedBox(width: 10.w),
+                      Text("Confirm Investors", style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'remove_participant',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person_remove_outlined, color: Colors.orangeAccent, size: 18.r),
+                      SizedBox(width: 10.w),
+                      Text("Remove Participant (Owner)", style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'report',
+                  child: Row(
+                    children: [
+                      Icon(Icons.flag_outlined, color: Colors.amberAccent, size: 18.r),
+                      SizedBox(width: 10.w),
+                      Text("Report Group", style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'leave',
+                  child: Row(
+                    children: [
+                      Icon(Icons.exit_to_app_rounded, color: Colors.redAccent, size: 18.r),
+                      SizedBox(width: 10.w),
+                      Text("Leave Group", style: GoogleFonts.outfit(color: Colors.redAccent, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -11,6 +11,8 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
 import 'controllers/project_draft_provider.dart';
 import 'models/project_draft_model.dart';
+import 'widgets/additional_images_section.dart';
+import 'widgets/ai_prompt_modal.dart';
 import 'widgets/financials_section.dart';
 import 'widgets/project_details_section.dart';
 import 'widgets/project_dropdown_field.dart';
@@ -19,8 +21,13 @@ import 'widgets/upload_box.dart';
 
 class CreateProjectView extends StatefulWidget {
   final ProjectDraftModel? initialDraft;
+  final bool autoOpenAiModal;
 
-  const CreateProjectView({super.key, this.initialDraft});
+  const CreateProjectView({
+    super.key,
+    this.initialDraft,
+    this.autoOpenAiModal = false,
+  });
 
   @override
   State<CreateProjectView> createState() => _CreateProjectViewState();
@@ -100,6 +107,56 @@ class _CreateProjectViewState extends State<CreateProjectView> {
     _selectedCountry = d?.country;
     _selectedFundingStage = d?.fundingStage ?? 'Seed';
     _selectedTimeline = d?.timeline ?? '36 months';
+
+    if (widget.autoOpenAiModal) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        final aiDraft = await AiPromptModal.show(context);
+        if (aiDraft != null && mounted) {
+          _applyAiDraft(aiDraft);
+        }
+      });
+    } else if (d != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          CustomSnackBar.success(
+            context,
+            "AI suggested field data loaded! You can edit any details below.",
+          );
+        }
+      });
+    }
+  }
+
+  void _applyAiDraft(ProjectDraftModel d) {
+    setState(() {
+      _titleController.text = d.title;
+      _shortDescController.text = d.shortDesc;
+      _fullDescController.text = d.fullDesc;
+      _minInvestmentController.text = d.minInvestment;
+      _fundingGoalController.text = d.fundingGoal;
+      _targetRoiController.text = d.targetRoi;
+      _statusController.text = d.status;
+      _milestonesController.text = d.milestones;
+      _useOfFundsController.text = d.useOfFunds;
+      _sponsorInvestmentController.text = d.sponsorInvestment;
+      _minContributionController.text = d.minContribution;
+      _expectedRoiController.text = d.expectedRoi;
+      _monthlyRevenueController.text = d.monthlyRevenue;
+      _holdPeriodController.text = d.holdPeriod;
+      _timelineOpsController.text = d.timelineOps;
+      _teamMembersController.text = d.teamMembers;
+      _ndaAgreementController.text = d.ndaAgreement;
+
+      _selectedIndustry = d.industry;
+      _selectedCountry = d.country;
+      _selectedFundingStage = d.fundingStage;
+      _selectedTimeline = d.timeline;
+    });
+    CustomSnackBar.success(
+      context,
+      "AI suggested field data populated! You can edit any details.",
+    );
   }
 
   @override
@@ -199,6 +256,8 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                         icon: Icons.image_outlined,
                         onTap: () {},
                       ),
+                      SizedBox(height: AppDimens.spaceMd),
+                      const AdditionalImagesSection(),
                       SizedBox(height: AppDimens.spaceMd),
                       ProjectFormField(
                         label: "Project Title",
@@ -327,6 +386,37 @@ class _CreateProjectViewState extends State<CreateProjectView> {
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
               color: tc.textPrimary,
+            ),
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () async {
+              final aiDraft = await AiPromptModal.show(context);
+              if (aiDraft != null && mounted) {
+                _applyAiDraft(aiDraft);
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+              decoration: BoxDecoration(
+                color: const Color(0xFF9333EA).withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: const Color(0xFFC026D3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.auto_awesome, color: const Color(0xFFC026D3), size: 16.r),
+                  SizedBox(width: 4.w),
+                  Text(
+                    "AI Fill",
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

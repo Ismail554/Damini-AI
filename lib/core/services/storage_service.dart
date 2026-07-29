@@ -39,5 +39,21 @@ class StorageService {
     return val == 'true';
   }
 
-  static Future<void> clearAll() async => _storage.deleteAll();
+  static Future<void> saveHasSeenOnboarding() async =>
+      _storage.write(key: GlobalKeys.hasSeenOnboardingKey, value: 'true');
+
+  static Future<bool> hasSeenOnboarding() async {
+    final val = await _storage.read(key: GlobalKeys.hasSeenOnboardingKey);
+    return val == 'true';
+  }
+
+  static Future<void> clearAuthData() async {
+    await _storage.delete(key: GlobalKeys.authTokenKey);
+    await _storage.delete(key: GlobalKeys.uuidKey);
+    await _storage.delete(key: GlobalKeys.userRoleKey);
+    await _storage.delete(key: GlobalKeys.isRoleSelectedKey);
+    await _storage.delete(key: GlobalKeys.isApiConnectedKey);
+  }
+
+  static Future<void> clearAll() async => clearAuthData();
 }

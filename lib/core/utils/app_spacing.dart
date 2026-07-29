@@ -11,6 +11,7 @@ class AppSpacing {
   static Widget h2 = SizedBox(height: 2.h);
   static Widget h4 = SizedBox(height: 4.h);
   static Widget h8 = SizedBox(height: 8.h);
+  static Widget h10 = SizedBox(height: 10.h);
   static Widget h12 = SizedBox(height: 12.h);
   static Widget h14 = SizedBox(height: 14.h);
   static Widget h16 = SizedBox(height: 16.h);
