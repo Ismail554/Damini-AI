@@ -193,10 +193,19 @@ class AppRouter {
       GoRoute(
         path: '/public-view',
         pageBuilder: (context, state) {
-          final project = state.extra is ProjectPublicViewModel
-              ? state.extra as ProjectPublicViewModel
-              : (state.extra as Map<String, dynamic>?)?['project']
-                  as ProjectPublicViewModel?;
+          ProjectPublicViewModel? project;
+          if (state.extra is ProjectPublicViewModel) {
+            project = state.extra as ProjectPublicViewModel;
+          } else if (state.extra is ProjectDraftModel) {
+            project = ProjectPublicViewModel.fromDraft(state.extra as ProjectDraftModel);
+          } else if (state.extra is Map<String, dynamic>) {
+            final extraMap = state.extra as Map<String, dynamic>;
+            if (extraMap['project'] is ProjectPublicViewModel) {
+              project = extraMap['project'] as ProjectPublicViewModel;
+            } else if (extraMap['project'] is ProjectDraftModel) {
+              project = ProjectPublicViewModel.fromDraft(extraMap['project'] as ProjectDraftModel);
+            }
+          }
           return buildNativePage(
             context: context,
             state: state,

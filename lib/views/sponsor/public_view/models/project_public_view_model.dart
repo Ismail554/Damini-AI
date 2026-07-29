@@ -1,3 +1,5 @@
+import '../../create_project/models/project_draft_model.dart';
+
 class TeamMemberModel {
   final String name;
   final String role;
@@ -62,6 +64,59 @@ class ProjectPublicViewModel {
     this.holdPeriod = "36 months",
     this.timelineToOperations = "6 months",
   });
+
+  factory ProjectPublicViewModel.fromDraft(ProjectDraftModel draft) {
+    final title = draft.title.trim().isEmpty ? "Untitled Project Preview" : draft.title;
+    final category = draft.industry ?? "Technology";
+    final country = draft.country ?? "United States";
+    final stage = draft.fundingStage.isEmpty ? "Seed" : draft.fundingStage;
+    final raise = draft.fundingGoal.isEmpty
+        ? "\$5,000,000"
+        : (draft.fundingGoal.startsWith('\$') ? draft.fundingGoal : "\$${draft.fundingGoal}");
+    final roi = draft.targetRoi.isEmpty
+        ? "18%"
+        : (draft.targetRoi.endsWith('%') ? draft.targetRoi : "${draft.targetRoi}%");
+
+    final rawTeam = draft.teamMembers.isEmpty ? "Alex Vance, Maria Santos" : draft.teamMembers;
+    final teamNames = rawTeam.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+    final teamList = teamNames.map((name) {
+      final parts = name.split(' ');
+      final initials = parts.map((p) => p.isNotEmpty ? p[0] : '').take(2).join('').toUpperCase();
+      return TeamMemberModel(
+        name: name,
+        role: "Team Member",
+        initials: initials.isEmpty ? "TM" : initials,
+      );
+    }).toList();
+
+    return ProjectPublicViewModel(
+      id: draft.id,
+      title: title,
+      location: country,
+      category: category,
+      stage: stage,
+      targetRaise: raise,
+      targetRoi: roi,
+      sponsorName: "Acme Corp",
+      sponsorTagline: "Verified Sponsor · Preview Mode",
+      imageUrls: const [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=600&auto=format&fit=crop",
+      ],
+      overviewText: draft.shortDesc.isEmpty ? "No short description provided." : draft.shortDesc,
+      timeline: draft.timeline.isEmpty ? "36 months" : draft.timeline,
+      teamSize: "${teamList.length} Member${teamList.length > 1 ? 's' : ''}",
+      teamMembers: teamList,
+      businessDescription: draft.fullDesc.isEmpty ? "No business description provided." : draft.fullDesc,
+      minContribution: draft.minContribution.isEmpty
+          ? (draft.minInvestment.isEmpty ? "\$50,000" : "\$${draft.minInvestment}")
+          : draft.minContribution,
+      expectedRoi: draft.expectedRoi.isEmpty ? roi : draft.expectedRoi,
+      monthlyRevenue: draft.monthlyRevenue.isEmpty ? "\$18,000" : draft.monthlyRevenue,
+      holdPeriod: draft.holdPeriod.isEmpty ? "36 months" : draft.holdPeriod,
+      timelineToOperations: draft.timelineOps.isEmpty ? "6 months" : draft.timelineOps,
+    );
+  }
 
   static ProjectPublicViewModel mockData() {
     return const ProjectPublicViewModel(

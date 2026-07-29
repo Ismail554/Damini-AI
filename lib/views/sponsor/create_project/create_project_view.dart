@@ -214,8 +214,42 @@ class _CreateProjectViewState extends State<CreateProjectView> {
 
     await context.read<ProjectDraftProvider>().saveDraft(draft);
     if (!mounted) return;
-    CustomSnackBar.success(context, "Draft saved locally!");
-    context.pop();
+    CustomSnackBar.success(context, "Draft saved to Sponsor Dashboard!");
+    context.go('/home');
+  }
+
+  void _onPreview() {
+    final title = _titleController.text.trim().isEmpty
+        ? "Untitled Project Preview"
+        : _titleController.text.trim();
+
+    final draft = ProjectDraftModel(
+      id: _draftId ?? 'preview_${DateTime.now().millisecondsSinceEpoch}',
+      title: title,
+      shortDesc: _shortDescController.text,
+      fullDesc: _fullDescController.text,
+      minInvestment: _minInvestmentController.text,
+      fundingGoal: _fundingGoalController.text,
+      targetRoi: _targetRoiController.text,
+      industry: _selectedIndustry,
+      country: _selectedCountry,
+      fundingStage: _selectedFundingStage ?? 'Seed',
+      timeline: _selectedTimeline ?? '36 months',
+      status: _statusController.text,
+      milestones: _milestonesController.text,
+      useOfFunds: _useOfFundsController.text,
+      sponsorInvestment: _sponsorInvestmentController.text,
+      minContribution: _minContributionController.text,
+      expectedRoi: _expectedRoiController.text,
+      monthlyRevenue: _monthlyRevenueController.text,
+      holdPeriod: _holdPeriodController.text,
+      timelineOps: _timelineOpsController.text,
+      teamMembers: _teamMembersController.text,
+      ndaAgreement: _ndaAgreementController.text,
+      lastEdited: 'Preview Mode',
+    );
+
+    context.push('/public-view', extra: draft);
   }
 
   void _onPublish() async {
@@ -529,9 +563,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
               child: CustomButton(
                 text: "Preview",
                 variant: CustomButtonVariant.outlined,
-                onPressed: () {
-                  context.push('/public-view');
-                },
+                onPressed: _onPreview,
               ),
             ),
           ],

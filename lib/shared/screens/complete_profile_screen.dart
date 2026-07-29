@@ -137,6 +137,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     label: "Full Name",
                     hint: "Enter name",
                     controller: _fullNameCtrl,
+                    keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next,
                     validator: (v) =>
                         (v == null || v.trim().isEmpty) ? "Enter full name" : null,
@@ -145,7 +146,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                   LabeledTextField(
                     label: "Company Name",
-                    hint: "Enter name",
+                    hint: "e.g. Apex Ventures Ltd.",
                     controller: _companyCtrl,
                     textInputAction: TextInputAction.next,
                     validator: (v) => (v == null || v.trim().isEmpty)
@@ -156,7 +157,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                   LabeledTextField(
                     label: "Country",
-                    hint: "Enter name",
+                    hint: "Select country",
                     controller: _countryCtrl,
                     textInputAction: TextInputAction.next,
                     suffixIcon: Icon(
@@ -169,7 +170,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                   LabeledTextField(
                     label: "Position / Title",
-                    hint: "Enter position/title",
+                    hint: "e.g. CEO & Co-Founder",
                     controller: _positionCtrl,
                     textInputAction: TextInputAction.next,
                   ),

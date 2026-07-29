@@ -96,7 +96,7 @@ class _CompanyVerificationScreenState
 
                   LabeledTextField(
                     label: isSponsor ? "Legal Company Name" : "Entity / Investor Name",
-                    hint: "Enter name",
+                    hint: isSponsor ? "e.g. Acme Corporation LLC" : "e.g. Apex Global Ventures",
                     controller: _legalNameCtrl,
                     textInputAction: TextInputAction.next,
                     validator: (v) =>
@@ -114,7 +114,7 @@ class _CompanyVerificationScreenState
 
                   LabeledTextField(
                     label: "Business Address",
-                    hint: "Full registered address...",
+                    hint: "e.g. 100 Innovation Way, Suite 400, Austin, TX",
                     controller: _addressCtrl,
                     textInputAction: TextInputAction.next,
                   ),

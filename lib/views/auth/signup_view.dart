@@ -109,6 +109,7 @@ class _SignUpViewState extends State<SignUpView> {
                     Expanded(
                       child: LabeledTextField(
                         textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.name,
                         label: "First Name",
                         hint: "Enter name",
                         controller: _firstNameCtrl,
@@ -121,8 +122,9 @@ class _SignUpViewState extends State<SignUpView> {
                     Expanded(
                       child: LabeledTextField(
                         textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.name,
                         label: "Last Name",
-                        hint: "Enter name",
+                        hint: "Enter your name",
                         controller: _lastNameCtrl,
                         validator: (v) => (v == null || v.trim().isEmpty)
                             ? "Enter last name"
@@ -135,7 +137,7 @@ class _SignUpViewState extends State<SignUpView> {
                 LabeledTextField(
                   textInputAction: TextInputAction.next,
                   label: "Email",
-                  hint: "Enter email",
+                  hint: "Enter your email",
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) {

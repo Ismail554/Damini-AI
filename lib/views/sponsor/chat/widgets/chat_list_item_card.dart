@@ -8,11 +8,7 @@ class ChatListItemCard extends StatelessWidget {
   final ChatItemModel item;
   final VoidCallback onTap;
 
-  const ChatListItemCard({
-    super.key,
-    required this.item,
-    required this.onTap,
-  });
+  const ChatListItemCard({super.key, required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -131,15 +127,15 @@ class ChatListItemCard extends StatelessWidget {
         ),
         if (item.isOnline)
           Positioned(
-            right: 0,
+            right: 2.w,
             bottom: 0,
+            // left: 38.w,
             child: Container(
-              width: 12.r,
-              height: 12.r,
+              width: 10.r,
+              height: 10.r,
               decoration: BoxDecoration(
                 color: const Color(0xFF10B981),
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF061427), width: 2.r),
               ),
             ),
           ),
