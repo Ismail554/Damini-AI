@@ -110,10 +110,14 @@ class SettingsView extends StatelessWidget {
           SettingsItemTile(
             icon: Icons.notifications_none_rounded,
             title: "Notifications",
-            trailing: CupertinoSwitch(
-              value: provider.notificationsEnabled,
-              activeTrackColor: const Color(0xFF2563EB),
-              onChanged: provider.toggleNotifications,
+            trailing: Transform.scale(
+              scale: 0.75,
+              alignment: Alignment.centerRight,
+              child: CupertinoSwitch(
+                value: provider.notificationsEnabled,
+                activeTrackColor: const Color(0xFF2563EB),
+                onChanged: provider.toggleNotifications,
+              ),
             ),
           ),
           _divider(tc),
@@ -130,8 +134,23 @@ class SettingsView extends StatelessWidget {
           ),
           _divider(tc),
           SettingsItemTile(
-            icon: Icons.wb_sunny_outlined,
-            title: "Mode",
+            icon: themeProvider.themeMode == ThemeMode.dark
+                ? Icons.dark_mode_outlined
+                : Icons.wb_sunny_outlined,
+            title: "Dark Mode",
+            trailing: Transform.scale(
+              scale: 0.75,
+              alignment: Alignment.centerRight,
+              child: CupertinoSwitch(
+                value: themeProvider.themeMode == ThemeMode.dark,
+                activeTrackColor: const Color(0xFF2563EB),
+                onChanged: (bool isDark) {
+                  themeProvider.setThemeMode(
+                    isDark ? ThemeMode.dark : ThemeMode.light,
+                  );
+                },
+              ),
+            ),
             onTap: () {
               final nextMode = themeProvider.themeMode == ThemeMode.dark
                   ? ThemeMode.light

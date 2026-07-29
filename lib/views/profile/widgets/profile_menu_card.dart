@@ -56,16 +56,9 @@ class ProfileMenuCard extends StatelessWidget {
           Divider(color: tc.borderSubtle, height: 1),
           _buildMenuItem(
             tc: tc,
-            title: "Saved Projects",
-            icon: Icons.bookmark_border_rounded,
-            onTap: () {},
-          ),
-          Divider(color: tc.borderSubtle, height: 1),
-          _buildMenuItem(
-            tc: tc,
             title: "Investment History",
             icon: Icons.trending_up_rounded,
-            onTap: () {},
+            onTap: () => context.push('/investment-history'),
           ),
         ],
       ),
@@ -89,7 +82,9 @@ class ProfileMenuCard extends StatelessWidget {
       context: context,
       backgroundColor: tc.sheetBg,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radiusXl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimens.radiusXl),
+        ),
       ),
       builder: (context) {
         final sheetTc = AppThemeColors.of(context);
@@ -108,30 +103,39 @@ class ProfileMenuCard extends StatelessWidget {
                 ),
               ),
               SizedBox(height: AppDimens.spaceLg),
-              _buildThemeOption(context, sheetTc,
-                  title: "System Default",
-                  mode: ThemeMode.system,
-                  currentMode: provider.themeMode,
-                  onSelect: () {
-                    provider.setThemeMode(ThemeMode.system);
-                    Navigator.pop(context);
-                  }),
-              _buildThemeOption(context, sheetTc,
-                  title: "Dark Theme",
-                  mode: ThemeMode.dark,
-                  currentMode: provider.themeMode,
-                  onSelect: () {
-                    provider.setThemeMode(ThemeMode.dark);
-                    Navigator.pop(context);
-                  }),
-              _buildThemeOption(context, sheetTc,
-                  title: "Light Theme",
-                  mode: ThemeMode.light,
-                  currentMode: provider.themeMode,
-                  onSelect: () {
-                    provider.setThemeMode(ThemeMode.light);
-                    Navigator.pop(context);
-                  }),
+              _buildThemeOption(
+                context,
+                sheetTc,
+                title: "System Default",
+                mode: ThemeMode.system,
+                currentMode: provider.themeMode,
+                onSelect: () {
+                  provider.setThemeMode(ThemeMode.system);
+                  Navigator.pop(context);
+                },
+              ),
+              _buildThemeOption(
+                context,
+                sheetTc,
+                title: "Dark Theme",
+                mode: ThemeMode.dark,
+                currentMode: provider.themeMode,
+                onSelect: () {
+                  provider.setThemeMode(ThemeMode.dark);
+                  Navigator.pop(context);
+                },
+              ),
+              _buildThemeOption(
+                context,
+                sheetTc,
+                title: "Light Theme",
+                mode: ThemeMode.light,
+                currentMode: provider.themeMode,
+                onSelect: () {
+                  provider.setThemeMode(ThemeMode.light);
+                  Navigator.pop(context);
+                },
+              ),
               SizedBox(height: AppDimens.spaceLg),
             ],
           ),
@@ -161,7 +165,11 @@ class ProfileMenuCard extends StatelessWidget {
         ),
       ),
       trailing: isSelected
-          ? Icon(Icons.check_circle_rounded, color: AppColors.primaryColor, size: AppDimens.iconMd)
+          ? Icon(
+              Icons.check_circle_rounded,
+              color: AppColors.primaryColor,
+              size: AppDimens.iconMd,
+            )
           : null,
     );
   }
@@ -198,7 +206,10 @@ class ProfileMenuCard extends StatelessWidget {
       subtitle: subtitle != null
           ? Text(
               subtitle,
-              style: GoogleFonts.outfit(fontSize: 12.sp, color: tc.textSecondary),
+              style: GoogleFonts.outfit(
+                fontSize: 12.sp,
+                color: tc.textSecondary,
+              ),
             )
           : null,
       trailing: Icon(
