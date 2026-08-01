@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,10 +25,7 @@ class SponsorSavedView extends StatelessWidget {
             builder: (context, provider, _) {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 20.w,
-                  vertical: 16.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -39,13 +37,13 @@ class SponsorSavedView extends StatelessWidget {
                         color: tc.textPrimary,
                       ),
                     ),
-                    SizedBox(height: 16.h),
+                    AppSpacing.h16,
                     _buildTabPills(provider, tc),
-                    SizedBox(height: 20.h),
+                    AppSpacing.h20,
                     _buildSortRow(context, tc, provider),
-                    SizedBox(height: 16.h),
+                    AppSpacing.h16,
                     _buildContentList(provider),
-                    SizedBox(height: 80.h),
+                    AppSpacing.h80,
                   ],
                 ),
               );
@@ -69,15 +67,12 @@ class SponsorSavedView extends StatelessWidget {
               color: isProjects
                   ? tc.buttonPrimary
                   : (tc.isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : tc.cardInner),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : tc.cardInner),
               borderRadius: BorderRadius.circular(22.r),
               border: isProjects
                   ? null
-                  : Border.all(
-                      color: tc.borderColor,
-                      width: 1.w,
-                    ),
+                  : Border.all(color: tc.borderColor, width: 1.w),
             ),
             child: Text(
               "Saved Projects",
@@ -98,15 +93,12 @@ class SponsorSavedView extends StatelessWidget {
               color: !isProjects
                   ? tc.buttonPrimary
                   : (tc.isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : tc.cardInner),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : tc.cardInner),
               borderRadius: BorderRadius.circular(22.r),
               border: !isProjects
                   ? null
-                  : Border.all(
-                      color: tc.borderColor,
-                      width: 1.w,
-                    ),
+                  : Border.all(color: tc.borderColor, width: 1.w),
             ),
             child: Text(
               "Saved Profile",
@@ -127,47 +119,132 @@ class SponsorSavedView extends StatelessWidget {
     AppThemeColors tc,
     SponsorSavedProvider provider,
   ) {
+    final isProjects = provider.currentTab == SavedTab.projects;
+    final isDark = tc.isDark;
+
+    final sortOptions = isProjects
+        ? [
+            "Newest",
+            "Oldest",
+            "Highest ROI",
+            "Target Raise: High to Low",
+            "Target Raise: Low to High",
+          ]
+        : ["Newest", "Oldest", "Name: A to Z", "Name: Z to A"];
+
+    final isSorted = provider.selectedSort != "Newest";
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           "${provider.resultsCount} results",
-          style: GoogleFonts.outfit(
-            fontSize: 14.sp,
-            color: tc.textSecondary,
-          ),
+          style: GoogleFonts.outfit(fontSize: 14.sp, color: tc.textSecondary),
         ),
         PopupMenuButton<String>(
           initialValue: provider.selectedSort,
           onSelected: provider.setSortOption,
-          color: tc.isDark ? const Color(0xFF091E36) : Colors.white,
+          color: isDark ? const Color(0xFF092444) : Colors.white,
+          elevation: 4,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          itemBuilder: (context) => const [
-            PopupMenuItem(value: "Newest", child: Text("Sort by: Newest")),
-            PopupMenuItem(value: "Oldest", child: Text("Sort by: Oldest")),
-            PopupMenuItem(
-              value: "Highest ROI",
-              child: Text("Sort by: Highest ROI"),
+            borderRadius: BorderRadius.circular(16.r),
+            side: BorderSide(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : const Color(0xFFE2E8F0),
             ),
-          ],
-          child: Row(
-            children: [
-              Text(
-                "Sort by: ${provider.selectedSort}",
-                style: GoogleFonts.outfit(
-                  fontSize: 14.sp,
-                  color: tc.textSecondary,
+          ),
+          itemBuilder: (context) => sortOptions
+              .map(
+                (option) => PopupMenuItem(
+                  value: option,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        option,
+                        style: GoogleFonts.outfit(
+                          fontSize: 14.sp,
+                          color: provider.selectedSort == option
+                              ? (isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF059669))
+                              : tc.textPrimary,
+                          fontWeight: provider.selectedSort == option
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
+                      if (provider.selectedSort == option)
+                        Icon(
+                          Icons.check_rounded,
+                          color: isDark
+                              ? const Color(0xFF34D399)
+                              : const Color(0xFF059669),
+                          size: 18.r,
+                        ),
+                    ],
+                  ),
                 ),
+              )
+              .toList(),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: isSorted
+                  ? (isDark
+                        ? const Color(0xFF064E3B).withValues(alpha: 0.6)
+                        : const Color(0xFFD1FAE5))
+                  : (isDark ? const Color(0xFF092444) : Colors.white),
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(
+                color: isSorted
+                    ? (isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF10B981))
+                    : (isDark
+                          ? Colors.white.withValues(alpha: 0.2)
+                          : const Color(0xFFCBD5E1)),
               ),
-              SizedBox(width: 4.w),
-              Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: tc.textSecondary,
-                size: 20.r,
-              ),
-            ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.sort_rounded,
+                  color: isSorted
+                      ? (isDark
+                            ? const Color(0xFF34D399)
+                            : const Color(0xFF059669))
+                      : tc.textPrimary,
+                  size: 16.sp,
+                ),
+                AppSpacing.w6,
+                Text(
+                  isSorted ? provider.selectedSort : "Sort",
+                  style: GoogleFonts.outfit(
+                    fontSize: 13.sp,
+                    fontWeight: isSorted ? FontWeight.bold : FontWeight.w600,
+                    color: isSorted
+                        ? (isDark
+                              ? const Color(0xFF34D399)
+                              : const Color(0xFF059669))
+                        : tc.textPrimary,
+                  ),
+                ),
+                SizedBox(width: 4.w),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: isSorted
+                      ? (isDark
+                            ? const Color(0xFF34D399)
+                            : const Color(0xFF059669))
+                      : tc.textSecondary,
+                  size: 18.sp,
+                ),
+              ],
+            ),
           ),
         ),
       ],

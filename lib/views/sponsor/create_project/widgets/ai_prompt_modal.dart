@@ -43,7 +43,9 @@ class _AiPromptModalState extends State<AiPromptModal> {
     final userIdea = _promptController.text.trim();
     final tmpl = template ?? _templates[0];
 
-    final title = userIdea.isNotEmpty ? "AI Project: $userIdea" : tmpl['title']!;
+    final title = userIdea.isNotEmpty
+        ? "AI Project: $userIdea"
+        : tmpl['title']!;
 
     final draft = ProjectDraftModel(
       id: 'ai_draft_${DateTime.now().millisecondsSinceEpoch}',
@@ -62,7 +64,8 @@ class _AiPromptModalState extends State<AiPromptModal> {
       fundingStage: tmpl['stage']!,
       timeline: '36 months',
       status: 'Ready for investment pipeline',
-      milestones: 'Q1: Prototype & MVP\nQ2: Pilot Customers\nQ3: Scale Operations',
+      milestones:
+          'Q1: Prototype & MVP\nQ2: Pilot Customers\nQ3: Scale Operations',
       useOfFunds: '40% R&D, 30% Sales & Marketing, 20% Ops, 10% Reserve',
       sponsorInvestment: '250000',
       minContribution: tmpl['minInv']!,
@@ -71,7 +74,8 @@ class _AiPromptModalState extends State<AiPromptModal> {
       holdPeriod: '3-5 years',
       timelineOps: 'Immediate deployment',
       teamMembers: 'Alex Vance (CEO), Maria Santos (CTO), David Chen (CFO)',
-      ndaAgreement: 'Standard confidential disclosure agreement required for detailed cap table and audit documents.',
+      ndaAgreement:
+          'Standard confidential disclosure agreement required for detailed cap table and audit documents.',
       lastEdited: 'Just now',
     );
 
@@ -94,26 +98,35 @@ class _AiPromptModalState extends State<AiPromptModal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8.r),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF9333EA).withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8.r),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF9333EA).withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.auto_awesome,
+                        color: const Color(0xFFC026D3),
+                        size: 20.r,
+                      ),
                     ),
-                    child: Icon(Icons.auto_awesome, color: const Color(0xFFC026D3), size: 20.r),
-                  ),
-                  SizedBox(width: 10.w),
-                  Text(
-                    "Create with AI Assistant",
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Text(
+                        "Create with AI Assistant",
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
@@ -143,8 +156,12 @@ class _AiPromptModalState extends State<AiPromptModal> {
               maxLines: 3,
               style: GoogleFonts.outfit(color: Colors.white, fontSize: 14.sp),
               decoration: InputDecoration(
-                hintText: "e.g. A renewable energy solar farm project in Texas seeking \$5M Series A funding...",
-                hintStyle: GoogleFonts.outfit(color: Colors.grey, fontSize: 13.sp),
+                hintText:
+                    "e.g. A renewable energy solar farm project in Texas seeking \$5M Series A funding...",
+                hintStyle: GoogleFonts.outfit(
+                  color: Colors.grey,
+                  fontSize: 13.sp,
+                ),
                 border: InputBorder.none,
               ),
             ),
@@ -170,11 +187,17 @@ class _AiPromptModalState extends State<AiPromptModal> {
                     decoration: BoxDecoration(
                       color: const Color(0xFF07192F),
                       borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: const Color(0xFF006EDB).withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: const Color(0xFF006EDB).withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.bolt_rounded, color: const Color(0xFF006EDB), size: 20.r),
+                        Icon(
+                          Icons.bolt_rounded,
+                          color: const Color(0xFF006EDB),
+                          size: 20.r,
+                        ),
                         SizedBox(width: 10.w),
                         Expanded(
                           child: Column(
@@ -198,7 +221,11 @@ class _AiPromptModalState extends State<AiPromptModal> {
                             ],
                           ),
                         ),
-                        Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 14.r),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: Colors.grey,
+                          size: 14.r,
+                        ),
                       ],
                     ),
                   ),
@@ -216,17 +243,27 @@ class _AiPromptModalState extends State<AiPromptModal> {
                   ? SizedBox(
                       width: 20.r,
                       height: 20.r,
-                      child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
                   : Icon(Icons.auto_awesome, color: Colors.white, size: 20.r),
               label: Text(
-                _isGenerating ? "Generating Suggestions..." : "Autofill Fields with AI",
-                style: GoogleFonts.outfit(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                _isGenerating
+                    ? "Generating Suggestions..."
+                    : "Autofill Fields with AI",
+                style: GoogleFonts.outfit(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF9333EA),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26.r)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(26.r),
+                ),
               ),
             ),
           ),

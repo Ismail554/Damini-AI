@@ -101,7 +101,59 @@ class SponsorSavedProfileCard extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: onBookmarkTap,
+              onTap: () {
+                if (onBookmarkTap != null) {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: tc.cardBg,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      title: Text(
+                        "Remove Profile?",
+                        style: GoogleFonts.outfit(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: tc.textPrimary,
+                        ),
+                      ),
+                      content: Text(
+                        "Are you sure you want to remove this profile from your saved items?",
+                        style: GoogleFonts.outfit(
+                          fontSize: 14.sp,
+                          color: tc.textSecondary,
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: Text(
+                            "Cancel",
+                            style: GoogleFonts.outfit(
+                              color: tc.textSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(ctx).pop();
+                            onBookmarkTap!();
+                          },
+                          child: Text(
+                            "Remove",
+                            style: GoogleFonts.outfit(
+                              color: const Color(0xFFE53935),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
               child: Container(
                 width: 36.w,
                 height: 36.h,

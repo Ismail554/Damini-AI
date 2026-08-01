@@ -11,16 +11,17 @@ class InvestorSavedProjectCard extends StatelessWidget {
   final InvestorSavedItemModel item;
   final VoidCallback? onTap;
 
-  const InvestorSavedProjectCard({
-    super.key,
-    required this.item,
-    this.onTap,
-  });
+  const InvestorSavedProjectCard({super.key, required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
     final isDark = tc.isDark;
+
+    final accentOrange =
+        isDark ? const Color(0xFFF97316) : const Color(0xFFEA580C);
+    final roiGreen =
+        isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
 
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
@@ -34,6 +35,15 @@ class InvestorSavedProjectCard extends StatelessWidget {
                 ? Colors.white.withValues(alpha: 0.12)
                 : const Color(0xFFE2E8F0),
           ),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+                    blurRadius: 12.r,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
         child: Column(
           children: [
@@ -42,7 +52,8 @@ class InvestorSavedProjectCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: onTap ??
+                    onTap:
+                        onTap ??
                         () {
                           final publicProject = ProjectPublicViewModel(
                             id: item.id,
@@ -86,17 +97,17 @@ class InvestorSavedProjectCard extends StatelessWidget {
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   Container(
-                                width: 54.w,
-                                height: 54.h,
-                                color: tc.isDark
-                                    ? const Color(0xFF07192E)
-                                    : const Color(0xFFE2E8F0),
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  color: tc.textTertiary,
-                                  size: 24.r,
-                                ),
-                              ),
+                                    width: 54.w,
+                                    height: 54.h,
+                                    color: isDark
+                                        ? const Color(0xFF07192E)
+                                        : const Color(0xFFF1F5F9),
+                                    child: Icon(
+                                      Icons.image_outlined,
+                                      color: tc.textTertiary,
+                                      size: 24.r,
+                                    ),
+                                  ),
                             ),
                           ),
                         ),
@@ -126,7 +137,7 @@ class InvestorSavedProjectCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               SizedBox(height: 6.h),
-                              _buildStatusBadge(item.isActive),
+                              _buildStatusBadge(context, item.isActive),
                             ],
                           ),
                         ),
@@ -151,12 +162,21 @@ class InvestorSavedProjectCard extends StatelessWidget {
                     width: 38.r,
                     height: 38.r,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF064E3B).withValues(alpha: 0.8),
+                      color: isDark
+                          ? const Color(0xFF064E3B).withValues(alpha: 0.6)
+                          : const Color(0xFFD1FAE5),
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0xFF34D399).withValues(alpha: 0.2)
+                            : const Color(0xFFA7F3D0),
+                      ),
                     ),
                     child: Icon(
                       Icons.chat_bubble_outline_rounded,
-                      color: const Color(0xFF10B981),
+                      color: isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF059669),
                       size: 18.r,
                     ),
                   ),
@@ -172,16 +192,14 @@ class InvestorSavedProjectCard extends StatelessWidget {
                   child: _buildMetricBox(tc, "Invested", item.invested),
                 ),
                 SizedBox(width: 8.w),
-                Expanded(
-                  child: _buildMetricBox(tc, "Value", item.value),
-                ),
+                Expanded(child: _buildMetricBox(tc, "Value", item.value)),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: _buildMetricBox(
                     tc,
                     "Target ROI",
                     item.targetRoi,
-                    valueColor: const Color(0xFF10B981),
+                    valueColor: roiGreen,
                   ),
                 ),
               ],
@@ -204,7 +222,7 @@ class InvestorSavedProjectCard extends StatelessWidget {
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFFF97316),
+                    color: accentOrange,
                   ),
                 ),
               ],
@@ -218,9 +236,7 @@ class InvestorSavedProjectCard extends StatelessWidget {
                 backgroundColor: isDark
                     ? const Color(0xFF07192E)
                     : const Color(0xFFE2E8F0),
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFFF97316),
-                ),
+                valueColor: AlwaysStoppedAnimation<Color>(accentOrange),
               ),
             ),
           ],
@@ -229,14 +245,21 @@ class InvestorSavedProjectCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(bool isActive) {
-    final bg = isActive ? const Color(0xFF064E3B) : const Color(0xFF3B1E19);
-    final fg = isActive ? const Color(0xFF10B981) : const Color(0xFFF97316);
+  Widget _buildStatusBadge(BuildContext context, bool isActive) {
+    final tc = AppThemeColors.of(context);
+    final isDark = tc.isDark;
+
+    final bg = isActive
+        ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFD1FAE5))
+        : (isDark ? const Color(0xFF451A03) : const Color(0xFFFFEDD5));
+    final fg = isActive
+        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+        : (isDark ? const Color(0xFFFDBA74) : const Color(0xFFEA580C));
     final icon = isActive ? Icons.check_circle_outline : Icons.access_time;
     final text = isActive ? "Active" : "Pending";
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(10.r),
@@ -244,14 +267,14 @@ class InvestorSavedProjectCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: fg, size: 12.r),
+          Icon(icon, color: fg, size: 12.sp),
           SizedBox(width: 4.w),
           Flexible(
             child: Text(
               text,
               style: GoogleFonts.outfit(
                 fontSize: 11.sp,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: fg,
               ),
               maxLines: 1,
@@ -274,16 +297,18 @@ class InvestorSavedProjectCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: tc.isDark ? const Color(0xFF07192E) : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: tc.isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : const Color(0xFFE2E8F0),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: GoogleFonts.outfit(
-              fontSize: 11.sp,
-              color: tc.textTertiary,
-            ),
+            style: GoogleFonts.outfit(fontSize: 11.sp, color: tc.textSecondary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

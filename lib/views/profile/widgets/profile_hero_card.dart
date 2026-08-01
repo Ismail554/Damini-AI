@@ -46,10 +46,10 @@ class ProfileHeroCard extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: tc.textPrimary,
-                          width: AppDimens.borderMedium,
-                        ),
+                        // border: Border.all(
+                        //   color: tc.textPrimary,
+                        //   width: AppDimens.borderMedium,
+                        // ),
                       ),
                       child: CircleAvatar(
                         radius: 40.r,
@@ -119,7 +119,10 @@ class ProfileHeroCard extends StatelessWidget {
               GestureDetector(
                 onTap: () => context.push('/company-verification'),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 4.h,
+                  ),
                   decoration: BoxDecoration(
                     color: tc.greenPillBg,
                     borderRadius: BorderRadius.circular(AppDimens.radiusSm),

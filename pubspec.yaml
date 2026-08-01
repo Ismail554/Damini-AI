@@ -49,20 +49,6 @@ flutter:
     - assets/svgs/
     - assets/lottie/
 
-flutter_native_splash:
-  color: "#050E17"
-  image: assets/icons/app_logo.png
-  color_dark: "#050E17"
-  image_dark: assets/icons/app_logo.png
-  fullscreen: true
-
-  android_12:
-    image: assets/icons/app_logo.png
-    icon_background_color: "#050E17"
-    color: "#050E17"
-    image_dark: assets/icons/app_logo.png
-    icon_background_color_dark: "#050E17"
-    color_dark: "#050E17"
 
 
 

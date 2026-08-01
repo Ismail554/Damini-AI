@@ -69,8 +69,14 @@
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 		<key>UIStatusBarHidden</key>
-		<true/>
+		<false/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Damani AI requires access to your photo library to allow you to upload profile pictures, project verification documents, and project attachments.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Damani AI requires access to your camera so you can take and upload photos directly within the app.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Damani AI requires access to your microphone when recording video attachments for projects.</string>
 	</dict>
 </plist>

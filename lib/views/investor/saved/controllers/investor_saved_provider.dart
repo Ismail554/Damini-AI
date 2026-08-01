@@ -42,19 +42,89 @@ class InvestorSavedProvider extends ChangeNotifier {
       imageUrl:
           "https://images.unsplash.com/photo-1509391365360-2e959784a276?q=80&w=300&auto=format&fit=crop",
     ),
+    InvestorSavedItemModel(
+      id: "inv_saved_4",
+      title: "BioMed Research Lab",
+      category: "Healthcare",
+      date: "Jan 10, 2026",
+      status: "Active",
+      invested: "\$400k",
+      value: "\$520k",
+      targetRoi: "+18.5%",
+      fundingProgress: 0.85,
+      imageUrl:
+          "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=300&auto=format&fit=crop",
+    ),
   ];
 
-  String _filterSelected = "All";
+  String _filterSelected = "Newest";
 
-  List<InvestorSavedItemModel> get items => _items;
   String get filterSelected => _filterSelected;
 
-  String get totalCommitted => "\$560k";
-  int get activeProjectsCount => 2;
-  int get pendingNdasCount => 1;
+  List<InvestorSavedItemModel> get items {
+    List<InvestorSavedItemModel> list = List.from(_items);
+
+    switch (_filterSelected) {
+      case 'Value: Low to High':
+        list.sort(
+          (a, b) => _parseAmount(a.value).compareTo(_parseAmount(b.value)),
+        );
+        break;
+      case 'Value: High to Low':
+        list.sort(
+          (a, b) => _parseAmount(b.value).compareTo(_parseAmount(a.value)),
+        );
+        break;
+      case 'Invested: Low to High':
+        list.sort(
+          (a, b) =>
+              _parseAmount(a.invested).compareTo(_parseAmount(b.invested)),
+        );
+        break;
+      case 'Invested: High to Low':
+        list.sort(
+          (a, b) =>
+              _parseAmount(b.invested).compareTo(_parseAmount(a.invested)),
+        );
+        break;
+      case 'Active Only':
+        list = list.where((e) => e.isActive).toList();
+        break;
+      case 'Pending Only':
+        list = list.where((e) => !e.isActive).toList();
+        break;
+      case 'Newest':
+      default:
+        break;
+    }
+
+    return list;
+  }
+
+  String get totalCommitted {
+    final total = _items.fold<double>(
+      0.0,
+      (sum, item) => sum + _parseAmount(item.invested),
+    );
+    return "\$${(total / 1000).toInt()}k";
+  }
+
+  int get activeProjectsCount => _items.where((e) => e.isActive).length;
+  int get pendingNdasCount => _items.where((e) => !e.isActive).length;
 
   void setFilter(String filter) {
     _filterSelected = filter;
     notifyListeners();
+  }
+
+  double _parseAmount(String input) {
+    final cleaned = input.replaceAll(RegExp(r'[^0-9.]'), '');
+    final val = double.tryParse(cleaned) ?? 0.0;
+    if (input.toLowerCase().contains('k')) {
+      return val * 1000;
+    } else if (input.toLowerCase().contains('m')) {
+      return val * 1000000;
+    }
+    return val;
   }
 }
