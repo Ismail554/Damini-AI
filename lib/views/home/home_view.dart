@@ -212,32 +212,34 @@ class _HomeViewState extends State<HomeView> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          // Orange AI Robot Button
-                          GestureDetector(
-                            onTap: () => context.push('/ai-chat'),
-                            child: Container(
-                              padding: EdgeInsets.all(12.r),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFD34E27),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFFD34E27,
-                                    ).withValues(alpha: 0.4),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.smart_toy_outlined,
-                                color: Colors.white,
-                                size: 22.r,
+                          // Orange AI Robot Button (Only visible in Chat View)
+                          if (_currentIndex == 2) ...[
+                            GestureDetector(
+                              onTap: () => context.push('/ai-chat'),
+                              child: Container(
+                                padding: EdgeInsets.all(12.r),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD34E27),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFFD34E27,
+                                      ).withValues(alpha: 0.4),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.smart_toy_outlined,
+                                  color: Colors.white,
+                                  size: 22.r,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 12.h),
+                            if (isSponsor) SizedBox(height: 12.h),
+                          ],
 
                           // Blue + Add Button (Sponsor role) with Horizontal Expansion
                           if (isSponsor)

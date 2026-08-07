@@ -1,10 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/app_theme_colors.dart';
 
-class LogoutDialog extends StatefulWidget {
+class LogoutDialog extends StatelessWidget {
   const LogoutDialog({super.key});
 
   static Future<bool?> show(BuildContext context) {
@@ -16,51 +15,14 @@ class LogoutDialog extends StatefulWidget {
   }
 
   @override
-  State<LogoutDialog> createState() => _LogoutDialogState();
-}
-
-class _LogoutDialogState extends State<LogoutDialog> {
-  int _secondsRemaining = 5;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsRemaining > 1) {
-        setState(() {
-          _secondsRemaining--;
-        });
-      } else {
-        setState(() {
-          _secondsRemaining = 0;
-        });
-        _timer?.cancel();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
-    final isEnabled = _secondsRemaining == 0;
 
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24.r),
-      ),
-      backgroundColor: tc.isDark ? tc.cardHero : Colors.white,
-      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
+      backgroundColor: tc.isDark ? const Color(0xFF0F1E2E) : Colors.white,
+      surfaceTintColor: Colors.transparent,
+      elevation: 12,
       insetPadding: EdgeInsets.symmetric(horizontal: 28.w),
       child: Padding(
         padding: EdgeInsets.all(24.r),
@@ -115,27 +77,22 @@ class _LogoutDialogState extends State<LogoutDialog> {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: isEnabled
-                        ? () => Navigator.of(context).pop(true)
-                        : null,
+                    onPressed: () => Navigator.of(context).pop(true),
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 44.h),
                       backgroundColor: const Color(0xFFD34E27),
-                      disabledBackgroundColor: const Color(0xFFD34E27)
-                          .withValues(alpha: 0.4),
+                      foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(22.r),
                       ),
                     ),
                     child: Text(
-                      isEnabled ? "Log out" : "Log out (${_secondsRemaining}s)",
+                      "Log out",
                       style: GoogleFonts.outfit(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
-                        color: isEnabled
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white,
                       ),
                     ),
                   ),

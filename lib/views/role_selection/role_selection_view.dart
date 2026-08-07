@@ -72,7 +72,7 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
                         description:
                             "I want to publish projects and find strategic investors for my business.",
                         bulletPoints: const [
-                          "Publish unlimited projects",
+                          "Publish new projects",
                           "Review investor proposals",
                           "Secure NDA workflow",
                         ],
@@ -90,7 +90,7 @@ class _RoleSelectionViewState extends State<RoleSelectionView> {
                         bulletPoints: const [
                           "Browse vetted projects",
                           "Send proposals directly",
-                          "Bookmark opportunities",
+                          "Chat with professionals worldwide",
                         ],
                         icon: Icons.trending_up_rounded,
                       ),

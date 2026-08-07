@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
@@ -66,6 +68,55 @@ class _CreateProjectViewState extends State<CreateProjectView> {
   String? _selectedTimeline;
 
   bool _isPublishing = false;
+
+  // File Upload States
+  String? _coverImagePath;
+  String? _confidentialDocPath;
+  String? _confidentialDocName;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickCoverImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        setState(() {
+          _coverImagePath = image.path;
+        });
+        if (mounted) {
+          CustomSnackBar.success(context, "Cover image selected!");
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        CustomSnackBar.error(context, "Could not select image: $e");
+      }
+    }
+  }
+
+  Future<void> _pickConfidentialDoc() async {
+    try {
+      final FilePickerResult? result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt'],
+      );
+      if (result != null && result.files.isNotEmpty) {
+        setState(() {
+          _confidentialDocPath = result.files.first.path;
+          _confidentialDocName = result.files.first.name;
+        });
+        if (mounted) {
+          CustomSnackBar.success(context, "Document selected: $_confidentialDocName");
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        CustomSnackBar.error(context, "Could not select document: $e");
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -253,7 +304,11 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                         title: "Tap to upload cover",
                         subtitle: "16:9 recommended",
                         icon: Icons.image_outlined,
-                        onTap: () {},
+                        selectedFilePath: _coverImagePath,
+                        onTap: _pickCoverImage,
+                        onRemove: _coverImagePath != null
+                            ? () => setState(() => _coverImagePath = null)
+                            : null,
                       ),
                       SizedBox(height: AppDimens.spaceMd),
                       const AdditionalImagesSection(),
@@ -324,7 +379,15 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                         label: "Confidential Documents (Requires NDA)",
                         title: "Upload Pitch Deck & Financials",
                         icon: Icons.cloud_upload_outlined,
-                        onTap: () {},
+                        selectedFilePath: _confidentialDocPath,
+                        selectedFileName: _confidentialDocName,
+                        onTap: _pickConfidentialDoc,
+                        onRemove: _confidentialDocPath != null
+                            ? () => setState(() {
+                                  _confidentialDocPath = null;
+                                  _confidentialDocName = null;
+                                })
+                            : null,
                       ),
                       SizedBox(height: AppDimens.spaceXxl),
                       _buildActionButtons(),

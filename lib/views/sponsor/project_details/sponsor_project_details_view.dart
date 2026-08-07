@@ -18,18 +18,14 @@ import 'widgets/sponsor_project_stats_card.dart';
 class SponsorProjectDetailsView extends StatefulWidget {
   final SponsorProjectDetailsModel? initialProject;
 
-  const SponsorProjectDetailsView({
-    super.key,
-    this.initialProject,
-  });
+  const SponsorProjectDetailsView({super.key, this.initialProject});
 
   @override
   State<SponsorProjectDetailsView> createState() =>
       _SponsorProjectDetailsViewState();
 }
 
-class _SponsorProjectDetailsViewState
-    extends State<SponsorProjectDetailsView> {
+class _SponsorProjectDetailsViewState extends State<SponsorProjectDetailsView> {
   bool _isExpanded = false;
 
   @override
@@ -67,12 +63,12 @@ class _SponsorProjectDetailsViewState
                           ),
                           SizedBox(height: AppDimens.spaceLg),
                           SponsorProjectStatsCard(project: project),
-                          SizedBox(height: AppDimens.spaceXxl),
+                          SizedBox(height: AppDimens.spaceSmd),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Investor Contributions",
+                                "NDA Signed",
                                 style: GoogleFonts.outfit(
                                   fontSize: 18.sp,
                                   fontWeight: FontWeight.bold,
@@ -82,8 +78,7 @@ class _SponsorProjectDetailsViewState
                               if (contributions.length > 2)
                                 GestureDetector(
                                   onTap: () {
-                                    setState(
-                                        () => _isExpanded = !_isExpanded);
+                                    setState(() => _isExpanded = !_isExpanded);
                                   },
                                   child: Row(
                                     children: [
@@ -98,8 +93,9 @@ class _SponsorProjectDetailsViewState
                                       SizedBox(width: 2.w),
                                       AnimatedRotation(
                                         turns: _isExpanded ? 0.5 : 0.0,
-                                        duration:
-                                            const Duration(milliseconds: 250),
+                                        duration: const Duration(
+                                          milliseconds: 250,
+                                        ),
                                         child: Icon(
                                           Icons.keyboard_arrow_down_rounded,
                                           color: AppColors.accentOrange,
@@ -111,7 +107,7 @@ class _SponsorProjectDetailsViewState
                                 ),
                             ],
                           ),
-                          SizedBox(height: AppDimens.spaceMd),
+                          SizedBox(height: AppDimens.spaceXxs),
                         ],
                       ),
                     ),
@@ -123,20 +119,17 @@ class _SponsorProjectDetailsViewState
                       horizontal: AppDimens.screenHorizontal,
                     ),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final item = contributions[index];
-                          return AnimatedOpacity(
-                            duration: const Duration(milliseconds: 250),
-                            opacity: 1.0,
-                            child: InvestorContributionCard(
-                              contribution: item,
-                              onTap: () {},
-                            ),
-                          );
-                        },
-                        childCount: displayCount,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final item = contributions[index];
+                        return AnimatedOpacity(
+                          duration: const Duration(milliseconds: 250),
+                          opacity: 1.0,
+                          child: InvestorContributionCard(
+                            contribution: item,
+                            onTap: () {},
+                          ),
+                        );
+                      }, childCount: displayCount),
                     ),
                   ),
 

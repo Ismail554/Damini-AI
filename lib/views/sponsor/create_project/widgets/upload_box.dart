@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,9 @@ class UploadBox extends StatelessWidget {
   final String? subtitle;
   final IconData icon;
   final VoidCallback onTap;
+  final String? selectedFilePath;
+  final String? selectedFileName;
+  final VoidCallback? onRemove;
 
   const UploadBox({
     super.key,
@@ -18,7 +22,25 @@ class UploadBox extends StatelessWidget {
     this.subtitle,
     required this.icon,
     required this.onTap,
+    this.selectedFilePath,
+    this.selectedFileName,
+    this.onRemove,
   });
+
+  bool get _hasFile =>
+      (selectedFilePath != null && selectedFilePath!.isNotEmpty) ||
+      (selectedFileName != null && selectedFileName!.isNotEmpty);
+
+  bool get _isImage {
+    if (selectedFilePath == null) return false;
+    final lower = selectedFilePath!.toLowerCase();
+    return lower.endsWith('.jpg') ||
+        lower.endsWith('.jpeg') ||
+        lower.endsWith('.png') ||
+        lower.endsWith('.webp') ||
+        lower.endsWith('.heic') ||
+        lower.startsWith('assets/');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,59 +60,180 @@ class UploadBox extends StatelessWidget {
         SizedBox(height: AppDimens.spaceXxs),
         GestureDetector(
           onTap: onTap,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
+            padding: _hasFile
+                ? EdgeInsets.all(12.r)
+                : EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
             decoration: BoxDecoration(
               color: tc.cardInner,
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               border: Border.all(
-                color: tc.borderColor,
-                width: 1.2,
+                color: _hasFile
+                    ? const Color(0xFF006EDB)
+                    : tc.borderColor,
+                width: _hasFile ? 1.5 : 1.2,
               ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: _hasFile ? _buildPreview(context, tc) : _buildEmptyState(tc),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState(AppThemeColors tc) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: EdgeInsets.all(12.r),
+          decoration: BoxDecoration(
+            color: tc.cardBg,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: tc.borderColor,
+              width: AppDimens.borderThin,
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: tc.textSecondary,
+            size: 24.r,
+          ),
+        ),
+        SizedBox(height: 10.h),
+        Text(
+          title,
+          style: GoogleFonts.outfit(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w600,
+            color: tc.textPrimary,
+          ),
+        ),
+        if (subtitle != null) ...[
+          SizedBox(height: 4.h),
+          Text(
+            subtitle!,
+            style: GoogleFonts.outfit(
+              fontSize: 11.sp,
+              color: tc.textTertiary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildPreview(BuildContext context, AppThemeColors tc) {
+    final path = selectedFilePath ?? '';
+    final isAsset = path.startsWith('assets/');
+    final file = File(path);
+    final fileName = selectedFileName ?? (path.isNotEmpty ? path.split('/').last : 'Uploaded File');
+
+    if (_isImage) {
+      return Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10.r),
+            child: SizedBox(
+              height: 140.h,
+              width: double.infinity,
+              child: isAsset
+                  ? Image.asset(path, fit: BoxFit.cover)
+                  : (file.existsSync()
+                      ? Image.file(file, fit: BoxFit.cover)
+                      : Container(
+                          color: Colors.black26,
+                          child: Icon(Icons.image, color: Colors.white, size: 40.r),
+                        )),
+            ),
+          ),
+          Positioned(
+            top: 8.r,
+            right: 8.r,
+            child: Row(
               children: [
-                Container(
-                  padding: EdgeInsets.all(12.r),
-                  decoration: BoxDecoration(
-                    color: tc.cardBg,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: tc.borderColor,
-                      width: AppDimens.borderThin,
+                GestureDetector(
+                  onTap: onTap,
+                  child: Container(
+                    padding: EdgeInsets.all(6.r),
+                    decoration: const BoxDecoration(
+                      color: Color(0xCC000000),
+                      shape: BoxShape.circle,
                     ),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: tc.textSecondary,
-                    size: 24.r,
+                    child: Icon(Icons.edit_rounded, color: Colors.white, size: 16.r),
                   ),
                 ),
-                SizedBox(height: 10.h),
-                Text(
-                  title,
-                  style: GoogleFonts.outfit(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                    color: tc.textPrimary,
-                  ),
-                ),
-                if (subtitle != null) ...[
-                  SizedBox(height: 4.h),
-                  Text(
-                    subtitle!,
-                    style: GoogleFonts.outfit(
-                      fontSize: 11.sp,
-                      color: tc.textTertiary,
+                if (onRemove != null) ...[
+                  SizedBox(width: 8.w),
+                  GestureDetector(
+                    onTap: onRemove,
+                    child: Container(
+                      padding: EdgeInsets.all(6.r),
+                      decoration: const BoxDecoration(
+                        color: Color(0xCCEF4444),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.close_rounded, color: Colors.white, size: 16.r),
                     ),
                   ),
                 ],
               ],
             ),
           ),
+        ],
+      );
+    }
+
+    // Document file preview
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(12.r),
+          decoration: BoxDecoration(
+            color: const Color(0xFF006EDB).withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Icon(
+            Icons.insert_drive_file_rounded,
+            color: const Color(0xFF006EDB),
+            size: 24.r,
+          ),
         ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                fileName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.outfit(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.bold,
+                  color: tc.textPrimary,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                "Tap box to replace file",
+                style: GoogleFonts.outfit(
+                  fontSize: 11.sp,
+                  color: tc.textTertiary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (onRemove != null)
+          IconButton(
+            icon: Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20.r),
+            onPressed: onRemove,
+          ),
       ],
     );
   }

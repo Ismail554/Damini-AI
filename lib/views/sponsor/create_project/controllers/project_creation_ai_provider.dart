@@ -26,18 +26,47 @@ class ProjectCreationAiProvider extends ChangeNotifier {
   bool get isTyping => _isTyping;
   ProjectDraftModel? get generatedDraft => _generatedDraft;
 
+  int get currentStepIndex {
+    switch (_currentStep) {
+      case _ChatStep.intro:
+      case _ChatStep.industry:
+        return 1;
+      case _ChatStep.description:
+        return 2;
+      case _ChatStep.fundingGoal:
+        return 3;
+      case _ChatStep.done:
+        return 4;
+    }
+  }
+
+  int get totalSteps => 4;
+
+  String get stepTitle {
+    switch (_currentStep) {
+      case _ChatStep.intro:
+      case _ChatStep.industry:
+        return "Select Industry";
+      case _ChatStep.description:
+        return "Project Concept";
+      case _ChatStep.fundingGoal:
+        return "Funding Target";
+      case _ChatStep.done:
+        return "Blueprint Ready!";
+    }
+  }
+
   List<String> get currentSuggestions {
     switch (_currentStep) {
       case _ChatStep.intro:
+      case _ChatStep.industry:
         return ["Technology", "Clean Energy", "Real Estate", "Healthcare", "Fintech"];
       case _ChatStep.description:
         return ["A renewable energy solar farm project", "A downtown tech hub", "An innovative healthcare app"];
       case _ChatStep.fundingGoal:
-        return ["5000000", "1000000", "10000000"];
+        return ["\$5,000,000", "\$1,000,000", "\$10,000,000"];
       case _ChatStep.done:
         return ["Apply to Project"];
-      default:
-        return [];
     }
   }
 

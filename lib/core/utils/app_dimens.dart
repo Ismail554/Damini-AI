@@ -24,6 +24,7 @@ class AppDimens {
   static double spaceXxs = 2.h;
   static double spaceXs = 4.h;
   static double spaceSm = 6.h;
+  static double spaceSmd = 8.h;
   static double spaceMd = 12.h;
   static double spaceLg = 16.h;
   static double spaceXl = 20.h;
