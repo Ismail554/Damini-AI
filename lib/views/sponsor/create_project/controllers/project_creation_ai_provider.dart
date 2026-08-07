@@ -1,0 +1,164 @@
+import 'package:flutter/material.dart';
+import '../../../ai_chat/models/ai_chat_message_model.dart';
+import '../models/project_draft_model.dart';
+
+enum _ChatStep {
+  intro,
+  industry,
+  description,
+  fundingGoal,
+  done,
+}
+
+class ProjectCreationAiProvider extends ChangeNotifier {
+  final List<AiChatMessageModel> _messages = [];
+  bool _isTyping = false;
+  _ChatStep _currentStep = _ChatStep.intro;
+
+  // Collected data
+  String _industry = '';
+  String _description = '';
+  String _fundingGoal = '';
+  
+  ProjectDraftModel? _generatedDraft;
+
+  List<AiChatMessageModel> get messages => List.unmodifiable(_messages);
+  bool get isTyping => _isTyping;
+  ProjectDraftModel? get generatedDraft => _generatedDraft;
+
+  List<String> get currentSuggestions {
+    switch (_currentStep) {
+      case _ChatStep.intro:
+        return ["Technology", "Clean Energy", "Real Estate", "Healthcare", "Fintech"];
+      case _ChatStep.description:
+        return ["A renewable energy solar farm project", "A downtown tech hub", "An innovative healthcare app"];
+      case _ChatStep.fundingGoal:
+        return ["5000000", "1000000", "10000000"];
+      case _ChatStep.done:
+        return ["Apply to Project"];
+      default:
+        return [];
+    }
+  }
+
+  ProjectCreationAiProvider() {
+    _initGreeting();
+  }
+
+  void _initGreeting() {
+    _messages.add(
+      AiChatMessageModel(
+        id: "msg_welcome",
+        text: "Hi, I'm Damini Advisor. I can help you with creating a new project. To get started, what industry is your project in?",
+        isUser: false,
+        timestamp: DateTime.now(),
+        suggestions: currentSuggestions,
+      ),
+    );
+  }
+
+  Future<void> sendMessage(String text) async {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+
+    if (_currentStep == _ChatStep.done && trimmed == "Apply to Project") {
+      // Handled by the UI
+      return;
+    }
+
+    final userMsg = AiChatMessageModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      text: trimmed,
+      isUser: true,
+      timestamp: DateTime.now(),
+    );
+
+    _messages.add(userMsg);
+    _isTyping = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 1000));
+
+    _processUserResponse(trimmed);
+    
+    _isTyping = false;
+    notifyListeners();
+  }
+  
+  void _processUserResponse(String response) {
+    String aiReplyText = "";
+    
+    switch (_currentStep) {
+      case _ChatStep.intro:
+        _industry = response;
+        aiReplyText = "Great! You chose $_industry. Now, could you provide a brief description of your business idea?";
+        _currentStep = _ChatStep.description;
+        break;
+      case _ChatStep.description:
+        _description = response;
+        aiReplyText = "Awesome! Finally, what is your target funding goal (in \$)?";
+        _currentStep = _ChatStep.fundingGoal;
+        break;
+      case _ChatStep.fundingGoal:
+        _fundingGoal = response;
+        _generateDraft();
+        aiReplyText = "Thanks for the details! Based on our conversation, I have generated a project draft. Would you like to review and apply it to your new project configuration?";
+        _currentStep = _ChatStep.done;
+        break;
+      case _ChatStep.done:
+        aiReplyText = "You can tap 'Apply to Project' below to use the generated configuration.";
+        break;
+      default:
+        break;
+    }
+
+    final aiMsg = AiChatMessageModel(
+      id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
+      text: aiReplyText,
+      isUser: false,
+      timestamp: DateTime.now(),
+      suggestions: currentSuggestions,
+    );
+    
+    _messages.add(aiMsg);
+  }
+
+  void _generateDraft() {
+    _generatedDraft = ProjectDraftModel(
+      id: 'ai_draft_${DateTime.now().millisecondsSinceEpoch}',
+      title: "AI Project: $_industry Innovation",
+      shortDesc: "AI-assisted business opportunity focusing on $_description.",
+      fullDesc: "Comprehensive operational blueprint for $_description with projected revenue streams, key milestones, and verified financial forecasting.",
+      fundingGoal: _fundingGoal.replaceAll(RegExp(r'[^0-9]'), ''),
+      minInvestment: "1000",
+      targetRoi: "15",
+      industry: _industry,
+      country: 'United States',
+      fundingStage: 'Seed',
+      timeline: '36 months',
+      status: 'Ready for investment pipeline',
+      milestones: 'Q1: Prototype & MVP\nQ2: Pilot Customers\nQ3: Scale Operations',
+      useOfFunds: '40% R&D, 30% Sales & Marketing, 20% Ops, 10% Reserve',
+      sponsorInvestment: '250000',
+      minContribution: '1000',
+      expectedRoi: '15% annually',
+      monthlyRevenue: '45000',
+      holdPeriod: '3-5 years',
+      timelineOps: 'Immediate deployment',
+      teamMembers: 'Alex Vance (CEO), Maria Santos (CTO), David Chen (CFO)',
+      ndaAgreement: 'Standard confidential disclosure agreement required for detailed cap table and audit documents.',
+      lastEdited: 'Generated by Damini Advisor',
+    );
+  }
+
+  void clearChat() {
+    _messages.clear();
+    _currentStep = _ChatStep.intro;
+    _industry = '';
+    _description = '';
+    _fundingGoal = '';
+    _generatedDraft = null;
+    _initGreeting();
+    notifyListeners();
+  }
+}

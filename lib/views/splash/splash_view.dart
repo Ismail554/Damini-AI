@@ -44,16 +44,14 @@ class _SplashViewState extends State<SplashView>
       ),
     );
 
-    _ctrl.forward();
-
     _ctrl.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
-        final auth = context.read<AuthProvider>();
-        final hasToken = await auth.checkAuthStatus();
-        final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
+        String nextRoute = '/onboarding';
+        try {
+          final auth = context.read<AuthProvider>();
+          final hasToken = await auth.checkAuthStatus();
+          final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
 
-        if (mounted) {
-          String nextRoute;
           if (hasToken && auth.isAuthenticated) {
             nextRoute =
                 GlobalKeys.isValidRole(auth.userRole) ? '/home' : '/role-selection';
@@ -62,10 +60,17 @@ class _SplashViewState extends State<SplashView>
           } else {
             nextRoute = '/onboarding';
           }
+        } catch (_) {
+          nextRoute = '/onboarding';
+        }
+
+        if (mounted) {
           context.go(nextRoute);
         }
       }
     });
+
+    _ctrl.forward();
   }
 
   @override

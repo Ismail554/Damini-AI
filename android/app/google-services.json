@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1003008036989",
+    "project_id": "damini-ai",
+    "storage_bucket": "damini-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1003008036989:android:5ddc00f78c3c5d2022a114",
+        "android_client_info": {
+          "package_name": "com.braintekh.diafi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

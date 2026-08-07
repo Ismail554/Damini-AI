@@ -12,6 +12,7 @@ import '../../views/role_selection/role_onboarding_view.dart';
 import '../../views/home/home_view.dart';
 import '../../views/sponsor/all_projects/sponsor_projects_view.dart';
 import '../../views/sponsor/create_project/create_project_view.dart';
+import '../../views/sponsor/create_project/project_creation_ai_chat_view.dart';
 import '../../views/sponsor/project_details/sponsor_project_details_view.dart';
 import '../../views/sponsor/collaboration_requests/collaboration_requests_view.dart';
 import '../../views/sponsor/public_view/project_public_view.dart';
@@ -142,20 +143,16 @@ class AppRouter {
       GoRoute(
         path: '/create-project',
         pageBuilder: (context, state) {
-          final extraMap = state.extra is Map<String, dynamic>
-              ? state.extra as Map<String, dynamic>
-              : null;
+          final extraMap = state.extra as Map<String, dynamic>?;
           final draft = state.extra is ProjectDraftModel
               ? state.extra as ProjectDraftModel
               : extraMap?['draft'] as ProjectDraftModel?;
-          final autoOpenAi = extraMap?['isAiMode'] == true;
 
           return buildNativePage(
             context: context,
             state: state,
             child: CreateProjectView(
               initialDraft: draft,
-              autoOpenAiModal: autoOpenAi,
             ),
           );
         },
@@ -237,6 +234,14 @@ class AppRouter {
           context: context,
           state: state,
           child: const AiChatView(),
+        ),
+      ),
+      GoRoute(
+        path: '/project-creation-ai-chat',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const ProjectCreationAiChatView(),
         ),
       ),
       GoRoute(

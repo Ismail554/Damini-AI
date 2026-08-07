@@ -248,10 +248,7 @@ class _HomeViewState extends State<HomeView> {
                                   label: "Create with AI",
                                   color: const Color(0xFF9333EA),
                                   onTap: () {
-                                    context.push(
-                                      '/create-project',
-                                      extra: {'isAiMode': true},
-                                    );
+                                    context.push('/project-creation-ai-chat');
                                   },
                                 ),
                                 BubbleMenuItem(

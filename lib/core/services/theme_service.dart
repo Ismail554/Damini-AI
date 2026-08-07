@@ -5,7 +5,9 @@ class ThemeService {
   static const String _key = 'theme_mode_key';
 
   static Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+    try {
+      _prefs = await SharedPreferences.getInstance();
+    } catch (_) {}
   }
 
   static String getThemeModeString() {
@@ -13,6 +15,8 @@ class ThemeService {
   }
 
   static Future<void> setThemeModeString(String mode) async {
-    await _prefs?.setString(_key, mode);
+    try {
+      await _prefs?.setString(_key, mode);
+    } catch (_) {}
   }
 }
