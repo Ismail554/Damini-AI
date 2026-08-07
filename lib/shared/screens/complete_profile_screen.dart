@@ -54,7 +54,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                icon: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.white,
+                  size: 32,
+                ),
                 onPressed: widget.onBack,
               ),
               SizedBox(width: 8.w),
@@ -92,7 +96,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                 shape: BoxShape.circle,
                                 color: const Color(0xFF0F2238),
                                 border: Border.all(
-                                  color: AppColors.primaryColor.withValues(alpha: 0.4),
+                                  color: AppColors.primaryColor.withValues(
+                                    alpha: 0.4,
+                                  ),
                                   width: 1.5.w,
                                 ),
                               ),
@@ -139,8 +145,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     controller: _fullNameCtrl,
                     keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next,
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? "Enter full name" : null,
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? "Enter full name"
+                        : null,
                   ),
                   SizedBox(height: 16.h),
 

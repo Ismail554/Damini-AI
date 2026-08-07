@@ -19,11 +19,29 @@ class RoleOnboardingView extends StatefulWidget {
 class _RoleOnboardingViewState extends State<RoleOnboardingView> {
   final PageController _pageCtrl = PageController();
   int _currentStep = 0;
+  String _selectedAccountType = 'Individual';
 
   @override
   void dispose() {
     _pageCtrl.dispose();
     super.dispose();
+  }
+
+  void _onTypeSelected(String type) {
+    setState(() {
+      _selectedAccountType = type;
+    });
+    _nextPage();
+  }
+
+  void _onInterestsCompleted() {
+    if (_selectedAccountType == 'Individual') {
+      // Individual users skip company verification and complete onboarding
+      context.go('/home');
+    } else {
+      // Corporate users proceed to Company Verification
+      _nextPage();
+    }
   }
 
   void _nextPage() {
@@ -68,7 +86,7 @@ class _RoleOnboardingViewState extends State<RoleOnboardingView> {
             ),
             ChooseTypeScreen(
               role: widget.role,
-              onNext: _nextPage,
+              onNext: _onTypeSelected,
               onBack: _prevPage,
             ),
             CompleteProfileScreen(
@@ -78,7 +96,7 @@ class _RoleOnboardingViewState extends State<RoleOnboardingView> {
             ),
             InterestsScreen(
               role: widget.role,
-              onNext: _nextPage,
+              onNext: _onInterestsCompleted,
               onBack: _prevPage,
             ),
             CompanyVerificationScreen(

@@ -4,13 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ChooseTypeScreen extends StatefulWidget {
   final String role;
-  final VoidCallback onNext;
+  final ValueChanged<String>? onNext;
   final VoidCallback onBack;
 
   const ChooseTypeScreen({
     super.key,
     required this.role,
-    required this.onNext,
+    this.onNext,
     required this.onBack,
   });
 
@@ -23,77 +23,88 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IconButton(
-            onPressed: widget.onBack,
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          onPressed: widget.onBack,
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 22,
           ),
-          SizedBox(height: 16.h),
-          Text(
-            "Account Type",
-            style: GoogleFonts.outfit(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            "Select how you plan to operate as a ${widget.role.toUpperCase()}.",
-            style: GoogleFonts.outfit(
-              fontSize: 14.sp,
-              color: Colors.white.withValues(alpha: 0.6),
-            ),
-          ),
-          SizedBox(height: 32.h),
-
-          // Individual Option Card
-          _buildOptionCard(
-            title: "Individual",
-            subtitle: "Personal investor account for individual funding.",
-            icon: Icons.person_outline_rounded,
-            value: "Individual",
-          ),
-          SizedBox(height: 16.h),
-
-          // Corporate / Entity Option Card
-          _buildOptionCard(
-            title: "Corporate Entity",
-            subtitle: "Registered business, fund, or institutional investor.",
-            icon: Icons.business_outlined,
-            value: "Corporate",
-          ),
-
-          const Spacer(),
-
-          // Continue Button
-          SizedBox(
-            width: double.infinity,
-            height: 52.h,
-            child: ElevatedButton(
-              onPressed: widget.onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF006EDB),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(26.r),
-                ),
-              ),
-              child: Text(
-                "Continue",
-                style: GoogleFonts.outfit(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                ),
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Account Type",
+              style: GoogleFonts.outfit(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
-          ),
-          SizedBox(height: 16.h),
-        ],
+            SizedBox(height: 6.h),
+            Text(
+              "Select how you plan to operate as a ${widget.role.toUpperCase()}.",
+              style: GoogleFonts.outfit(
+                fontSize: 14.sp,
+                color: Colors.white.withValues(alpha: 0.6),
+              ),
+            ),
+            SizedBox(height: 32.h),
+
+            // Individual Option Card
+            _buildOptionCard(
+              title: "Individual",
+              subtitle: "Personal investor account for individual funding.",
+              icon: Icons.person_outline_rounded,
+              value: "Individual",
+            ),
+            SizedBox(height: 16.h),
+
+            // Corporate / Entity Option Card
+            _buildOptionCard(
+              title: "Corporate Entity",
+              subtitle: "Registered business, fund, or institutional investor.",
+              icon: Icons.business_outlined,
+              value: "Corporate",
+            ),
+
+            const Spacer(),
+
+            // Continue Button
+            SizedBox(
+              width: double.infinity,
+              height: 52.h,
+              child: ElevatedButton(
+                onPressed: () => widget.onNext?.call(_selectedType),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF006EDB),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26.r),
+                  ),
+                ),
+                child: Text(
+                  "Continue",
+                  style: GoogleFonts.outfit(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+          ],
+        ),
       ),
     );
   }
@@ -126,7 +137,9 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
             Container(
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF006EDB) : const Color(0xFF132B47),
+                color: isSelected
+                    ? const Color(0xFF006EDB)
+                    : const Color(0xFF132B47),
                 borderRadius: BorderRadius.circular(14.r),
               ),
               child: Icon(icon, color: Colors.white, size: 24.r),
