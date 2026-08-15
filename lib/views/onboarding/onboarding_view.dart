@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/app_theme_colors.dart';
@@ -18,12 +19,15 @@ class OnboardingView extends StatefulWidget {
 class _OnboardingViewState extends State<OnboardingView> {
   final PageController _pageCtrl = PageController();
   int _currentIndex = 0;
+  VideoPlayerController? _videoCtrl;
+  bool _isVideoInitialized = false;
 
   final List<Map<String, String>> _slides = [
     {
       "title": "Find real opportunities",
       "desc": "Browse vetted business projects from sponsors around the world curated by industry, region, and stage.",
       "image": ImageAssets.onboarding1,
+      "video": VideoAssets.onboarding1,
     },
     {
       "title": "Talk securely",
@@ -38,7 +42,39 @@ class _OnboardingViewState extends State<OnboardingView> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _initVideo();
+  }
+
+  void _videoListener() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _initVideo() async {
+    try {
+      _videoCtrl = VideoPlayerController.asset(VideoAssets.onboarding1);
+      _videoCtrl!.addListener(_videoListener);
+      await _videoCtrl!.initialize();
+      await _videoCtrl!.setLooping(true);
+      await _videoCtrl!.setVolume(1.0);
+      if (mounted) {
+        setState(() {
+          _isVideoInitialized = true;
+        });
+        await _videoCtrl!.play();
+      }
+    } catch (e, st) {
+      debugPrint("Video initialization failed: $e\n$st");
+    }
+  }
+
+  @override
   void dispose() {
+    _videoCtrl?.removeListener(_videoListener);
+    _videoCtrl?.dispose();
     _pageCtrl.dispose();
     super.dispose();
   }
@@ -69,9 +105,20 @@ class _OnboardingViewState extends State<OnboardingView> {
                 child: PageView.builder(
                   controller: _pageCtrl,
                   itemCount: _slides.length,
-                  onPageChanged: (idx) => setState(() => _currentIndex = idx),
+                  onPageChanged: (idx) {
+                    setState(() => _currentIndex = idx);
+                    if (_isVideoInitialized && _videoCtrl != null) {
+                      if (_slides[idx].containsKey("video")) {
+                        _videoCtrl!.play();
+                      } else {
+                        _videoCtrl!.pause();
+                      }
+                    }
+                  },
                   itemBuilder: (context, idx) {
                     final slide = _slides[idx];
+                    final hasVideo = slide.containsKey("video");
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -94,37 +141,97 @@ class _OnboardingViewState extends State<OnboardingView> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(24.r),
                               child: Stack(
+                                fit: StackFit.expand,
                                 children: [
-                                  // Base image
-                                  Positioned.fill(
-                                    child: Image.asset(
-                                      slide["image"]!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  // Play button overlay
-                                  Center(
-                                    child: Container(
-                                      width: 60.r,
-                                      height: 60.r,
-                                      decoration: BoxDecoration(
-                                        color: colors.cardBg,
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: colors.shadowColor,
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 4),
+                                  if (hasVideo &&
+                                      _videoCtrl != null &&
+                                      _videoCtrl!.value.isInitialized)
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if (_videoCtrl!.value.isPlaying) {
+                                            _videoCtrl!.pause();
+                                          } else {
+                                            _videoCtrl!.play();
+                                          }
+                                        });
+                                      },
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          SizedBox.expand(
+                                            child: FittedBox(
+                                              fit: BoxFit.cover,
+                                              clipBehavior: Clip.hardEdge,
+                                              child: SizedBox(
+                                                width: _videoCtrl!.value.size.width > 0
+                                                    ? _videoCtrl!.value.size.width
+                                                    : 16,
+                                                height: _videoCtrl!.value.size.height > 0
+                                                    ? _videoCtrl!.value.size.height
+                                                    : 9,
+                                                child: VideoPlayer(_videoCtrl!),
+                                              ),
+                                            ),
                                           ),
+                                          // Animated play overlay button when paused
+                                          if (!_videoCtrl!.value.isPlaying)
+                                            Center(
+                                              child: Container(
+                                                width: 60.r,
+                                                height: 60.r,
+                                                decoration: BoxDecoration(
+                                                  color: colors.cardBg.withValues(alpha: 0.85),
+                                                  shape: BoxShape.circle,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: colors.shadowColor,
+                                                      blurRadius: 10,
+                                                      offset: const Offset(0, 4),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Icon(
+                                                  Icons.play_arrow_rounded,
+                                                  color: colors.textPrimary,
+                                                  size: 40.r,
+                                                ),
+                                              ),
+                                            ),
                                         ],
                                       ),
-                                      child: Icon(
-                                        Icons.play_arrow_rounded,
-                                        color: colors.textPrimary,
-                                        size: 40,
-                                      ),
+                                    )
+                                  else
+                                    Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        Image.asset(
+                                          slide["image"]!,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        if (hasVideo && !_isVideoInitialized)
+                                          Center(
+                                            child: Container(
+                                              width: 50.r,
+                                              height: 50.r,
+                                              decoration: BoxDecoration(
+                                                color: colors.cardBg.withValues(alpha: 0.8),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Center(
+                                                child: SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2.5,
+                                                    color: AppColors.primaryColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
                                     ),
-                                  ),
                                 ],
                               ),
                             ),

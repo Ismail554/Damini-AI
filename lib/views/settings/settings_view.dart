@@ -8,6 +8,7 @@ import '../../controllers/auth_provider.dart';
 import '../../controllers/theme_provider.dart';
 import '../../core/utils/app_theme_colors.dart';
 import '../../core/widgets/common_background.dart';
+import '../../core/widgets/logout_dialog.dart';
 import 'controllers/settings_provider.dart';
 import 'widgets/delete_account_dialog.dart';
 import 'widgets/settings_item_tile.dart';
@@ -169,6 +170,27 @@ class SettingsView extends StatelessWidget {
             icon: Icons.description_outlined,
             title: "Terms & Conditions",
             onTap: () {},
+          ),
+          _divider(tc),
+          SettingsItemTile(
+            icon: Icons.logout_rounded,
+            title: "Log Out",
+            textColor: const Color(0xFFEF4444),
+            iconColor: const Color(0xFFEF4444),
+            iconBgColor: tc.isDark
+                ? const Color(0xFF4A151B).withValues(alpha: 0.5)
+                : const Color(0xFFFEE2E2),
+            trailing: const SizedBox.shrink(),
+            onTap: () async {
+              final confirmed = await LogoutDialog.show(context);
+              if (confirmed == true && context.mounted) {
+                final auth = context.read<AuthProvider>();
+                await auth.logout();
+                if (context.mounted) {
+                  context.go('/login');
+                }
+              }
+            },
           ),
         ],
       ),

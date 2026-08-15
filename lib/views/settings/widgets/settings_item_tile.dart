@@ -8,6 +8,9 @@ class SettingsItemTile extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final VoidCallback? onTap;
+  final Color? textColor;
+  final Color? iconColor;
+  final Color? iconBgColor;
 
   const SettingsItemTile({
     super.key,
@@ -15,6 +18,9 @@ class SettingsItemTile extends StatelessWidget {
     required this.title,
     this.trailing,
     this.onTap,
+    this.textColor,
+    this.iconColor,
+    this.iconBgColor,
   });
 
   @override
@@ -33,14 +39,15 @@ class SettingsItemTile extends StatelessWidget {
               width: 40.r,
               height: 40.r,
               decoration: BoxDecoration(
-                color: tc.isDark
-                    ? const Color(0xFF132B47).withValues(alpha: 0.7)
-                    : const Color(0xFFE2E8F0),
+                color: iconBgColor ??
+                    (tc.isDark
+                        ? const Color(0xFF132B47).withValues(alpha: 0.7)
+                        : const Color(0xFFE2E8F0)),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: tc.textPrimary,
+                color: iconColor ?? tc.textPrimary,
                 size: 20.r,
               ),
             ),
@@ -51,7 +58,7 @@ class SettingsItemTile extends StatelessWidget {
                 style: GoogleFonts.outfit(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
-                  color: tc.textPrimary,
+                  color: textColor ?? tc.textPrimary,
                 ),
               ),
             ),

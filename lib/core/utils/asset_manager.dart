@@ -3,6 +3,7 @@ const String iconPath = "assets/icons";
 const String jsonPath = "assets/json";
 const String svgPath = "assets/svgs";
 const String lottie = "assets/lottie";
+const String videoPath = "assets/videos";
 
 class ImageAssets {
   static const String splash = "$imagePath/splash_screen.png";
@@ -27,4 +28,7 @@ class SvgAssets {
 
 class LottieAssets {
   static const String success = "$lottie/success.json";
+}
+class VideoAssets {
+  static const String onboarding1 = "$videoPath/onboarding_1.mp4";
 }

@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Braintech/controllers/auth_provider.dart';
-import 'package:Braintech/core/services/storage_service.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
@@ -50,13 +49,10 @@ class _SplashViewState extends State<SplashView>
         try {
           final auth = context.read<AuthProvider>();
           final hasToken = await auth.checkAuthStatus();
-          final hasSeenOnboarding = await StorageService.hasSeenOnboarding();
 
           if (hasToken && auth.isAuthenticated) {
             nextRoute =
                 GlobalKeys.isValidRole(auth.userRole) ? '/home' : '/role-selection';
-          } else if (hasSeenOnboarding) {
-            nextRoute = '/login';
           } else {
             nextRoute = '/onboarding';
           }

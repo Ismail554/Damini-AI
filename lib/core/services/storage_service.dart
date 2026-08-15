@@ -96,6 +96,7 @@ class StorageService {
       await _storage.delete(key: GlobalKeys.userRoleKey);
       await _storage.delete(key: GlobalKeys.isRoleSelectedKey);
       await _storage.delete(key: GlobalKeys.isApiConnectedKey);
+      await _storage.delete(key: GlobalKeys.hasSeenOnboardingKey);
     } catch (_) {}
   }
 
