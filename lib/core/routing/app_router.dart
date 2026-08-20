@@ -41,7 +41,7 @@ import 'custom_page_transition.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/onboarding',
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
