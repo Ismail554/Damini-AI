@@ -1,32 +1,59 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/notification_model.dart';
 
-class NotificationProvider extends ChangeNotifier {
-  List<NotificationModel> _notifications =
-      NotificationModel.mockNotifications();
+class NotificationState {
+  final List<NotificationModel> notifications;
 
-  List<NotificationModel> get notifications => _notifications;
+  const NotificationState({
+    required this.notifications,
+  });
 
-  int get unreadCount =>
-      _notifications.where((item) => item.isUnread).length;
+  int get unreadCount => notifications.where((item) => item.isUnread).length;
+
+  NotificationState copyWith({
+    List<NotificationModel>? notifications,
+  }) {
+    return NotificationState(
+      notifications: notifications ?? this.notifications,
+    );
+  }
+}
+
+class NotificationNotifier extends Notifier<NotificationState> {
+  @override
+  NotificationState build() {
+    return NotificationState(
+      notifications: NotificationModel.mockNotifications(),
+    );
+  }
 
   void markAllAsRead() {
-    _notifications = _notifications.map((item) {
-      return item.copyWith(isUnread: false);
-    }).toList();
-    notifyListeners();
+    state = state.copyWith(
+      notifications: state.notifications.map((item) {
+        return item.copyWith(isUnread: false);
+      }).toList(),
+    );
   }
 
   void markAsRead(String id) {
-    final index = _notifications.indexWhere((item) => item.id == id);
-    if (index != -1 && _notifications[index].isUnread) {
-      _notifications[index] = _notifications[index].copyWith(isUnread: false);
-      notifyListeners();
-    }
+    state = state.copyWith(
+      notifications: state.notifications.map((item) {
+        if (item.id == id && item.isUnread) {
+          return item.copyWith(isUnread: false);
+        }
+        return item;
+      }).toList(),
+    );
   }
 
   void deleteNotification(String id) {
-    _notifications.removeWhere((item) => item.id == id);
-    notifyListeners();
+    state = state.copyWith(
+      notifications: state.notifications.where((item) => item.id != id).toList(),
+    );
   }
 }
+
+final notificationProvider =
+    NotifierProvider.autoDispose<NotificationNotifier, NotificationState>(
+  NotificationNotifier.new,
+);

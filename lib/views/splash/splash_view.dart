@@ -1,21 +1,21 @@
 import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:Braintech/controllers/auth_provider.dart';
+import 'package:Braintech/views/auth/session/controllers/session_provider.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
 
-class SplashView extends StatefulWidget {
+class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
   @override
-  State<SplashView> createState() => _SplashViewState();
+  ConsumerState<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView>
+class _SplashViewState extends ConsumerState<SplashView>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _fade;
@@ -47,8 +47,9 @@ class _SplashViewState extends State<SplashView>
       if (status == AnimationStatus.completed) {
         String nextRoute = '/onboarding';
         try {
-          final auth = context.read<AuthProvider>();
-          final hasToken = await auth.checkAuthStatus();
+          final hasToken =
+              await ref.read(authProvider.notifier).checkAuthStatus();
+          final auth = ref.read(authProvider);
 
           if (hasToken && auth.isAuthenticated) {
             nextRoute =
@@ -89,7 +90,7 @@ class _SplashViewState extends State<SplashView>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset(
-                      IconAssets.app_logo,
+                      IconAssets.appLogo,
                       width: 160.r,
                       height: 160.r,
                     ),

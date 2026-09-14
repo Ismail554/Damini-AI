@@ -1,14 +1,8 @@
 import 'package:Braintech/app.dart';
-import 'package:Braintech/controllers/navigation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'controllers/auth_provider.dart';
-import 'controllers/theme_provider.dart';
-import 'controllers/opportunity_provider.dart';
-import 'controllers/sponsor_project_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/services/app_service.dart';
-import 'views/sponsor/create_project/controllers/project_draft_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,16 +22,8 @@ void main() async {
   );
   await AppService.init();
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider(create: (_) => OpportunityProvider()),
-        ChangeNotifierProvider(create: (_) => SponsorProjectProvider()),
-        ChangeNotifierProvider(create: (_) => ProjectDraftProvider()),
-      ],
-      child: const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }

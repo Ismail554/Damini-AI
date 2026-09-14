@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:Braintech/controllers/theme_provider.dart';
+import 'package:Braintech/core/theme/theme_provider.dart';
 import 'package:Braintech/core/theme/app_theme.dart';
 import 'package:Braintech/core/routing/app_router.dart';
-import 'package:provider/provider.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final themeProvider = context.watch<ThemeProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
             title: 'Damini AI',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
+            themeMode: themeMode,
             routerConfig: AppRouter.router,
           );
         },

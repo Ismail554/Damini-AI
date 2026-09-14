@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../../controllers/auth_provider.dart';
+import '../auth/session/controllers/session_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
 import '../../shared/widgets/role_selection_card.dart';
 
-class RoleSelectionView extends StatefulWidget {
+class RoleSelectionView extends ConsumerStatefulWidget {
   const RoleSelectionView({super.key});
 
   @override
-  State<RoleSelectionView> createState() => _RoleSelectionViewState();
+  ConsumerState<RoleSelectionView> createState() => _RoleSelectionViewState();
 }
 
-class _RoleSelectionViewState extends State<RoleSelectionView> {
+class _RoleSelectionViewState extends ConsumerState<RoleSelectionView> {
   String _selectedRole = GlobalKeys.sponsorRole;
 
   Future<void> _handleContinue() async {
     if (!GlobalKeys.isValidRole(_selectedRole)) return;
-    final auth = context.read<AuthProvider>();
-    await auth.setRole(_selectedRole);
-    if (mounted && auth.validateCurrentRole()) {
+    final authNotifier = ref.read(authProvider.notifier);
+    await authNotifier.setRole(_selectedRole);
+    if (mounted && authNotifier.validateCurrentRole()) {
       context.go('/role-onboarding', extra: {'role': _selectedRole});
     }
   }

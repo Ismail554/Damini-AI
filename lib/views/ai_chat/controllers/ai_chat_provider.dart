@@ -1,38 +1,53 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/ai_chat_message_model.dart';
 
-class AiChatProvider extends ChangeNotifier {
-  final List<AiChatMessageModel> _messages = [];
-  bool _isTyping = false;
+class AiChatState {
+  final List<AiChatMessageModel> messages;
+  final bool isTyping;
+  final List<String> quickPrompts;
 
-  List<AiChatMessageModel> get messages => List.unmodifiable(_messages);
-  bool get isTyping => _isTyping;
+  const AiChatState({
+    required this.messages,
+    this.isTyping = false,
+    this.quickPrompts = const [
+      "Analyze high-yield real estate projects",
+      "How do I create a new funding request?",
+      "Calculate estimated ROI for Tech Hub",
+      "What are current market trends?",
+    ],
+  });
 
-  final List<String> quickPrompts = [
-    "Analyze high-yield real estate projects",
-    "How do I create a new funding request?",
-    "Calculate estimated ROI for Tech Hub",
-    "What are current market trends?",
-  ];
-
-  AiChatProvider() {
-    _initGreeting();
+  AiChatState copyWith({
+    List<AiChatMessageModel>? messages,
+    bool? isTyping,
+    List<String>? quickPrompts,
+  }) {
+    return AiChatState(
+      messages: messages ?? this.messages,
+      isTyping: isTyping ?? this.isTyping,
+      quickPrompts: quickPrompts ?? this.quickPrompts,
+    );
   }
+}
 
-  void _initGreeting() {
-    _messages.add(
-      AiChatMessageModel(
-        id: "msg_welcome",
-        text:
-            "Hello! I am your AI Investment Copilot. How can I help you optimize your portfolio or projects today?",
-        isUser: false,
-        timestamp: DateTime.now(),
-        suggestions: const [
-          "Explore Top Projects",
-          "Draft New Proposal",
-          "Market Analytics",
-        ],
-      ),
+class AiChatNotifier extends Notifier<AiChatState> {
+  @override
+  AiChatState build() {
+    return AiChatState(
+      messages: [
+        AiChatMessageModel(
+          id: "msg_welcome",
+          text:
+              "Hello! I am your AI Investment Copilot. How can I help you optimize your portfolio or projects today?",
+          isUser: false,
+          timestamp: DateTime.now(),
+          suggestions: const [
+            "Explore Top Projects",
+            "Draft New Proposal",
+            "Market Analytics",
+          ],
+        ),
+      ],
     );
   }
 
@@ -47,9 +62,10 @@ class AiChatProvider extends ChangeNotifier {
       timestamp: DateTime.now(),
     );
 
-    _messages.add(userMsg);
-    _isTyping = true;
-    notifyListeners();
+    state = state.copyWith(
+      messages: [...state.messages, userMsg],
+      isTyping: true,
+    );
 
     await Future.delayed(const Duration(milliseconds: 1200));
 
@@ -62,15 +78,30 @@ class AiChatProvider extends ChangeNotifier {
       suggestions: _getFollowUpSuggestions(trimmed),
     );
 
-    _isTyping = false;
-    _messages.add(aiMsg);
-    notifyListeners();
+    state = state.copyWith(
+      messages: [...state.messages, aiMsg],
+      isTyping: false,
+    );
   }
 
   void clearChat() {
-    _messages.clear();
-    _initGreeting();
-    notifyListeners();
+    state = state.copyWith(
+      messages: [
+        AiChatMessageModel(
+          id: "msg_welcome",
+          text:
+              "Hello! I am your AI Investment Copilot. How can I help you optimize your portfolio or projects today?",
+          isUser: false,
+          timestamp: DateTime.now(),
+          suggestions: const [
+            "Explore Top Projects",
+            "Draft New Proposal",
+            "Market Analytics",
+          ],
+        ),
+      ],
+      isTyping: false,
+    );
   }
 
   String _generateAiReply(String prompt) {
@@ -93,3 +124,8 @@ class AiChatProvider extends ChangeNotifier {
     ];
   }
 }
+
+final aiChatProvider =
+    NotifierProvider.autoDispose<AiChatNotifier, AiChatState>(
+  AiChatNotifier.new,
+);

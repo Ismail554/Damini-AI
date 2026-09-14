@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import '../../../controllers/theme_provider.dart';
+import 'package:Braintech/core/theme/theme_provider.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
 
-class ProfileMenuCard extends StatelessWidget {
+class ProfileMenuCard extends ConsumerWidget {
   const ProfileMenuCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tc = AppThemeColors.of(context);
-    final themeProvider = context.watch<ThemeProvider>();
+    final themeMode = ref.watch(themeProvider);
 
     return Container(
       width: double.infinity,
@@ -49,9 +49,9 @@ class ProfileMenuCard extends StatelessWidget {
           _buildMenuItem(
             tc: tc,
             title: "Theme Settings",
-            subtitle: _getThemeLabel(themeProvider.themeMode),
+            subtitle: _getThemeLabel(themeMode),
             icon: Icons.palette_outlined,
-            onTap: () => _showThemeSelectionSheet(context, themeProvider),
+            onTap: () => _showThemeSelectionSheet(context, ref, themeMode),
           ),
           Divider(color: tc.borderSubtle, height: 1),
           _buildMenuItem(
@@ -76,7 +76,11 @@ class ProfileMenuCard extends StatelessWidget {
     }
   }
 
-  void _showThemeSelectionSheet(BuildContext context, ThemeProvider provider) {
+  void _showThemeSelectionSheet(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeMode currentMode,
+  ) {
     final tc = AppThemeColors.of(context);
     showModalBottomSheet(
       context: context,
@@ -108,9 +112,11 @@ class ProfileMenuCard extends StatelessWidget {
                 sheetTc,
                 title: "System Default",
                 mode: ThemeMode.system,
-                currentMode: provider.themeMode,
+                currentMode: currentMode,
                 onSelect: () {
-                  provider.setThemeMode(ThemeMode.system);
+                  ref
+                      .read(themeProvider.notifier)
+                      .setThemeMode(ThemeMode.system);
                   Navigator.pop(context);
                 },
               ),
@@ -119,9 +125,11 @@ class ProfileMenuCard extends StatelessWidget {
                 sheetTc,
                 title: "Dark Theme",
                 mode: ThemeMode.dark,
-                currentMode: provider.themeMode,
+                currentMode: currentMode,
                 onSelect: () {
-                  provider.setThemeMode(ThemeMode.dark);
+                  ref
+                      .read(themeProvider.notifier)
+                      .setThemeMode(ThemeMode.dark);
                   Navigator.pop(context);
                 },
               ),
@@ -130,9 +138,11 @@ class ProfileMenuCard extends StatelessWidget {
                 sheetTc,
                 title: "Light Theme",
                 mode: ThemeMode.light,
-                currentMode: provider.themeMode,
+                currentMode: currentMode,
                 onSelect: () {
-                  provider.setThemeMode(ThemeMode.light);
+                  ref
+                      .read(themeProvider.notifier)
+                      .setThemeMode(ThemeMode.light);
                   Navigator.pop(context);
                 },
               ),

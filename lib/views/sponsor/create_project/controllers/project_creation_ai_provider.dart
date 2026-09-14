@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../ai_chat/models/ai_chat_message_model.dart';
 import '../models/project_draft_model.dart';
 
-enum _ChatStep {
+enum ProjectCreationChatStep {
   intro,
   industry,
   description,
@@ -10,32 +10,35 @@ enum _ChatStep {
   done,
 }
 
-class ProjectCreationAiProvider extends ChangeNotifier {
-  final List<AiChatMessageModel> _messages = [];
-  bool _isTyping = false;
-  _ChatStep _currentStep = _ChatStep.intro;
+class ProjectCreationAiState {
+  final List<AiChatMessageModel> messages;
+  final bool isTyping;
+  final ProjectCreationChatStep currentStep;
+  final String industry;
+  final String description;
+  final String fundingGoal;
+  final ProjectDraftModel? generatedDraft;
 
-  // Collected data
-  String _industry = '';
-  String _description = '';
-  String _fundingGoal = '';
-  
-  ProjectDraftModel? _generatedDraft;
-
-  List<AiChatMessageModel> get messages => List.unmodifiable(_messages);
-  bool get isTyping => _isTyping;
-  ProjectDraftModel? get generatedDraft => _generatedDraft;
+  const ProjectCreationAiState({
+    required this.messages,
+    this.isTyping = false,
+    this.currentStep = ProjectCreationChatStep.intro,
+    this.industry = '',
+    this.description = '',
+    this.fundingGoal = '',
+    this.generatedDraft,
+  });
 
   int get currentStepIndex {
-    switch (_currentStep) {
-      case _ChatStep.intro:
-      case _ChatStep.industry:
+    switch (currentStep) {
+      case ProjectCreationChatStep.intro:
+      case ProjectCreationChatStep.industry:
         return 1;
-      case _ChatStep.description:
+      case ProjectCreationChatStep.description:
         return 2;
-      case _ChatStep.fundingGoal:
+      case ProjectCreationChatStep.fundingGoal:
         return 3;
-      case _ChatStep.done:
+      case ProjectCreationChatStep.done:
         return 4;
     }
   }
@@ -43,46 +46,87 @@ class ProjectCreationAiProvider extends ChangeNotifier {
   int get totalSteps => 4;
 
   String get stepTitle {
-    switch (_currentStep) {
-      case _ChatStep.intro:
-      case _ChatStep.industry:
+    switch (currentStep) {
+      case ProjectCreationChatStep.intro:
+      case ProjectCreationChatStep.industry:
         return "Select Industry";
-      case _ChatStep.description:
+      case ProjectCreationChatStep.description:
         return "Project Concept";
-      case _ChatStep.fundingGoal:
+      case ProjectCreationChatStep.fundingGoal:
         return "Funding Target";
-      case _ChatStep.done:
+      case ProjectCreationChatStep.done:
         return "Blueprint Ready!";
     }
   }
 
   List<String> get currentSuggestions {
-    switch (_currentStep) {
-      case _ChatStep.intro:
-      case _ChatStep.industry:
-        return ["Technology", "Clean Energy", "Real Estate", "Healthcare", "Fintech"];
-      case _ChatStep.description:
-        return ["A renewable energy solar farm project", "A downtown tech hub", "An innovative healthcare app"];
-      case _ChatStep.fundingGoal:
+    switch (currentStep) {
+      case ProjectCreationChatStep.intro:
+      case ProjectCreationChatStep.industry:
+        return [
+          "Technology",
+          "Clean Energy",
+          "Real Estate",
+          "Healthcare",
+          "Fintech",
+        ];
+      case ProjectCreationChatStep.description:
+        return [
+          "A renewable energy solar farm project",
+          "A downtown tech hub",
+          "An innovative healthcare app",
+        ];
+      case ProjectCreationChatStep.fundingGoal:
         return ["\$5,000,000", "\$1,000,000", "\$10,000,000"];
-      case _ChatStep.done:
+      case ProjectCreationChatStep.done:
         return ["Apply to Project"];
     }
   }
 
-  ProjectCreationAiProvider() {
-    _initGreeting();
+  ProjectCreationAiState copyWith({
+    List<AiChatMessageModel>? messages,
+    bool? isTyping,
+    ProjectCreationChatStep? currentStep,
+    String? industry,
+    String? description,
+    String? fundingGoal,
+    ProjectDraftModel? generatedDraft,
+    bool clearDraft = false,
+  }) {
+    return ProjectCreationAiState(
+      messages: messages ?? this.messages,
+      isTyping: isTyping ?? this.isTyping,
+      currentStep: currentStep ?? this.currentStep,
+      industry: industry ?? this.industry,
+      description: description ?? this.description,
+      fundingGoal: fundingGoal ?? this.fundingGoal,
+      generatedDraft:
+          clearDraft ? null : (generatedDraft ?? this.generatedDraft),
+    );
   }
+}
 
-  void _initGreeting() {
-    _messages.add(
-      AiChatMessageModel(
-        id: "msg_welcome",
-        text: "Hi, I'm Damini Advisor. I can help you with creating a new project. To get started, what industry is your project in?",
-        isUser: false,
-        timestamp: DateTime.now(),
-        suggestions: currentSuggestions,
-      ),
+class ProjectCreationAiNotifier
+    extends Notifier<ProjectCreationAiState> {
+  @override
+  ProjectCreationAiState build() {
+    return ProjectCreationAiState(
+      messages: [
+        AiChatMessageModel(
+          id: "msg_welcome",
+          text:
+              "Hi, I'm Damini Advisor. I can help you with creating a new project. To get started, what industry is your project in?",
+          isUser: false,
+          timestamp: DateTime.now(),
+          suggestions: const [
+            "Technology",
+            "Clean Energy",
+            "Real Estate",
+            "Healthcare",
+            "Fintech",
+          ],
+        ),
+      ],
     );
   }
 
@@ -90,8 +134,8 @@ class ProjectCreationAiProvider extends ChangeNotifier {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
 
-    if (_currentStep == _ChatStep.done && trimmed == "Apply to Project") {
-      // Handled by the UI
+    if (state.currentStep == ProjectCreationChatStep.done &&
+        trimmed == "Apply to Project") {
       return;
     }
 
@@ -102,71 +146,94 @@ class ProjectCreationAiProvider extends ChangeNotifier {
       timestamp: DateTime.now(),
     );
 
-    _messages.add(userMsg);
-    _isTyping = true;
-    notifyListeners();
+    state = state.copyWith(
+      messages: [...state.messages, userMsg],
+      isTyping: true,
+    );
 
     await Future.delayed(const Duration(milliseconds: 1000));
 
     _processUserResponse(trimmed);
-    
-    _isTyping = false;
-    notifyListeners();
   }
-  
+
   void _processUserResponse(String response) {
     String aiReplyText = "";
-    
-    switch (_currentStep) {
-      case _ChatStep.intro:
-        _industry = response;
-        aiReplyText = "Great! You chose $_industry. Now, could you provide a brief description of your business idea?";
-        _currentStep = _ChatStep.description;
+    ProjectCreationChatStep nextStep = state.currentStep;
+    String newIndustry = state.industry;
+    String newDescription = state.description;
+    String newFundingGoal = state.fundingGoal;
+    ProjectDraftModel? draft = state.generatedDraft;
+
+    switch (state.currentStep) {
+      case ProjectCreationChatStep.intro:
+      case ProjectCreationChatStep.industry:
+        newIndustry = response;
+        aiReplyText =
+            "Great! You chose $newIndustry. Now, could you provide a brief description of your business idea?";
+        nextStep = ProjectCreationChatStep.description;
         break;
-      case _ChatStep.description:
-        _description = response;
-        aiReplyText = "Awesome! Finally, what is your target funding goal (in \$)?";
-        _currentStep = _ChatStep.fundingGoal;
+      case ProjectCreationChatStep.description:
+        newDescription = response;
+        aiReplyText =
+            "Awesome! Finally, what is your target funding goal (in \$)?";
+        nextStep = ProjectCreationChatStep.fundingGoal;
         break;
-      case _ChatStep.fundingGoal:
-        _fundingGoal = response;
-        _generateDraft();
-        aiReplyText = "Thanks for the details! Based on our conversation, I have generated a project draft. Would you like to review and apply it to your new project configuration?";
-        _currentStep = _ChatStep.done;
+      case ProjectCreationChatStep.fundingGoal:
+        newFundingGoal = response;
+        draft = _createDraft(newIndustry, newDescription, newFundingGoal);
+        aiReplyText =
+            "Thanks for the details! Based on our conversation, I have generated a project draft. Would you like to review and apply it to your new project configuration?";
+        nextStep = ProjectCreationChatStep.done;
         break;
-      case _ChatStep.done:
-        aiReplyText = "You can tap 'Apply to Project' below to use the generated configuration.";
-        break;
-      default:
+      case ProjectCreationChatStep.done:
+        aiReplyText =
+            "You can tap 'Apply to Project' below to use the generated configuration.";
         break;
     }
+
+    final intermediateState = state.copyWith(
+      currentStep: nextStep,
+      industry: newIndustry,
+      description: newDescription,
+      fundingGoal: newFundingGoal,
+      generatedDraft: draft,
+    );
 
     final aiMsg = AiChatMessageModel(
       id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
       text: aiReplyText,
       isUser: false,
       timestamp: DateTime.now(),
-      suggestions: currentSuggestions,
+      suggestions: intermediateState.currentSuggestions,
     );
-    
-    _messages.add(aiMsg);
+
+    state = intermediateState.copyWith(
+      messages: [...intermediateState.messages, aiMsg],
+      isTyping: false,
+    );
   }
 
-  void _generateDraft() {
-    _generatedDraft = ProjectDraftModel(
+  ProjectDraftModel _createDraft(
+    String industry,
+    String description,
+    String fundingGoal,
+  ) {
+    return ProjectDraftModel(
       id: 'ai_draft_${DateTime.now().millisecondsSinceEpoch}',
-      title: "AI Project: $_industry Innovation",
-      shortDesc: "AI-assisted business opportunity focusing on $_description.",
-      fullDesc: "Comprehensive operational blueprint for $_description with projected revenue streams, key milestones, and verified financial forecasting.",
-      fundingGoal: _fundingGoal.replaceAll(RegExp(r'[^0-9]'), ''),
+      title: "AI Project: $industry Innovation",
+      shortDesc: "AI-assisted business opportunity focusing on $description.",
+      fullDesc:
+          "Comprehensive operational blueprint for $description with projected revenue streams, key milestones, and verified financial forecasting.",
+      fundingGoal: fundingGoal.replaceAll(RegExp(r'[^0-9]'), ''),
       minInvestment: "1000",
       targetRoi: "15",
-      industry: _industry,
+      industry: industry,
       country: 'United States',
       fundingStage: 'Seed',
       timeline: '36 months',
       status: 'Ready for investment pipeline',
-      milestones: 'Q1: Prototype & MVP\nQ2: Pilot Customers\nQ3: Scale Operations',
+      milestones:
+          'Q1: Prototype & MVP\nQ2: Pilot Customers\nQ3: Scale Operations',
       useOfFunds: '40% R&D, 30% Sales & Marketing, 20% Ops, 10% Reserve',
       sponsorInvestment: '250000',
       minContribution: '1000',
@@ -175,19 +242,41 @@ class ProjectCreationAiProvider extends ChangeNotifier {
       holdPeriod: '3-5 years',
       timelineOps: 'Immediate deployment',
       teamMembers: 'Alex Vance (CEO), Maria Santos (CTO), David Chen (CFO)',
-      ndaAgreement: 'Standard confidential disclosure agreement required for detailed cap table and audit documents.',
+      ndaAgreement:
+          'Standard confidential disclosure agreement required for detailed cap table and audit documents.',
       lastEdited: 'Generated by Damini Advisor',
     );
   }
 
   void clearChat() {
-    _messages.clear();
-    _currentStep = _ChatStep.intro;
-    _industry = '';
-    _description = '';
-    _fundingGoal = '';
-    _generatedDraft = null;
-    _initGreeting();
-    notifyListeners();
+    state = ProjectCreationAiState(
+      messages: [
+        AiChatMessageModel(
+          id: "msg_welcome",
+          text:
+              "Hi, I'm Damini Advisor. I can help you with creating a new project. To get started, what industry is your project in?",
+          isUser: false,
+          timestamp: DateTime.now(),
+          suggestions: const [
+            "Technology",
+            "Clean Energy",
+            "Real Estate",
+            "Healthcare",
+            "Fintech",
+          ],
+        ),
+      ],
+      isTyping: false,
+      currentStep: ProjectCreationChatStep.intro,
+      industry: '',
+      description: '',
+      fundingGoal: '',
+      generatedDraft: null,
+    );
   }
 }
+
+final projectCreationAiProvider = NotifierProvider.autoDispose<
+    ProjectCreationAiNotifier, ProjectCreationAiState>(
+  ProjectCreationAiNotifier.new,
+);

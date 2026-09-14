@@ -13,7 +13,7 @@ class ImageAssets {
 }
 
 class IconAssets {
-  static const String app_logo = "$iconPath/app_logo.png";
+  static const String appLogo = "$iconPath/app_logo.png";
   static const String rawLogo = "$iconPath/raw_logo.png";
 }
 

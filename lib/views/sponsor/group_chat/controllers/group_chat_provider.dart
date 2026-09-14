@@ -1,55 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../chat/models/chat_message_model.dart';
 import '../models/group_chat_model.dart';
 import '../repositories/group_chat_repository.dart';
 
-class GroupChatProvider extends ChangeNotifier {
-  final GroupChatRepository _repository;
+class GroupChatState {
+  final List<GroupChatMessage> messages;
+  final List<AiSuggestion> suggestions;
+  final List<String> participants;
+  final bool isLoading;
 
-  GroupChatProvider({GroupChatRepository? repository})
-      : _repository = repository ?? GroupChatRepositoryImpl();
+  const GroupChatState({
+    this.messages = const [],
+    this.suggestions = const [],
+    this.participants = const [
+      'Ahmad Al-Rashid',
+      'Marcus Webb',
+      'Priya Mehta',
+    ],
+    this.isLoading = false,
+  });
 
-  final TextEditingController messageController = TextEditingController();
-  final ScrollController scrollController = ScrollController();
+  GroupChatState copyWith({
+    List<GroupChatMessage>? messages,
+    List<AiSuggestion>? suggestions,
+    List<String>? participants,
+    bool? isLoading,
+  }) {
+    return GroupChatState(
+      messages: messages ?? this.messages,
+      suggestions: suggestions ?? this.suggestions,
+      participants: participants ?? this.participants,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
+}
 
-  List<GroupChatMessage> _messages = [];
-  List<GroupChatMessage> get messages => _messages;
+class GroupChatNotifier extends Notifier<GroupChatState> {
+  late final GroupChatRepository _repository;
+  late final TextEditingController messageController;
+  late final ScrollController scrollController;
 
-  List<AiSuggestion> _suggestions = [];
-  List<AiSuggestion> get suggestions => _suggestions;
+  @override
+  GroupChatState build() {
+    _repository = GroupChatRepositoryImpl();
+    messageController = TextEditingController();
+    scrollController = ScrollController();
+    ref.onDispose(() {
+      messageController.dispose();
+      scrollController.dispose();
+    });
 
-  final List<String> _participants = [
-    'Ahmad Al-Rashid',
-    'Marcus Webb',
-    'Priya Mehta',
-  ];
-  List<String> get participants => _participants;
+    _init();
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  void removeParticipant(String name) {
-    _participants.remove(name);
-    addSystemMessage('⚠️ $name was removed from the group by the owner.');
-    notifyListeners();
+    return const GroupChatState(isLoading: true);
   }
 
-  Future<void> init() async {
-    _isLoading = true;
-    notifyListeners();
-
+  Future<void> _init() async {
     try {
       final fetchedMessages = await _repository.fetchInitialMessages();
       final fetchedSuggestions = await _repository.fetchSuggestions();
-      _messages = List.from(fetchedMessages);
-      _suggestions = List.from(fetchedSuggestions);
+      state = state.copyWith(
+        messages: List.from(fetchedMessages),
+        suggestions: List.from(fetchedSuggestions),
+        isLoading: false,
+      );
     } catch (_) {
-      // Empty/Error state handling
+      state = state.copyWith(isLoading: false);
     } finally {
-      _isLoading = false;
-      notifyListeners();
       _scrollToBottom();
     }
+  }
+
+  void removeParticipant(String name) {
+    final updatedParticipants = List<String>.from(state.participants)..remove(name);
+    state = state.copyWith(participants: updatedParticipants);
+    addSystemMessage('⚠️ $name was removed from the group by the owner.');
   }
 
   Future<void> sendMessage() async {
@@ -58,8 +84,7 @@ class GroupChatProvider extends ChangeNotifier {
 
     messageController.clear();
     final newMsg = await _repository.sendMessage(text);
-    _messages.add(newMsg);
-    notifyListeners();
+    state = state.copyWith(messages: [...state.messages, newMsg]);
     _scrollToBottom();
   }
 
@@ -84,8 +109,7 @@ class GroupChatProvider extends ChangeNotifier {
       mediaUrl: imagePath,
     );
 
-    _messages.add(newMsg);
-    notifyListeners();
+    state = state.copyWith(messages: [...state.messages, newMsg]);
     _scrollToBottom();
   }
 
@@ -108,8 +132,7 @@ class GroupChatProvider extends ChangeNotifier {
       voiceDuration: duration,
     );
 
-    _messages.add(newMsg);
-    notifyListeners();
+    state = state.copyWith(messages: [...state.messages, newMsg]);
     _scrollToBottom();
   }
 
@@ -117,25 +140,22 @@ class GroupChatProvider extends ChangeNotifier {
     final now = DateTime.now();
     final timeStr =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-    _messages.add(
-      GroupChatMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        senderName: 'Damani AI',
-        avatarInitials: 'AI',
-        avatarType: ChatAvatarType.ai,
-        isAi: true,
-        isMe: false,
-        text: text,
-        time: timeStr,
-      ),
+    final sysMsg = GroupChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      senderName: 'Damani AI',
+      avatarInitials: 'AI',
+      avatarType: ChatAvatarType.ai,
+      isAi: true,
+      isMe: false,
+      text: text,
+      time: timeStr,
     );
-    notifyListeners();
+    state = state.copyWith(messages: [...state.messages, sysMsg]);
     _scrollToBottom();
   }
 
   void onSuggestionTap(AiSuggestion suggestion) {
     messageController.text = suggestion.title;
-    notifyListeners();
   }
 
   void _scrollToBottom() {
@@ -149,11 +169,9 @@ class GroupChatProvider extends ChangeNotifier {
       }
     });
   }
-
-  @override
-  void dispose() {
-    messageController.dispose();
-    scrollController.dispose();
-    super.dispose();
-  }
 }
+
+final groupChatProvider =
+    NotifierProvider.autoDispose<GroupChatNotifier, GroupChatState>(
+  GroupChatNotifier.new,
+);

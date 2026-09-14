@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/widgets/common_background.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
@@ -10,59 +10,56 @@ import 'controllers/notification_provider.dart';
 import 'widgets/notification_item_card.dart';
 import 'widgets/notifications_app_bar.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => NotificationProvider(),
-      child: Consumer<NotificationProvider>(
-        builder: (context, provider, _) {
-          return CommonBackground(
-            showGrid: false,
-            child: SafeArea(
-              child: Column(
-                children: [
-                  NotificationsAppBar(
-                    onMarkAllRead: () {
-                      provider.markAllAsRead();
-                      CustomSnackBar.info(
-                        context,
-                        'All notifications marked as read',
-                      );
-                    },
-                  ),
-                  SizedBox(height: 10.h),
-                  Expanded(
-                    child: provider.notifications.isEmpty
-                        ? _buildEmptyState()
-                        : ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: AppDimens.screenHorizontal,
-                              vertical: AppDimens.paddingSm,
-                            ),
-                            itemCount: provider.notifications.length,
-                            itemBuilder: (context, index) {
-                              final item = provider.notifications[index];
-                              return NotificationItemCard(
-                                item: item,
-                                onTap: () {
-                                  provider.markAsRead(item.id);
-                                  if (item.route != null) {
-                                    context.push(item.route!);
-                                  }
-                                },
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(notificationProvider);
+
+    return CommonBackground(
+      showGrid: false,
+      child: SafeArea(
+        child: Column(
+          children: [
+            NotificationsAppBar(
+              onMarkAllRead: () {
+                ref.read(notificationProvider.notifier).markAllAsRead();
+                CustomSnackBar.info(
+                  context,
+                  'All notifications marked as read',
+                );
+              },
             ),
-          );
-        },
+            SizedBox(height: 10.h),
+            Expanded(
+              child: state.notifications.isEmpty
+                  ? _buildEmptyState()
+                  : ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimens.screenHorizontal,
+                        vertical: AppDimens.paddingSm,
+                      ),
+                      itemCount: state.notifications.length,
+                      itemBuilder: (context, index) {
+                        final item = state.notifications[index];
+                        return NotificationItemCard(
+                          item: item,
+                          onTap: () {
+                            ref
+                                .read(notificationProvider.notifier)
+                                .markAsRead(item.id);
+                            if (item.route != null) {
+                              context.push(item.route!);
+                            }
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

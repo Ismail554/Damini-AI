@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import '../../../core/utils/app_theme_colors.dart';
 import '../../../core/widgets/common_background.dart';
 import 'controllers/ai_chat_provider.dart';
@@ -10,69 +10,62 @@ import 'widgets/ai_chat_input_field.dart';
 import 'widgets/ai_message_bubble.dart';
 import 'widgets/ai_quick_prompt_chips.dart';
 
-class AiChatView extends StatelessWidget {
+class AiChatView extends ConsumerWidget {
   const AiChatView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tc = AppThemeColors.of(context);
+    final state = ref.watch(aiChatProvider);
+    final notifier = ref.read(aiChatProvider.notifier);
+    final messages = state.messages;
 
-    return ChangeNotifierProvider(
-      create: (_) => AiChatProvider(),
-      child: CommonBackground(
-        showGrid: false,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(60.h),
-            child: Consumer<AiChatProvider>(
-              builder: (context, provider, _) => AiChatAppBar(
-                onClearChat: () => provider.clearChat(),
+    return CommonBackground(
+      showGrid: false,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60.h),
+          child: AiChatAppBar(
+            onClearChat: () => notifier.clearChat(),
+          ),
+        ),
+        body: Column(
+          children: [
+            // Message list
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 12.h,
+                ),
+                itemCount: messages.length + (state.isTyping ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == messages.length && state.isTyping) {
+                    return _buildTypingIndicator(tc);
+                  }
+                  final msg = messages[index];
+                  return AiMessageBubble(
+                    message: msg,
+                    onSuggestionTap: (prompt) =>
+                        notifier.sendMessage(prompt),
+                  );
+                },
               ),
             ),
-          ),
-          body: Consumer<AiChatProvider>(
-            builder: (context, provider, _) {
-              final messages = provider.messages;
-              return Column(
-                children: [
-                  // Message list
-                  Expanded(
-                    child: ListView.builder(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                      itemCount: messages.length + (provider.isTyping ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == messages.length && provider.isTyping) {
-                          return _buildTypingIndicator(tc);
-                        }
-                        final msg = messages[index];
-                        return AiMessageBubble(
-                          message: msg,
-                          onSuggestionTap: (prompt) =>
-                              provider.sendMessage(prompt),
-                        );
-                      },
-                    ),
-                  ),
 
-                  // Quick Prompts list
-                  AiQuickPromptChips(
-                    prompts: provider.quickPrompts,
-                    onPromptTap: (prompt) => provider.sendMessage(prompt),
-                  ),
-                  SizedBox(height: 10.h),
+            // Quick Prompts list
+            AiQuickPromptChips(
+              prompts: state.quickPrompts,
+              onPromptTap: (prompt) => notifier.sendMessage(prompt),
+            ),
+            SizedBox(height: 10.h),
 
-                  // Input field
-                  AiChatInputField(
-                    onSend: (text) => provider.sendMessage(text),
-                  ),
-                ],
-              );
-            },
-          ),
+            // Input field
+            AiChatInputField(
+              onSend: (text) => notifier.sendMessage(text),
+            ),
+          ],
         ),
       ),
     );

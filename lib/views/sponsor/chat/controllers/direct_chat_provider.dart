@@ -1,31 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/chat_item_model.dart';
 import '../models/chat_message_model.dart';
 import '../repositories/chat_repository.dart';
 
-class DirectChatProvider extends ChangeNotifier {
+class DirectChatState {
+  final ChatItemModel chatItem;
+  final List<ChatMessageModel> messages;
+  final bool isLoading;
+
+  const DirectChatState({
+    required this.chatItem,
+    this.messages = const [],
+    this.isLoading = false,
+  });
+
+  DirectChatState copyWith({
+    ChatItemModel? chatItem,
+    List<ChatMessageModel>? messages,
+    bool? isLoading,
+  }) {
+    return DirectChatState(
+      chatItem: chatItem ?? this.chatItem,
+      messages: messages ?? this.messages,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
+}
+
+class DirectChatNotifier extends Notifier<DirectChatState> {
+  final ChatItemModel chatItem;
+  DirectChatNotifier(this.chatItem);
+
   final ChatRepository _repository = ChatRepository();
-  final TextEditingController textController = TextEditingController();
-  final ScrollController scrollController = ScrollController();
+  late final TextEditingController textController;
+  late final ScrollController scrollController;
 
-  late ChatItemModel _chatItem;
-  List<ChatMessageModel> _messages = [];
-  bool _isLoading = false;
+  @override
+  DirectChatState build() {
+    textController = TextEditingController();
+    scrollController = ScrollController();
+    ref.onDispose(() {
+      textController.dispose();
+      scrollController.dispose();
+    });
 
-  ChatItemModel get chatItem => _chatItem;
-  List<ChatMessageModel> get messages => _messages;
-  bool get isLoading => _isLoading;
-
-  void init(ChatItemModel chatItem) {
-    _chatItem = chatItem;
-    _isLoading = true;
-    notifyListeners();
-
-    _messages = _repository.fetchMessagesForChat(chatItem.id);
-    _isLoading = false;
-    notifyListeners();
-
-    _scrollToBottom();
+    final messages = _repository.fetchMessagesForChat(chatItem.id);
+    return DirectChatState(
+      chatItem: chatItem,
+      messages: messages,
+      isLoading: false,
+    );
   }
 
   void sendMessage() {
@@ -38,16 +63,15 @@ class DirectChatProvider extends ChangeNotifier {
 
     final newMessage = ChatMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      chatId: _chatItem.id,
+      chatId: state.chatItem.id,
       text: text,
       timestamp: timeStr,
       isMe: true,
       type: ChatMessageType.text,
     );
 
-    _messages.add(newMessage);
+    state = state.copyWith(messages: [...state.messages, newMessage]);
     textController.clear();
-    notifyListeners();
     _scrollToBottom();
   }
 
@@ -60,7 +84,7 @@ class DirectChatProvider extends ChangeNotifier {
 
     final newMessage = ChatMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      chatId: _chatItem.id,
+      chatId: state.chatItem.id,
       text: "Photo",
       timestamp: timeStr,
       isMe: true,
@@ -68,8 +92,7 @@ class DirectChatProvider extends ChangeNotifier {
       mediaUrl: imagePath,
     );
 
-    _messages.add(newMessage);
-    notifyListeners();
+    state = state.copyWith(messages: [...state.messages, newMessage]);
     _scrollToBottom();
   }
 
@@ -80,7 +103,7 @@ class DirectChatProvider extends ChangeNotifier {
 
     final newMessage = ChatMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      chatId: _chatItem.id,
+      chatId: state.chatItem.id,
       text: "Voice message",
       timestamp: timeStr,
       isMe: true,
@@ -88,8 +111,7 @@ class DirectChatProvider extends ChangeNotifier {
       voiceDuration: duration,
     );
 
-    _messages.add(newMessage);
-    notifyListeners();
+    state = state.copyWith(messages: [...state.messages, newMessage]);
     _scrollToBottom();
   }
 
@@ -104,11 +126,9 @@ class DirectChatProvider extends ChangeNotifier {
       }
     });
   }
-
-  @override
-  void dispose() {
-    textController.dispose();
-    scrollController.dispose();
-    super.dispose();
-  }
 }
+
+final directChatProvider = NotifierProvider.autoDispose
+    .family<DirectChatNotifier, DirectChatState, ChatItemModel>(
+  DirectChatNotifier.new,
+);

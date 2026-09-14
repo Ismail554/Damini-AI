@@ -1,12 +1,32 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+export '../models/settings_model.dart';
+import '../repositories/settings_repository.dart';
 
-class SettingsProvider extends ChangeNotifier {
-  bool _notificationsEnabled = true;
+final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
+  return SettingsRepositoryImpl();
+});
 
-  bool get notificationsEnabled => _notificationsEnabled;
+class SettingsState {
+  final bool notificationsEnabled;
+
+  const SettingsState({this.notificationsEnabled = true});
+
+  SettingsState copyWith({bool? notificationsEnabled}) {
+    return SettingsState(
+      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+    );
+  }
+}
+
+final settingsProvider =
+    NotifierProvider.autoDispose<SettingsNotifier, SettingsState>(
+        SettingsNotifier.new);
+
+class SettingsNotifier extends Notifier<SettingsState> {
+  @override
+  SettingsState build() => const SettingsState();
 
   void toggleNotifications(bool value) {
-    _notificationsEnabled = value;
-    notifyListeners();
+    state = state.copyWith(notificationsEnabled: value);
   }
 }

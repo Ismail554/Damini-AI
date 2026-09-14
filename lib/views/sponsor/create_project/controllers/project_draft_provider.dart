@@ -1,42 +1,63 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/project_draft_model.dart';
 import '../repositories/project_draft_repository.dart';
 
-class ProjectDraftProvider extends ChangeNotifier {
-  final ProjectDraftRepository _repository = ProjectDraftRepository();
+class ProjectDraftState {
+  final List<ProjectDraftModel> drafts;
+  final bool isLoading;
 
-  List<ProjectDraftModel> _drafts = [];
-  List<ProjectDraftModel> get drafts => _drafts;
+  const ProjectDraftState({
+    this.drafts = const [],
+    this.isLoading = false,
+  });
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  ProjectDraftState copyWith({
+    List<ProjectDraftModel>? drafts,
+    bool? isLoading,
+  }) {
+    return ProjectDraftState(
+      drafts: drafts ?? this.drafts,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
+}
 
-  ProjectDraftProvider() {
+final projectDraftProvider =
+    NotifierProvider<ProjectDraftNotifier, ProjectDraftState>(
+        ProjectDraftNotifier.new);
+
+class ProjectDraftNotifier extends Notifier<ProjectDraftState> {
+  late final ProjectDraftRepository _repository;
+
+  @override
+  ProjectDraftState build() {
+    _repository = ProjectDraftRepository();
     loadDrafts();
+    return const ProjectDraftState(isLoading: true);
   }
 
   Future<void> loadDrafts() async {
-    _isLoading = true;
-    notifyListeners();
-    _drafts = await _repository.getDrafts();
-    _isLoading = false;
-    notifyListeners();
+    state = state.copyWith(isLoading: true);
+    final list = await _repository.getDrafts();
+    state = state.copyWith(drafts: list, isLoading: false);
   }
 
   Future<void> saveDraft(ProjectDraftModel draft) async {
-    final index = _drafts.indexWhere((d) => d.id == draft.id);
+    final list = List<ProjectDraftModel>.from(state.drafts);
+    final index = list.indexWhere((d) => d.id == draft.id);
     if (index != -1) {
-      _drafts[index] = draft;
+      list[index] = draft;
     } else {
-      _drafts.insert(0, draft);
+      list.insert(0, draft);
     }
-    notifyListeners();
-    await _repository.saveDrafts(_drafts);
+    state = state.copyWith(drafts: list);
+    await _repository.saveDrafts(list);
   }
 
   Future<void> deleteDraft(String id) async {
-    _drafts.removeWhere((d) => d.id == id);
-    notifyListeners();
-    await _repository.saveDrafts(_drafts);
+    final list = List<ProjectDraftModel>.from(state.drafts)
+      ..removeWhere((d) => d.id == id);
+    state = state.copyWith(drafts: list);
+    await _repository.saveDrafts(list);
   }
 }

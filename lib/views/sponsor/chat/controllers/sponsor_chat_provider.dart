@@ -1,55 +1,78 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/chat_item_model.dart';
 import '../repositories/chat_repository.dart';
 
-class SponsorChatProvider extends ChangeNotifier {
-  final ChatRepository _repository = ChatRepository();
+class SponsorChatState {
+  final List<ChatItemModel> allChats;
+  final String searchQuery;
+  final bool isLoading;
 
-  List<ChatItemModel> _allChats = [];
-  String _searchQuery = '';
-  bool _isLoading = false;
+  const SponsorChatState({
+    this.allChats = const [],
+    this.searchQuery = '',
+    this.isLoading = false,
+  });
 
   List<ChatItemModel> get chats {
-    if (_searchQuery.isEmpty) return _allChats;
-    final query = _searchQuery.toLowerCase();
-    return _allChats.where((chat) {
+    if (searchQuery.isEmpty) return allChats;
+    final query = searchQuery.toLowerCase();
+    return allChats.where((chat) {
       return chat.name.toLowerCase().contains(query) ||
           chat.lastMessage.toLowerCase().contains(query);
     }).toList();
   }
 
-  String get searchQuery => _searchQuery;
-  bool get isLoading => _isLoading;
+  SponsorChatState copyWith({
+    List<ChatItemModel>? allChats,
+    String? searchQuery,
+    bool? isLoading,
+  }) {
+    return SponsorChatState(
+      allChats: allChats ?? this.allChats,
+      searchQuery: searchQuery ?? this.searchQuery,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
+}
 
-  void init() {
-    _isLoading = true;
-    notifyListeners();
-    _allChats = _repository.fetchChats();
-    _isLoading = false;
-    notifyListeners();
+class SponsorChatNotifier extends Notifier<SponsorChatState> {
+  late final ChatRepository _repository = ChatRepository();
+
+  @override
+  SponsorChatState build() {
+    final chats = _repository.fetchChats();
+    return SponsorChatState(
+      allChats: chats,
+      isLoading: false,
+    );
   }
 
   void updateSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners();
+    state = state.copyWith(searchQuery: query);
   }
 
   void clearUnread(String chatId) {
-    final index = _allChats.indexWhere((c) => c.id == chatId);
-    if (index != -1 && _allChats[index].unreadCount > 0) {
-      _allChats[index] = _allChats[index].copyWith(unreadCount: 0);
-      notifyListeners();
-    }
+    final updated = state.allChats.map((c) {
+      if (c.id == chatId && c.unreadCount > 0) {
+        return c.copyWith(unreadCount: 0);
+      }
+      return c;
+    }).toList();
+    state = state.copyWith(allChats: updated);
   }
 
   void updateLastMessage(String chatId, String message, String time) {
-    final index = _allChats.indexWhere((c) => c.id == chatId);
-    if (index != -1) {
-      _allChats[index] = _allChats[index].copyWith(
-        lastMessage: message,
-        time: time,
-      );
-      notifyListeners();
-    }
+    final updated = state.allChats.map((c) {
+      if (c.id == chatId) {
+        return c.copyWith(lastMessage: message, time: time);
+      }
+      return c;
+    }).toList();
+    state = state.copyWith(allChats: updated);
   }
 }
+
+final sponsorChatProvider =
+    NotifierProvider.autoDispose<SponsorChatNotifier, SponsorChatState>(
+  SponsorChatNotifier.new,
+);
