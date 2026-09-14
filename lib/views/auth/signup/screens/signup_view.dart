@@ -1,3 +1,4 @@
+import 'package:Braintech/views/auth/signup/provider/signup_state_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,9 +28,6 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
-
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -92,6 +90,8 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   @override
   Widget build(BuildContext context) {
     final signupState = ref.watch(signupProvider);
+    final state = ref.watch(signupStateProvider);
+    final stateProvider = ref.read(signupStateProvider.notifier);
 
     return CommonBackground(
       showGrid: false,
@@ -161,20 +161,19 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   label: "Password",
                   hint: "••••••••",
                   controller: _passwordCtrl,
-                  obscureText: _obscurePassword,
+                  obscureText: state.password,
                   validator: (v) => (v == null || v.length < 6)
                       ? "Password must be 6+ characters"
                       : null,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
+                      state.password
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
                       color: AppColors.grey,
                       size: 20.sp,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () => stateProvider.passwordToggle(),
                   ),
                 ),
                 AppSpacing.h14,
@@ -184,7 +183,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   label: "Confirm Password",
                   hint: "••••••••",
                   controller: _confirmPasswordCtrl,
-                  obscureText: _obscureConfirmPassword,
+                  obscureText: state.confirmPassword,
                   validator: (v) {
                     if (v == null || v.isEmpty) return "Confirm your password";
                     if (v != _passwordCtrl.text) {
@@ -194,15 +193,13 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   },
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureConfirmPassword
+                      state.confirmPassword
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
                       color: AppColors.grey,
                       size: 20.r,
                     ),
-                    onPressed: () => setState(
-                      () => _obscureConfirmPassword = !_obscureConfirmPassword,
-                    ),
+                    onPressed: () => stateProvider.confirmPasswordToggle(),
                   ),
                 ),
                 AppSpacing.h24,

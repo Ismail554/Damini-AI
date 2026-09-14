@@ -4,12 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/widgets/common_background.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 import '../../../../shared/global_key.dart';
 import '../../widgets/labeled_text_field.dart';
 import '../../widgets/social_auth_section.dart';
-import '../controllers/login_provider.dart';
+import '../models/login_request_model.dart';
+import '../provider/login_provider.dart';
+import '../provider/login_state.dart';
 import '../widgets/login_header.dart';
 
 class LoginView extends ConsumerStatefulWidget {
@@ -24,7 +28,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
-  bool _obscurePassword = true;
   bool _rememberMe = false;
 
   @override
@@ -37,35 +40,34 @@ class _LoginViewState extends ConsumerState<LoginView> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    try {
-      final success = await ref
-          .read(loginProvider.notifier)
-          .login(_emailCtrl.text.trim(), _passwordCtrl.text);
-      final loginState = ref.read(loginProvider);
+    final request = LoginRequestModel(
+      email: _emailCtrl.text.trim(),
+      password: _passwordCtrl.text,
+    );
 
-      if (mounted && success) {
-        if (GlobalKeys.isValidRole(loginState.userRole)) {
-          context.go('/home');
-        } else {
-          context.go('/role-selection');
-        }
-      } else if (mounted && loginState.errorMessage != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(loginState.errorMessage!)));
+    final success = await ref.read(loginProvider.notifier).login(request);
+    if (!mounted) return;
+
+    final loginAsync = ref.read(loginProvider);
+    final message = loginAsync.value?.message;
+
+    if (success) {
+      if (message != null) CustomSnackBar.show(context, message);
+      final role = loginAsync.value?.role;
+      if (GlobalKeys.isValidRole(role)) {
+        context.go('/home');
+      } else {
+        context.go('/role-selection');
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login failed: ${e.toString()}")),
-        );
-      }
+    } else if (message != null) {
+      CustomSnackBar.show(context, message, isError: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final loginState = ref.watch(loginProvider);
+    final loginAsync = ref.watch(loginProvider);
+    final passwordToggleState = ref.watch(loginState);
     final colors = AppThemeColors.of(context);
 
     return CommonBackground(
@@ -103,21 +105,21 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   label: "Password",
                   hint: "••••••••",
                   controller: _passwordCtrl,
-                  obscureText: _obscurePassword,
+                  obscureText: passwordToggleState.password,
                   textInputAction: TextInputAction.done,
                   validator: (v) => (v == null || v.length < 6)
                       ? "Enter password (6+ chars)"
                       : null,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
+                      passwordToggleState.password
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
                       color: AppColors.grey,
                       size: 20.r,
                     ),
                     onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                        ref.read(loginState.notifier).passwordToggle(),
                   ),
                 ),
                 SizedBox(height: 12.h),
@@ -145,7 +147,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         Text(
                           "Remember me",
                           style: GoogleFonts.outfit(
-                            fontSize: 13.sp,
+                            fontSize: 14.sp,
                             color: colors.textPrimary,
                           ),
                         ),
@@ -154,23 +156,23 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     GestureDetector(
                       onTap: () => context.push('/forgot-password'),
                       child: Text(
-                        "Forgot password?",
+                        "Forgot Password?",
                         style: GoogleFonts.outfit(
-                          fontSize: 13.sp,
-                          color: const Color(0xFFFF5252),
-                          fontWeight: FontWeight.w500,
+                          fontSize: 14.sp,
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 28.h),
+                SizedBox(height: 32.h),
 
                 SizedBox(
                   width: double.infinity,
                   height: 56.h,
                   child: ElevatedButton(
-                    onPressed: loginState.isLoading ? null : _handleLogin,
+                    onPressed: loginAsync.isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
@@ -178,7 +180,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                         borderRadius: BorderRadius.circular(28.r),
                       ),
                     ),
-                    child: loginState.isLoading
+                    child: loginAsync.isLoading
                         ? const SizedBox(
                             width: 24,
                             height: 24,
@@ -207,7 +209,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       text: TextSpan(
                         style: GoogleFonts.outfit(
                           fontSize: 14.sp,
-                          color: colors.textPrimary,
+                          color: colors.textSecondary,
                         ),
                         children: const [
                           TextSpan(text: "Don't have an account? "),
@@ -223,7 +225,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.h),
               ],
             ),
           ),

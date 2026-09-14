@@ -5,7 +5,9 @@ import '../models/session_model.dart';
 
 export '../models/session_model.dart';
 
-final sessionProvider = NotifierProvider<SessionNotifier, SessionState>(SessionNotifier.new);
+final sessionProvider = NotifierProvider<SessionNotifier, SessionState>(
+  SessionNotifier.new,
+);
 
 // Aliases for compatibility
 typedef AuthState = SessionState;
@@ -45,24 +47,15 @@ class SessionNotifier extends Notifier<SessionState> {
     if (!GlobalKeys.isValidRole(role)) return;
     state = state.copyWith(isLoading: true);
     await StorageService.saveRole(role);
-    state = state.copyWith(
-      isLoading: false,
-      userRole: role,
-    );
+    state = state.copyWith(isLoading: false, userRole: role);
   }
 
   bool validateCurrentRole() {
-    return GlobalKeys.validateKeyResponse(
-      isApiConnected: state.isApiConnected,
-      role: state.userRole,
-    );
+    return GlobalKeys.isValidRole(state.userRole);
   }
 
   Future<void> logout() async {
     await StorageService.clearAll();
-    state = state.copyWith(
-      isAuthenticated: false,
-      clearRole: true,
-    );
+    state = state.copyWith(isAuthenticated: false, clearRole: true);
   }
 }

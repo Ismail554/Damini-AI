@@ -22,9 +22,8 @@ class _RoleSelectionViewState extends ConsumerState<RoleSelectionView> {
 
   Future<void> _handleContinue() async {
     if (!GlobalKeys.isValidRole(_selectedRole)) return;
-    final authNotifier = ref.read(authProvider.notifier);
-    await authNotifier.setRole(_selectedRole);
-    if (mounted && authNotifier.validateCurrentRole()) {
+    await ref.read(authProvider.notifier).setRole(_selectedRole);
+    if (mounted) {
       context.go('/role-onboarding', extra: {'role': _selectedRole});
     }
   }

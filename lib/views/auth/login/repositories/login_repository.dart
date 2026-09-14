@@ -1,38 +1,62 @@
-import '../../../../core/services/storage_service.dart';
-import '../../../../shared/global_key.dart';
-import '../models/login_request_model.dart';
+import 'package:Braintech/core/constants/api_endpoints.dart';
+import 'package:Braintech/core/services/api_service.dart';
+import 'package:Braintech/core/services/storage_service.dart';
+import 'package:Braintech/views/auth/login/models/login_request_model.dart';
 
 abstract class LoginRepository {
   Future<LoginResponseModel> login(LoginRequestModel request);
 }
 
 class LoginRepositoryImpl implements LoginRepository {
+  final ApiService apiService;
+
+  LoginRepositoryImpl(this.apiService);
+
   @override
   Future<LoginResponseModel> login(LoginRequestModel request) async {
-    // Mock API Delay (Ready to replace with DioService.client.post)
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      final response = await apiService.post(
+        ApiEndpoints.login,
+        data: request.toJson(),
+        requireAuth: false,
+      );
+      final data = response.data;
+      String? token;
+      String? refreshToken;
+      String? message;
+      String? role;
 
-    await StorageService.saveToken("mock_jwt_token");
-    await StorageService.saveUuid("mock_uuid");
-    await StorageService.saveIsApiConnected(true);
-    await StorageService.saveHasSeenOnboarding();
+      if (data is Map) {
+        token = data['access'].toString();
+        refreshToken = data['refresh'].toString();
+        message = data['message'].toString();
 
-    final cleanEmail = request.email.trim().toLowerCase();
-    String? role;
-    if (cleanEmail == GlobalKeys.demoInvestorEmail) {
-      role = GlobalKeys.investorRole;
-      await StorageService.saveRole(GlobalKeys.investorRole);
-    } else if (cleanEmail == GlobalKeys.demoSponsorEmail) {
-      role = GlobalKeys.sponsorRole;
-      await StorageService.saveRole(GlobalKeys.sponsorRole);
-    } else {
-      role = await StorageService.getRole();
+        final user = data['user'];
+        if (user is Map && user['role'] != null) {
+          role = user['role'].toString().toLowerCase();
+        } else if (data['role'] != null) {
+          role = data['role'].toString().toLowerCase();
+        }
+      }
+
+      if (token != null) {
+        await StorageService.saveToken(token);
+      }
+      if (refreshToken != null) {
+        await StorageService.saveRefreshToken(refreshToken);
+      }
+      if (role != null) {
+        await StorageService.saveRole(role);
+      }
+
+      return LoginResponseModel(
+        success: true,
+        token: token,
+        role: role,
+        message: message ?? "Login successful",
+      );
+    } catch (e) {
+      return LoginResponseModel(success: false, message: e.toString());
     }
-
-    return LoginResponseModel(
-      success: true,
-      token: "mock_jwt_token",
-      role: role,
-    );
   }
 }
