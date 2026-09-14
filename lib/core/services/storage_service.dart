@@ -8,13 +8,27 @@ class StorageService {
 
   static Future<void> saveToken(String token) async {
     try {
-      await _storage.write(key: GlobalKeys.authTokenKey, value: token);
+      await _storage.write(key: GlobalKeys.access, value: token);
     } catch (_) {}
   }
 
   static Future<String?> getToken() async {
     try {
-      return await _storage.read(key: GlobalKeys.authTokenKey);
+      return await _storage.read(key: GlobalKeys.access);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> saveRefreshToken(String token) async {
+    try {
+      await _storage.write(key: GlobalKeys.refresh, value: token);
+    } catch (_) {}
+  }
+
+  static Future<String?> getRefreshToken() async {
+    try {
+      return await _storage.read(key: GlobalKeys.refresh);
     } catch (_) {
       return null;
     }
@@ -22,13 +36,13 @@ class StorageService {
 
   static Future<void> saveUuid(String uuid) async {
     try {
-      await _storage.write(key: GlobalKeys.uuidKey, value: uuid);
+      await _storage.write(key: GlobalKeys.uuid, value: uuid);
     } catch (_) {}
   }
 
   static Future<String?> getUuid() async {
     try {
-      return await _storage.read(key: GlobalKeys.uuidKey);
+      return await _storage.read(key: GlobalKeys.uuid);
     } catch (_) {
       return null;
     }
@@ -36,14 +50,14 @@ class StorageService {
 
   static Future<void> saveRole(String role) async {
     try {
-      await _storage.write(key: GlobalKeys.userRoleKey, value: role);
-      await _storage.write(key: GlobalKeys.isRoleSelectedKey, value: 'true');
+      await _storage.write(key: GlobalKeys.userRole, value: role);
+      await _storage.write(key: GlobalKeys.isRoleSelected, value: 'true');
     } catch (_) {}
   }
 
   static Future<String?> getRole() async {
     try {
-      return await _storage.read(key: GlobalKeys.userRoleKey);
+      return await _storage.read(key: GlobalKeys.userRole);
     } catch (_) {
       return null;
     }
@@ -51,7 +65,7 @@ class StorageService {
 
   static Future<bool> isRoleSelected() async {
     try {
-      final val = await _storage.read(key: GlobalKeys.isRoleSelectedKey);
+      final val = await _storage.read(key: GlobalKeys.isRoleSelected);
       return val == 'true';
     } catch (_) {
       return false;
@@ -61,13 +75,15 @@ class StorageService {
   static Future<void> saveIsApiConnected(bool isConnected) async {
     try {
       await _storage.write(
-          key: GlobalKeys.isApiConnectedKey, value: isConnected.toString());
+        key: GlobalKeys.isApiConnected,
+        value: isConnected.toString(),
+      );
     } catch (_) {}
   }
 
   static Future<bool> getIsApiConnected() async {
     try {
-      final val = await _storage.read(key: GlobalKeys.isApiConnectedKey);
+      final val = await _storage.read(key: GlobalKeys.isApiConnected);
       return val == 'true';
     } catch (_) {
       return false;
@@ -91,12 +107,8 @@ class StorageService {
 
   static Future<void> clearAuthData() async {
     try {
-      await _storage.delete(key: GlobalKeys.authTokenKey);
-      await _storage.delete(key: GlobalKeys.uuidKey);
-      await _storage.delete(key: GlobalKeys.userRoleKey);
-      await _storage.delete(key: GlobalKeys.isRoleSelectedKey);
-      await _storage.delete(key: GlobalKeys.isApiConnectedKey);
-      await _storage.delete(key: GlobalKeys.hasSeenOnboardingKey);
+      await _storage.delete(key: GlobalKeys.access);
+      await _storage.delete(key: GlobalKeys.refresh);
     } catch (_) {}
   }
 

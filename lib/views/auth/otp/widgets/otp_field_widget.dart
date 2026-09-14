@@ -18,14 +18,14 @@ class OtpFieldWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 64.w,
-      height: 64.h,
+      width: 46.w,
+      height: 56.h,
       child: TextFormField(
         controller: controller,
         focusNode: focusNode,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 24.sp,
+          fontSize: 20.sp,
           fontWeight: FontWeight.bold,
         ),
         textAlign: TextAlign.center,

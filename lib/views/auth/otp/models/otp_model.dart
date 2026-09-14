@@ -11,9 +11,8 @@ class OtpVerificationRequestModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'email': email,
-      'code': code,
-      'isRecovery': isRecovery,
+      'email': email.trim(),
+      'code': code.trim(),
     };
   }
 }

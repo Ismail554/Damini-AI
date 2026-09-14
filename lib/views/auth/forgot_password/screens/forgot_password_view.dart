@@ -35,7 +35,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
       final state = ref.read(forgotPasswordProvider);
 
       if (mounted && success) {
-        context.go(
+        context.push(
           '/otp',
           extra: {'email': _emailCtrl.text.trim(), 'isRecovery': true},
         );

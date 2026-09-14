@@ -6,8 +6,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/widgets/common_background.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 import '../../widgets/labeled_text_field.dart';
 import '../../widgets/social_auth_section.dart';
+import '../models/signup_request_model.dart';
 import '../provider/signup_provider.dart';
 import '../widgets/signup_header.dart';
 
@@ -42,38 +44,46 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   Future<void> _handleSignUp() async {
     if (!_formKey.currentState!.validate()) return;
     if (_passwordCtrl.text != _confirmPasswordCtrl.text) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
+      CustomSnackBar.show(context, "Passwords do not match", isError: true);
       return;
     }
 
-    final fullName =
-        "${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}";
+    final request = SignupRequestModel(
+      firstName: _firstNameCtrl.text.trim(),
+      lastName: _lastNameCtrl.text.trim(),
+      email: _emailCtrl.text.trim(),
+      password: _passwordCtrl.text,
+    );
+
     try {
-      final success = await ref
-          .read(signupProvider.notifier)
-          .signUp(
-            fullName: fullName,
-            email: _emailCtrl.text.trim(),
-            password: _passwordCtrl.text,
-          );
+      final success = await ref.read(signupProvider.notifier).signUp(request);
+
+      if (!mounted) return;
+
       final signupState = ref.read(signupProvider);
 
-      if (mounted && success) {
-        context.go(
+      if (success) {
+        CustomSnackBar.show(
+          context,
+          signupState.value?.message ?? "Account created successfully!",
+        );
+        context.push(
           '/otp',
           extra: {'email': _emailCtrl.text.trim(), 'isRecovery': false},
         );
-      } else if (mounted && signupState.errorMessage != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(signupState.errorMessage!)));
+      } else {
+        final errorMsg =
+            signupState.value?.message ??
+            signupState.error?.toString() ??
+            "Registration failed. Please try again.";
+        CustomSnackBar.show(context, errorMsg, isError: true);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Signup failed: ${e.toString()}")),
+        CustomSnackBar.show(
+          context,
+          "Signup failed: ${e.toString()}",
+          isError: true,
         );
       }
     }

@@ -1,75 +1,28 @@
+import 'dart:async';
+
+import 'package:Braintech/core/services/api_service.dart';
+import 'package:Braintech/views/auth/signup/models/signup_request_model.dart';
+import 'package:Braintech/views/auth/signup/repositories/signup_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/signup_request_model.dart';
-import '../repositories/signup_repository.dart';
 
 final signupRepositoryProvider = Provider<SignupRepository>((ref) {
-  return SignupRepositoryImpl();
+  return SignupRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
-class SignupState {
-  final bool isLoading;
-  final bool isSuccess;
-  final String? errorMessage;
-
-  const SignupState({
-    this.isLoading = false,
-    this.isSuccess = false,
-    this.errorMessage,
-  });
-
-  SignupState copyWith({
-    bool? isLoading,
-    bool? isSuccess,
-    String? errorMessage,
-    bool clearError = false,
-  }) {
-    return SignupState(
-      isLoading: isLoading ?? this.isLoading,
-      isSuccess: isSuccess ?? this.isSuccess,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-    );
-  }
-}
-
-final signupProvider = NotifierProvider<SignupNotifier, SignupState>(SignupNotifier.new);
-
-class SignupNotifier extends Notifier<SignupState> {
+class SignupProvider extends AsyncNotifier<SignupResponseModel?> {
   @override
-  SignupState build() => const SignupState();
+  FutureOr<SignupResponseModel?> build() => null;
 
-  Future<bool> signUp({
-    required String fullName,
-    required String email,
-    required String password,
-  }) async {
-    state = state.copyWith(isLoading: true, clearError: true, isSuccess: false);
-
-    try {
-      final repository = ref.read(signupRepositoryProvider);
-      final response = await repository.signUp(
-        SignupRequestModel(
-          fullName: fullName,
-          email: email,
-          password: password,
-        ),
-      );
-
-      if (response.success) {
-        state = state.copyWith(isLoading: false, isSuccess: true);
-        return true;
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: response.message ?? "Registration failed",
-        );
-        return false;
-      }
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
-      return false;
-    }
+  Future<bool> signUp(SignupRequestModel request) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(signupRepositoryProvider).signUp(request),
+    );
+    return state.value?.success ?? false;
   }
 }
+
+final signupProvider =
+    AsyncNotifierProvider<SignupProvider, SignupResponseModel?>(
+      SignupProvider.new,
+    );

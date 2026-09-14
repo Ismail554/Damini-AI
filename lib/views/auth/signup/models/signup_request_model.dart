@@ -1,17 +1,20 @@
 class SignupRequestModel {
-  final String fullName;
+  final String firstName;
+  final String lastName;
   final String email;
   final String password;
 
   const SignupRequestModel({
-    required this.fullName,
+    required this.firstName,
+    required this.lastName,
     required this.email,
     required this.password,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'name': fullName,
+      'first_name': firstName,
+      'last_name': lastName,
       'email': email,
       'password': password,
     };
@@ -22,8 +25,5 @@ class SignupResponseModel {
   final bool success;
   final String? message;
 
-  const SignupResponseModel({
-    required this.success,
-    this.message,
-  });
+  const SignupResponseModel({required this.success, this.message});
 }

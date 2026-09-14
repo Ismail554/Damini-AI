@@ -1,125 +1,95 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/services/api_service.dart';
 import '../../session/controllers/session_provider.dart';
 import '../models/otp_model.dart';
 import '../repositories/otp_repository.dart';
 
 final otpRepositoryProvider = Provider<OtpRepository>((ref) {
-  return OtpRepositoryImpl();
+  return OtpRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
-class OtpState {
-  final bool isLoading;
-  final bool isVerified;
-  final String? errorMessage;
-  final int secondsLeft;
-  final bool isResending;
+// Timer Provider for OTP countdown (60s)
+final otpTimerProvider = NotifierProvider<OtpTimerNotifier, int>(
+  OtpTimerNotifier.new,
+);
 
-  const OtpState({
-    this.isLoading = false,
-    this.isVerified = false,
-    this.errorMessage,
-    this.secondsLeft = 59,
-    this.isResending = false,
-  });
-
-  bool get canResend => secondsLeft == 0;
-
-  OtpState copyWith({
-    bool? isLoading,
-    bool? isVerified,
-    String? errorMessage,
-    int? secondsLeft,
-    bool? isResending,
-    bool clearError = false,
-  }) {
-    return OtpState(
-      isLoading: isLoading ?? this.isLoading,
-      isVerified: isVerified ?? this.isVerified,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-      secondsLeft: secondsLeft ?? this.secondsLeft,
-      isResending: isResending ?? this.isResending,
-    );
-  }
-}
-
-final otpProvider = NotifierProvider<OtpNotifier, OtpState>(OtpNotifier.new);
-
-class OtpNotifier extends Notifier<OtpState> {
+class OtpTimerNotifier extends Notifier<int> {
   Timer? _timer;
 
   @override
-  OtpState build() {
-    ref.onDispose(() {
-      _timer?.cancel();
-    });
-    return const OtpState();
+  int build() {
+    ref.onDispose(() => _timer?.cancel());
+    return 60;
   }
 
-  void startTimer() {
+  void startTimer([int duration = 60]) {
     _timer?.cancel();
-    state = state.copyWith(secondsLeft: 59);
+    state = duration;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (state.secondsLeft <= 1) {
+      if (state <= 1) {
         timer.cancel();
-        state = state.copyWith(secondsLeft: 0);
+        state = 0;
       } else {
-        state = state.copyWith(secondsLeft: state.secondsLeft - 1);
+        state--;
       }
     });
   }
 
-  Future<bool> verifyOtp({
-    required String email,
-    required String code,
-    bool isRecovery = false,
-  }) async {
-    state = state.copyWith(isLoading: true, clearError: true, isVerified: false);
-
-    try {
-      final repository = ref.read(otpRepositoryProvider);
-      final response = await repository.verifyOtp(
-        OtpVerificationRequestModel(
-          email: email,
-          code: code,
-          isRecovery: isRecovery,
-        ),
-      );
-
-      if (response.success) {
-        if (!isRecovery) {
-          ref.read(sessionProvider.notifier).updateSession(isAuthenticated: true);
-        }
-        state = state.copyWith(isLoading: false, isVerified: true);
-        return true;
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: response.message ?? "Verification failed",
-        );
-        return false;
-      }
-    } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
-      return false;
-    }
+  void stopTimer() {
+    _timer?.cancel();
   }
+}
+
+// Resend OTP Provider (AsyncNotifier, exactly like SignupProvider)
+final resendOtpProvider =
+    AsyncNotifierProvider<ResendOtpProvider, OtpVerificationResponseModel?>(
+      ResendOtpProvider.new,
+    );
+
+class ResendOtpProvider extends AsyncNotifier<OtpVerificationResponseModel?> {
+  @override
+  FutureOr<OtpVerificationResponseModel?> build() => null;
 
   Future<bool> resendOtp(String email) async {
-    if (!state.canResend) return false;
-    state = state.copyWith(isResending: true, clearError: true);
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(otpRepositoryProvider).resendOtp(email),
+    );
 
-    try {
-      final repository = ref.read(otpRepositoryProvider);
-      final success = await repository.resendOtp(email);
-      if (success) {
-        startTimer();
-      }
-      state = state.copyWith(isResending: false);
-      return success;
-    } catch (e) {
-      state = state.copyWith(isResending: false, errorMessage: e.toString());
-      return false;
+    final isSuccess = state.value?.success ?? false;
+    if (isSuccess) {
+      ref.read(otpTimerProvider.notifier).startTimer(60);
     }
+    return isSuccess;
+  }
+}
+
+// OTP Verification Provider (AsyncNotifier, exactly like SignupProvider)
+final otpProvider =
+    AsyncNotifierProvider<OtpProvider, OtpVerificationResponseModel?>(
+      OtpProvider.new,
+    );
+
+class OtpProvider extends AsyncNotifier<OtpVerificationResponseModel?> {
+  @override
+  FutureOr<OtpVerificationResponseModel?> build() => null;
+
+  Future<bool> verifyOtp(OtpVerificationRequestModel request) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(otpRepositoryProvider).verifyOtp(request),
+    );
+
+    final isSuccess = state.value?.success ?? false;
+    if (isSuccess) {
+      ref.read(otpTimerProvider.notifier).stopTimer();
+      if (!request.isRecovery) {
+        ref.read(sessionProvider.notifier).updateSession(isAuthenticated: true);
+      }
+    }
+    return isSuccess;
   }
 }
