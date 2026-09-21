@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/widgets/common_background.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../session/controllers/session_provider.dart';
 import '../controllers/otp_provider.dart';
 import '../models/otp_model.dart';
 import '../widgets/otp_field_widget.dart';
@@ -66,6 +67,10 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
 
     final message = ref.read(otpProvider).value?.message;
     if (success) {
+      ref.read(authProvider.notifier).updateSession(
+        isAuthenticated: true,
+        isApiConnected: true,
+      );
       if (message != null) CustomSnackBar.show(context, message);
       context.go(widget.isRecovery ? '/reset-password' : '/success');
     } else if (message != null) {

@@ -6,12 +6,14 @@ class ChooseTypeScreen extends StatefulWidget {
   final String role;
   final ValueChanged<String>? onNext;
   final VoidCallback onBack;
+  final bool isLoading;
 
   const ChooseTypeScreen({
     super.key,
     required this.role,
     this.onNext,
     required this.onBack,
+    this.isLoading = false,
   });
 
   @override
@@ -85,7 +87,7 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
               width: double.infinity,
               height: 52.h,
               child: ElevatedButton(
-                onPressed: () => widget.onNext?.call(_selectedType),
+                onPressed: widget.isLoading ? null : () => widget.onNext?.call(_selectedType),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006EDB),
                   foregroundColor: Colors.white,
@@ -93,13 +95,22 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
                     borderRadius: BorderRadius.circular(26.r),
                   ),
                 ),
-                child: Text(
-                  "Continue",
-                  style: GoogleFonts.outfit(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: widget.isLoading
+                    ? SizedBox(
+                        width: 22.r,
+                        height: 22.r,
+                        child: const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.5,
+                        ),
+                      )
+                    : Text(
+                        "Continue",
+                        style: GoogleFonts.outfit(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
             SizedBox(height: 16.h),

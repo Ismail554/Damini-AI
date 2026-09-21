@@ -1,4 +1,7 @@
+import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_service.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../shared/global_key.dart';
 import '../models/session_model.dart';
@@ -55,7 +58,25 @@ class SessionNotifier extends Notifier<SessionState> {
   }
 
   Future<void> logout() async {
-    await StorageService.clearAll();
-    state = state.copyWith(isAuthenticated: false, clearRole: true);
+    state = state.copyWith(isLoading: true);
+    try {
+      final refreshToken = await StorageService.getRefreshToken();
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        await ref.read(apiServiceProvider).post(
+          ApiEndpoints.logout,
+          data: {'refresh': refreshToken},
+          requireAuth: true,
+        );
+      }
+    } catch (e) {
+      log('Logout API error: $e');
+    } finally {
+      await StorageService.clearAll();
+      state = state.copyWith(
+        isLoading: false,
+        isAuthenticated: false,
+        clearRole: true,
+      );
+    }
   }
 }

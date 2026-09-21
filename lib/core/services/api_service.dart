@@ -41,6 +41,9 @@ class ApiService {
     bool requireAuth = true,
   }) async {
     try {
+      if (data is FormData) {
+        options = (options ?? Options()).copyWith(contentType: 'multipart/form-data');
+      }
       return await _getDio(requireAuth).post<T>(
         path,
         data: data,
@@ -85,6 +88,9 @@ class ApiService {
     bool requireAuth = true,
   }) async {
     try {
+      if (data is FormData) {
+        options = (options ?? Options()).copyWith(contentType: 'multipart/form-data');
+      }
       return await _getDio(requireAuth).patch<T>(
         path,
         data: data,

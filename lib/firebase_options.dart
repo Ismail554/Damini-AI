@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,20 +50,28 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE',
-    appId: '1:1003008036989:android:5ddc00f78c3c5d2022a114',
-    messagingSenderId: '1003008036989',
-    projectId: 'damini-ai',
-    storageBucket: 'damini-ai.firebasestorage.app',
+  static FirebaseOptions get android => FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY'] ??
+        'AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE',
+    appId: dotenv.env['FIREBASE_ANDROID_APP_ID'] ??
+        '1:1003008036989:android:5ddc00f78c3c5d2022a114',
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ??
+        '1003008036989',
+    projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? 'damini-ai',
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ??
+        'damini-ai.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDus-Kwpx5cHGcdfKOVUU7jD2TlX8EZp90',
-    appId: '1:1003008036989:ios:fb0b806b699cd83222a114',
-    messagingSenderId: '1003008036989',
-    projectId: 'damini-ai',
-    storageBucket: 'damini-ai.firebasestorage.app',
-    iosBundleId: 'com.braintekh.diafi',
+  static FirebaseOptions get ios => FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_IOS_API_KEY'] ??
+        'AIzaSyDus-Kwpx5cHGcdfKOVUU7jD2TlX8EZp90',
+    appId: dotenv.env['FIREBASE_IOS_APP_ID'] ??
+        '1:1003008036989:ios:fb0b806b699cd83222a114',
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ??
+        '1003008036989',
+    projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? 'damini-ai',
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ??
+        'damini-ai.firebasestorage.app',
+    iosBundleId: dotenv.env['FIREBASE_IOS_BUNDLE_ID'] ?? 'com.braintekh.diafi',
   );
 }

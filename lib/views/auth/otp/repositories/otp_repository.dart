@@ -32,8 +32,13 @@ class OtpRepositoryImpl implements OtpRepository {
       String? message;
 
       if (data is Map) {
-        token = data['access']?.toString();
-        refreshToken = data['refresh']?.toString();
+        token = data['access']?.toString() ??
+            data['token']?.toString() ??
+            data['access_token']?.toString() ??
+            (data['data'] is Map ? data['data']['access']?.toString() : null);
+        refreshToken = data['refresh']?.toString() ??
+            data['refresh_token']?.toString() ??
+            (data['data'] is Map ? data['data']['refresh']?.toString() : null);
         message = data['message']?.toString();
       }
 

@@ -7,8 +7,10 @@ import '../auth/session/controllers/session_provider.dart';
 import '../../core/utils/app_colors.dart';
 import '../../core/utils/asset_manager.dart';
 import '../../core/widgets/common_background.dart';
+import '../../core/widgets/custom_snackbar.dart';
 import '../../shared/global_key.dart';
 import '../../shared/widgets/role_selection_card.dart';
+import 'provider/onboarding_provider.dart';
 
 class RoleSelectionView extends ConsumerStatefulWidget {
   const RoleSelectionView({super.key});
@@ -22,9 +24,15 @@ class _RoleSelectionViewState extends ConsumerState<RoleSelectionView> {
 
   Future<void> _handleContinue() async {
     if (!GlobalKeys.isValidRole(_selectedRole)) return;
-    await ref.read(authProvider.notifier).setRole(_selectedRole);
-    if (mounted) {
+    final success = await ref.read(onboardingProvider.notifier).setRole(_selectedRole);
+    if (!mounted) return;
+    if (success) {
+      await ref.read(authProvider.notifier).setRole(_selectedRole);
+      if (!mounted) return;
       context.go('/role-onboarding', extra: {'role': _selectedRole});
+    } else {
+      final error = ref.read(onboardingProvider).errorMessage ?? "Failed to set role";
+      CustomSnackBar.show(context, error, isError: true);
     }
   }
 
@@ -99,26 +107,40 @@ class _RoleSelectionViewState extends ConsumerState<RoleSelectionView> {
                 ),
               ),
 
-              SizedBox(
-                width: double.infinity,
-                height: 56.h,
-                child: ElevatedButton(
-                  onPressed: _handleContinue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28.r),
+              Builder(
+                builder: (context) {
+                  final isLoading = ref.watch(onboardingProvider).isLoading;
+                  return SizedBox(
+                    width: double.infinity,
+                    height: 56.h,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _handleContinue,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28.r),
+                        ),
+                      ),
+                      child: isLoading
+                          ? SizedBox(
+                              width: 24.r,
+                              height: 24.r,
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
+                          : Text(
+                              "Continue",
+                              style: GoogleFonts.outfit(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
-                  ),
-                  child: Text(
-                    "Continue",
-                    style: GoogleFonts.outfit(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                  );
+                },
               ),
               SizedBox(height: 12.h),
             ],

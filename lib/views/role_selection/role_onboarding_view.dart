@@ -1,25 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/widgets/common_background.dart';
+import '../../core/widgets/custom_snackbar.dart';
 import '../../shared/screens/choose_type_screen.dart';
 import '../../shared/screens/company_verification_screen.dart';
 import '../../shared/screens/complete_profile_screen.dart';
 import '../../shared/screens/interests_screen.dart';
 import '../../shared/screens/role_feature_slides_screen.dart';
 import '../../shared/screens/verification_pending_screen.dart';
+import 'provider/onboarding_provider.dart';
 
-class RoleOnboardingView extends StatefulWidget {
+class RoleOnboardingView extends ConsumerStatefulWidget {
   final String role;
   const RoleOnboardingView({super.key, required this.role});
 
   @override
-  State<RoleOnboardingView> createState() => _RoleOnboardingViewState();
+  ConsumerState<RoleOnboardingView> createState() => _RoleOnboardingViewState();
 }
 
-class _RoleOnboardingViewState extends State<RoleOnboardingView> {
+class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
   final PageController _pageCtrl = PageController();
   int _currentStep = 0;
   String _selectedAccountType = 'Individual';
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(onboardingProvider.notifier).initRole(widget.role);
+    });
+  }
 
   @override
   void dispose() {
@@ -27,20 +38,72 @@ class _RoleOnboardingViewState extends State<RoleOnboardingView> {
     super.dispose();
   }
 
-  void _onTypeSelected(String type) {
-    setState(() {
-      _selectedAccountType = type;
-    });
-    _nextPage();
+  Future<void> _onTypeSelected(String type) async {
+    final success = await ref.read(onboardingProvider.notifier).setAccountType(type);
+    if (!mounted) return;
+    if (success) {
+      setState(() => _selectedAccountType = type);
+      _nextPage();
+    } else {
+      final error = ref.read(onboardingProvider).errorMessage ?? "Failed to set account type";
+      CustomSnackBar.show(context, error, isError: true);
+    }
   }
 
-  void _onInterestsCompleted() {
-    if (_selectedAccountType == 'Individual') {
-      // Individual users skip company verification and complete onboarding
-      context.go('/home');
-    } else {
-      // Corporate users proceed to Company Verification
+  Future<void> _onProfileSaved(Map<String, dynamic> fields, String? photoPath) async {
+    final success = await ref.read(onboardingProvider.notifier).saveProfileDetails(
+          phone: fields['phone']?.toString() ?? '',
+          country: fields['country']?.toString() ?? '',
+          location: fields['location']?.toString() ?? '',
+          photoPath: photoPath,
+          positionTitle: fields['position_title']?.toString(),
+          legalCompanyName: fields['legal_company_name']?.toString(),
+          registrationNumber: fields['registration_number']?.toString(),
+          businessAddress: fields['business_address']?.toString(),
+          companyWebsite: fields['company_website']?.toString(),
+        );
+
+    if (!mounted) return;
+    if (success) {
       _nextPage();
+    } else {
+      final error = ref.read(onboardingProvider).errorMessage ?? "Failed to save profile";
+      CustomSnackBar.show(context, error, isError: true);
+    }
+  }
+
+  Future<void> _onInterestsCompleted(List<int> industryIds) async {
+    final success = await ref.read(onboardingProvider.notifier).setInterests(industryIds);
+    if (!mounted) return;
+    if (success) {
+      if (_selectedAccountType.toUpperCase() == 'INDIVIDUAL') {
+        _pageCtrl.jumpToPage(5);
+        setState(() => _currentStep = 5);
+      } else {
+        _nextPage();
+      }
+    } else {
+      final error = ref.read(onboardingProvider).errorMessage ?? "Failed to set interests";
+      CustomSnackBar.show(context, error, isError: true);
+    }
+  }
+
+  Future<void> _onCompanyDocsSubmitted(Map<String, String> documents) async {
+    bool allSuccess = true;
+    for (final entry in documents.entries) {
+      final ok = await ref.read(onboardingProvider.notifier).uploadDocument(entry.key, entry.value);
+      if (!ok) {
+        allSuccess = false;
+        break;
+      }
+    }
+
+    if (!mounted) return;
+    if (allSuccess) {
+      _nextPage();
+    } else {
+      final error = ref.read(onboardingProvider).errorMessage ?? "Failed to upload document";
+      CustomSnackBar.show(context, error, isError: true);
     }
   }
 
@@ -56,6 +119,11 @@ class _RoleOnboardingViewState extends State<RoleOnboardingView> {
 
   void _prevPage() {
     if (_currentStep > 0) {
+      if (_currentStep == 5 && _selectedAccountType.toUpperCase() == 'INDIVIDUAL') {
+        _pageCtrl.jumpToPage(3);
+        setState(() => _currentStep = 3);
+        return;
+      }
       _pageCtrl.previousPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -72,6 +140,10 @@ class _RoleOnboardingViewState extends State<RoleOnboardingView> {
 
   @override
   Widget build(BuildContext context) {
+    final onboardingState = ref.watch(onboardingProvider);
+    final isCompany = _selectedAccountType.toUpperCase() == 'COMPANY' ||
+        _selectedAccountType.toUpperCase() == 'CORPORATE';
+
     return CommonBackground(
       showGrid: false,
       child: SafeArea(
@@ -86,22 +158,27 @@ class _RoleOnboardingViewState extends State<RoleOnboardingView> {
             ),
             ChooseTypeScreen(
               role: widget.role,
+              isLoading: onboardingState.isLoading,
               onNext: _onTypeSelected,
               onBack: _prevPage,
             ),
             CompleteProfileScreen(
               role: widget.role,
-              onSaved: _nextPage,
+              isCompany: isCompany,
+              isLoading: onboardingState.isLoading,
+              onSaved: _onProfileSaved,
               onBack: _prevPage,
             ),
             InterestsScreen(
               role: widget.role,
+              isLoading: onboardingState.isLoading,
               onNext: _onInterestsCompleted,
               onBack: _prevPage,
             ),
             CompanyVerificationScreen(
               role: widget.role,
-              onSubmit: _nextPage,
+              isLoading: onboardingState.isLoading,
+              onSubmit: _onCompanyDocsSubmitted,
               onBack: _prevPage,
             ),
             VerificationPendingScreen(

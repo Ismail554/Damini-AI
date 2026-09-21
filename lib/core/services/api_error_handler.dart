@@ -43,6 +43,14 @@ class ApiErrorHandler {
                 (responseData['non_field_errors'] as List).isNotEmpty) {
               message =
                   (responseData['non_field_errors'] as List).first.toString();
+            } else if (responseData.isNotEmpty) {
+              // Extract first error message from field errors map like {"email": ["..."]}
+              final firstVal = responseData.values.first;
+              if (firstVal is List && firstVal.isNotEmpty) {
+                message = firstVal.first.toString();
+              } else if (firstVal is String) {
+                message = firstVal;
+              }
             }
           } else if (responseData is String && responseData.isNotEmpty) {
             message = responseData;

@@ -27,9 +27,9 @@ class LoginRepositoryImpl implements LoginRepository {
       String? role;
 
       if (data is Map) {
-        token = data['access'].toString();
-        refreshToken = data['refresh'].toString();
-        message = data['message'].toString();
+        token = data['access']?.toString();
+        refreshToken = data['refresh']?.toString();
+        message = data['message']?.toString();
 
         final user = data['user'];
         if (user is Map && user['role'] != null) {
@@ -39,15 +39,22 @@ class LoginRepositoryImpl implements LoginRepository {
         }
       }
 
-      if (token != null) {
-        await StorageService.saveToken(token);
+      if (token == null || token.isEmpty) {
+        return LoginResponseModel(
+          success: false,
+          message: message ?? "Invalid response from server",
+        );
       }
-      if (refreshToken != null) {
+
+      await StorageService.saveToken(token);
+      if (refreshToken != null && refreshToken.isNotEmpty) {
         await StorageService.saveRefreshToken(refreshToken);
       }
-      if (role != null) {
+      if (role != null && role.isNotEmpty) {
         await StorageService.saveRole(role);
       }
+      await StorageService.saveIsApiConnected(true);
+      await StorageService.saveHasSeenOnboarding();
 
       return LoginResponseModel(
         success: true,
