@@ -7,7 +7,6 @@ import '../../shared/screens/choose_type_screen.dart';
 import '../../shared/screens/company_verification_screen.dart';
 import '../../shared/screens/complete_profile_screen.dart';
 import '../../shared/screens/interests_screen.dart';
-import '../../shared/screens/role_feature_slides_screen.dart';
 import '../../shared/screens/verification_pending_screen.dart';
 import 'provider/onboarding_provider.dart';
 
@@ -22,7 +21,7 @@ class RoleOnboardingView extends ConsumerStatefulWidget {
 class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
   final PageController _pageCtrl = PageController();
   int _currentStep = 0;
-  String _selectedAccountType = 'Individual';
+  String _selectedAccountType = 'INDIVIDUAL';
 
   @override
   void initState() {
@@ -77,8 +76,8 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
     if (!mounted) return;
     if (success) {
       if (_selectedAccountType.toUpperCase() == 'INDIVIDUAL') {
-        _pageCtrl.jumpToPage(5);
-        setState(() => _currentStep = 5);
+        _pageCtrl.jumpToPage(4);
+        setState(() => _currentStep = 4);
       } else {
         _nextPage();
       }
@@ -108,7 +107,7 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
   }
 
   void _nextPage() {
-    if (_currentStep < 5) {
+    if (_currentStep < 4) {
       _pageCtrl.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -119,9 +118,9 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
 
   void _prevPage() {
     if (_currentStep > 0) {
-      if (_currentStep == 5 && _selectedAccountType.toUpperCase() == 'INDIVIDUAL') {
-        _pageCtrl.jumpToPage(3);
-        setState(() => _currentStep = 3);
+      if (_currentStep == 4 && _selectedAccountType.toUpperCase() == 'INDIVIDUAL') {
+        _pageCtrl.jumpToPage(2);
+        setState(() => _currentStep = 2);
         return;
       }
       _pageCtrl.previousPage(
@@ -141,8 +140,7 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
   @override
   Widget build(BuildContext context) {
     final onboardingState = ref.watch(onboardingProvider);
-    final isCompany = _selectedAccountType.toUpperCase() == 'COMPANY' ||
-        _selectedAccountType.toUpperCase() == 'CORPORATE';
+    final isCompany = _selectedAccountType.toUpperCase() == 'COMPANY';
 
     return CommonBackground(
       showGrid: false,
@@ -151,11 +149,6 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
           controller: _pageCtrl,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            RoleFeatureSlidesScreen(
-              role: widget.role,
-              onCompleted: _nextPage,
-              onBack: _prevPage,
-            ),
             ChooseTypeScreen(
               role: widget.role,
               isLoading: onboardingState.isLoading,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 
 class ApiException implements Exception {
@@ -28,12 +29,37 @@ class ApiErrorHandler {
 
         case DioExceptionType.badResponse:
           final statusCode = error.response?.statusCode;
-          final responseData = error.response?.data;
+          dynamic responseData = error.response?.data;
+
+          if (responseData is String) {
+            try {
+              final decoded = jsonDecode(responseData);
+              if (decoded is Map || decoded is List) {
+                responseData = decoded;
+              }
+            } catch (_) {}
+          }
 
           String message = "Something went wrong. Please try again.";
 
           if (responseData is Map) {
-            if (responseData['message'] != null) {
+            if (responseData['errors'] is Map && (responseData['errors'] as Map).isNotEmpty) {
+              final errorsMap = responseData['errors'] as Map;
+              final List<String> msgs = [];
+              errorsMap.forEach((key, val) {
+                if (val is List && val.isNotEmpty) {
+                  msgs.add(val.join(', '));
+                } else if (val != null) {
+                  msgs.add(val.toString());
+                }
+              });
+              if (msgs.isNotEmpty) {
+                message = msgs.join('\n');
+              }
+            } else if (responseData['errors'] is List && (responseData['errors'] as List).isNotEmpty) {
+              message = (responseData['errors'] as List).first.toString();
+            } else if (responseData['message'] != null &&
+                responseData['message'].toString().toLowerCase() != 'validation failed.') {
               message = responseData['message'].toString();
             } else if (responseData['detail'] != null) {
               message = responseData['detail'].toString();

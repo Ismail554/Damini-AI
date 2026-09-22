@@ -21,10 +21,12 @@ class ChooseTypeScreen extends StatefulWidget {
 }
 
 class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
-  String _selectedType = 'Individual';
+  String _selectedType = 'INDIVIDUAL';
 
   @override
   Widget build(BuildContext context) {
+    final isSponsor = widget.role.toLowerCase() == 'sponsor';
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -36,29 +38,29 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
             color: Colors.white,
-            size: 22,
+            size: 20,
           ),
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 8.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Account Type",
+              "Select Account Type",
               style: GoogleFonts.outfit(
-                fontSize: 24.sp,
+                fontSize: 26.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
             SizedBox(height: 6.h),
             Text(
-              "Select how you plan to operate as a ${widget.role.toUpperCase()}.",
+              "Choose whether you will operate as an Individual or a Company.",
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
-                color: Colors.white.withValues(alpha: 0.6),
+                color: Colors.white.withValues(alpha: 0.65),
               ),
             ),
             SizedBox(height: 32.h),
@@ -66,18 +68,22 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
             // Individual Option Card
             _buildOptionCard(
               title: "Individual",
-              subtitle: "Personal investor account for individual funding.",
+              subtitle: isSponsor
+                  ? "Personal sponsor profile for individual projects and ventures."
+                  : "Personal investor account for individual direct funding.",
               icon: Icons.person_outline_rounded,
-              value: "Individual",
+              value: "INDIVIDUAL",
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 18.h),
 
-            // Corporate / Entity Option Card
+            // Company Option Card
             _buildOptionCard(
-              title: "Corporate Entity",
-              subtitle: "Registered business, fund, or institutional investor.",
-              icon: Icons.business_outlined,
-              value: "Corporate",
+              title: "Company",
+              subtitle: isSponsor
+                  ? "Registered business, enterprise, or corporate entity seeking investment."
+                  : "Registered fund, family office, VC, or institutional investor.",
+              icon: Icons.business_rounded,
+              value: "COMPANY",
             ),
 
             const Spacer(),
@@ -85,14 +91,17 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
             // Continue Button
             SizedBox(
               width: double.infinity,
-              height: 52.h,
+              height: 54.h,
               child: ElevatedButton(
-                onPressed: widget.isLoading ? null : () => widget.onNext?.call(_selectedType),
+                onPressed: widget.isLoading
+                    ? null
+                    : () => widget.onNext?.call(_selectedType),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF006EDB),
                   foregroundColor: Colors.white,
+                  elevation: 2,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(26.r),
+                    borderRadius: BorderRadius.circular(27.r),
                   ),
                 ),
                 child: widget.isLoading
@@ -132,30 +141,41 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
       onTap: () => setState(() => _selectedType = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.all(18.r),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C1B2C).withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(20.r),
+          color: isSelected
+              ? const Color(0xFF006EDB).withValues(alpha: 0.12)
+              : const Color(0xFF0C1B2C).withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(22.r),
           border: Border.all(
             color: isSelected
                 ? const Color(0xFF006EDB)
                 : Colors.white.withValues(alpha: 0.08),
             width: isSelected ? 2.w : 1.w,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF006EDB).withValues(alpha: 0.25),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.r),
+              padding: EdgeInsets.all(14.r),
               decoration: BoxDecoration(
                 color: isSelected
                     ? const Color(0xFF006EDB)
                     : const Color(0xFF132B47),
-                borderRadius: BorderRadius.circular(14.r),
+                borderRadius: BorderRadius.circular(16.r),
               ),
-              child: Icon(icon, color: Colors.white, size: 24.r),
+              child: Icon(icon, color: Colors.white, size: 26.r),
             ),
-            SizedBox(width: 14.w),
+            SizedBox(width: 16.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,7 +183,7 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
                   Text(
                     title,
                     style: GoogleFonts.outfit(
-                      fontSize: 16.sp,
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -172,19 +192,34 @@ class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
                   Text(
                     subtitle,
                     style: GoogleFonts.outfit(
-                      fontSize: 12.sp,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 12.5.sp,
+                      color: Colors.white.withValues(alpha: 0.65),
+                      height: 1.35,
                     ),
                   ),
                 ],
               ),
             ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle_rounded,
-                color: const Color(0xFF006EDB),
-                size: 22.r,
+            SizedBox(width: 8.w),
+            Container(
+              width: 22.r,
+              height: 22.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected
+                    ? const Color(0xFF006EDB)
+                    : Colors.transparent,
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF006EDB)
+                      : Colors.white.withValues(alpha: 0.3),
+                  width: 2.w,
+                ),
               ),
+              child: isSelected
+                  ? const Icon(Icons.check, color: Colors.white, size: 14)
+                  : null,
+            ),
           ],
         ),
       ),

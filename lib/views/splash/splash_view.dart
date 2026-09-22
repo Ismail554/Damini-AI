@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Braintech/views/auth/session/controllers/session_provider.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
+import '../../core/services/storage_service.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
 
@@ -55,10 +56,11 @@ class _SplashViewState extends ConsumerState<SplashView>
             nextRoute =
                 GlobalKeys.isValidRole(auth.userRole) ? '/home' : '/role-selection';
           } else {
-            nextRoute = '/onboarding';
+            final hasSeen = await StorageService.hasSeenOnboarding();
+            nextRoute = hasSeen ? '/login' : '/onboarding';
           }
         } catch (_) {
-          nextRoute = '/onboarding';
+          nextRoute = '/login';
         }
 
         if (mounted) {

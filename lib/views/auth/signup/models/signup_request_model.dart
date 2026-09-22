@@ -24,6 +24,11 @@ class SignupRequestModel {
 class SignupResponseModel {
   final bool success;
   final String? message;
+  final Map<String, String>? errors;
 
-  const SignupResponseModel({required this.success, this.message});
+  const SignupResponseModel({
+    required this.success,
+    this.message,
+    this.errors,
+  });
 }

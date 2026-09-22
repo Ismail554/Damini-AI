@@ -10,9 +10,11 @@ class LabeledTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool obscureText;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final AutovalidateMode? autovalidateMode;
 
   const LabeledTextField({
     super.key,
@@ -21,9 +23,11 @@ class LabeledTextField extends StatelessWidget {
     required this.controller,
     this.obscureText = false,
     this.suffixIcon,
+    this.prefixIcon,
     this.validator,
     this.keyboardType,
     this.textInputAction,
+    this.autovalidateMode,
   });
 
   @override
@@ -42,6 +46,7 @@ class LabeledTextField extends StatelessWidget {
         ),
         SizedBox(height: 6.h),
         TextFormField(
+          autovalidateMode: autovalidateMode ?? AutovalidateMode.onUserInteraction,
           textInputAction: textInputAction,
           controller: controller,
           obscureText: obscureText,
@@ -53,6 +58,12 @@ class LabeledTextField extends StatelessWidget {
               color: colors.textSecondary,
               fontSize: 14.sp,
             ),
+            errorMaxLines: 3,
+            errorStyle: GoogleFonts.outfit(
+              color: AppColors.error,
+              fontSize: 12.sp,
+            ),
+            prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: colors.navBg,

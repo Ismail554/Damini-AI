@@ -29,6 +29,28 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   final _passwordCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
 
+  String? _emailServerError;
+  String? _passwordServerError;
+  String? _firstNameServerError;
+  String? _lastNameServerError;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailCtrl.addListener(() {
+      if (_emailServerError != null) setState(() => _emailServerError = null);
+    });
+    _passwordCtrl.addListener(() {
+      if (_passwordServerError != null) setState(() => _passwordServerError = null);
+    });
+    _firstNameCtrl.addListener(() {
+      if (_firstNameServerError != null) setState(() => _firstNameServerError = null);
+    });
+    _lastNameCtrl.addListener(() {
+      if (_lastNameServerError != null) setState(() => _lastNameServerError = null);
+    });
+  }
+
   @override
   void dispose() {
     _firstNameCtrl.dispose();
@@ -40,6 +62,13 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   }
 
   Future<void> _handleSignUp() async {
+    setState(() {
+      _emailServerError = null;
+      _passwordServerError = null;
+      _firstNameServerError = null;
+      _lastNameServerError = null;
+    });
+
     if (!_formKey.currentState!.validate()) return;
     if (_passwordCtrl.text != _confirmPasswordCtrl.text) {
       CustomSnackBar.show(context, "Passwords do not match", isError: true);
@@ -70,6 +99,28 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
           extra: {'email': _emailCtrl.text.trim(), 'isRecovery': false},
         );
       } else {
+        final errors = signupState.value?.errors;
+        if (errors != null && errors.isNotEmpty) {
+          setState(() {
+            if (errors.containsKey('email')) _emailServerError = errors['email'];
+            if (errors.containsKey('password')) _passwordServerError = errors['password'];
+            if (errors.containsKey('first_name')) {
+              _firstNameServerError = errors['first_name'];
+            } else if (errors.containsKey('firstName')) {
+              _firstNameServerError = errors['firstName'];
+            }
+            if (errors.containsKey('last_name')) {
+              _lastNameServerError = errors['last_name'];
+            } else if (errors.containsKey('lastName')) {
+              _lastNameServerError = errors['lastName'];
+            }
+          });
+          _formKey.currentState?.validate();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _formKey.currentState?.validate();
+          });
+        }
+
         final errorMsg =
             signupState.value?.message ??
             signupState.error?.toString() ??
@@ -115,11 +166,15 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                         textInputAction: TextInputAction.next,
                         keyboardType: TextInputType.name,
                         label: "First Name",
-                        hint: "Enter name",
+                        hint: "John",
+                        prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.grey, size: 20),
                         controller: _firstNameCtrl,
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? "Enter first name"
-                            : null,
+                        validator: (v) {
+                          if (_firstNameServerError != null) return _firstNameServerError;
+                          return (v == null || v.trim().isEmpty)
+                              ? "Enter first name"
+                              : null;
+                        },
                       ),
                     ),
                     AppSpacing.w12,
@@ -128,11 +183,15 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                         textInputAction: TextInputAction.next,
                         keyboardType: TextInputType.name,
                         label: "Last Name",
-                        hint: "Enter your name",
+                        hint: "Doe",
+                        prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.grey, size: 20),
                         controller: _lastNameCtrl,
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? "Enter last name"
-                            : null,
+                        validator: (v) {
+                          if (_lastNameServerError != null) return _lastNameServerError;
+                          return (v == null || v.trim().isEmpty)
+                              ? "Enter last name"
+                              : null;
+                        },
                       ),
                     ),
                   ],
@@ -141,10 +200,12 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                 LabeledTextField(
                   textInputAction: TextInputAction.next,
                   label: "Email",
-                  hint: "Enter your email",
+                  hint: "john@example.com",
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.grey, size: 20),
                   validator: (v) {
+                    if (_emailServerError != null) return _emailServerError;
                     if (v == null ||
                         !RegExp(
                           r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
@@ -161,10 +222,14 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   label: "Password",
                   hint: "••••••••",
                   controller: _passwordCtrl,
+                  prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.grey, size: 20),
                   obscureText: state.password,
-                  validator: (v) => (v == null || v.length < 6)
-                      ? "Password must be 6+ characters"
-                      : null,
+                  validator: (v) {
+                    if (_passwordServerError != null) return _passwordServerError;
+                    return (v == null || v.length < 6)
+                        ? "Password must be 6+ characters"
+                        : null;
+                  },
                   suffixIcon: IconButton(
                     icon: Icon(
                       state.password
@@ -183,6 +248,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   label: "Confirm Password",
                   hint: "••••••••",
                   controller: _confirmPasswordCtrl,
+                  prefixIcon: const Icon(Icons.lock_reset_rounded, color: AppColors.grey, size: 20),
                   obscureText: state.confirmPassword,
                   validator: (v) {
                     if (v == null || v.isEmpty) return "Confirm your password";

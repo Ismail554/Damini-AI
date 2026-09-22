@@ -49,7 +49,7 @@ class DefaultFirebaseOptions {
         );
     }
   }
-
+//android
   static FirebaseOptions get android => FirebaseOptions(
     apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY'] ??
         'AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE',
@@ -61,7 +61,7 @@ class DefaultFirebaseOptions {
     storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ??
         'damini-ai.firebasestorage.app',
   );
-
+//ios 
   static FirebaseOptions get ios => FirebaseOptions(
     apiKey: dotenv.env['FIREBASE_IOS_API_KEY'] ??
         'AIzaSyDus-Kwpx5cHGcdfKOVUU7jD2TlX8EZp90',
