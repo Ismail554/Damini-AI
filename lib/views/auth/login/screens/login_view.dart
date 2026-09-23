@@ -52,14 +52,18 @@ class _LoginViewState extends ConsumerState<LoginView> {
     final message = loginAsync.value?.message;
 
     if (success) {
-      if (message != null) CustomSnackBar.show(context, message);
-      final role = loginAsync.value?.role;
-      if (GlobalKeys.isValidRole(role)) {
-        context.go('/home');
-      } else {
-        context.go('/role-selection');
+      if (message != null && message.isNotEmpty) {
+        CustomSnackBar.show(context, message);
       }
-    } else if (message != null) {
+      final rawRole = loginAsync.value?.role?.trim().toUpperCase();
+      final normalizedRole = loginAsync.value?.role?.trim().toLowerCase();
+
+      if (rawRole == 'NONE' || rawRole == null || !GlobalKeys.isValidRole(normalizedRole)) {
+        context.go('/role-selection');
+      } else {
+        context.go('/home');
+      }
+    } else if (message != null && message.isNotEmpty) {
       CustomSnackBar.show(context, message, isError: true);
     }
   }
@@ -89,6 +93,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
+                  prefixIcon: const Icon(Icons.email_outlined, color: AppColors.grey, size: 20),
                   validator: (v) {
                     if (v == null ||
                         !RegExp(
@@ -107,6 +112,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   controller: _passwordCtrl,
                   obscureText: passwordToggleState.password,
                   textInputAction: TextInputAction.done,
+                  prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.grey, size: 20),
                   validator: (v) => (v == null || v.length < 6)
                       ? "Enter password (6+ chars)"
                       : null,

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:Braintech/core/services/api_service.dart';
+import 'package:Braintech/shared/global_key.dart';
 import 'package:Braintech/views/auth/login/models/login_request_model.dart';
 import 'package:Braintech/views/auth/login/repositories/login_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,9 +24,15 @@ class LoginProvider extends AsyncNotifier<LoginResponseModel?> {
 
     final isSuccess = state.value?.success ?? false;
     if (isSuccess) {
+      final role = state.value?.role?.trim().toLowerCase();
+      final validRole = GlobalKeys.isValidRole(role) ? role : null;
       ref
           .read(sessionProvider.notifier)
-          .updateSession(isAuthenticated: true, userRole: state.value?.role);
+          .updateSession(
+            isAuthenticated: true,
+            userRole: validRole,
+            isApiConnected: true,
+          );
     }
     return isSuccess;
   }

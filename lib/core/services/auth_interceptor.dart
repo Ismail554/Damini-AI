@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import '../constants/api_endpoints.dart';
+import '../routing/app_router.dart';
 import 'storage_service.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -99,7 +101,10 @@ class AuthInterceptor extends Interceptor {
       }
     } else {
       log('Token refresh failed. Clearing auth credentials...');
-      await StorageService.clearAuthData();
+      await StorageService.clearAll();
+      try {
+        AppRouter.router.go('/login');
+      } catch (_) {}
       return handler.next(err);
     }
   }
@@ -120,21 +125,31 @@ class AuthInterceptor extends Interceptor {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data;
+        dynamic data = response.data;
+        if (data is String) {
+          try {
+            data = jsonDecode(data);
+          } catch (_) {}
+        }
+
         if (data is Map) {
-          final newAccessToken =
-              data['access'] ?? data['token'] ?? data['accessToken'];
-          final newRefreshToken = data['refresh'] ?? data['refreshToken'];
+          final newAccessToken = data['access'] ??
+              data['token'] ??
+              data['accessToken'] ??
+              (data['data'] is Map ? data['data']['access'] : null);
+          final newRefreshToken = data['refresh'] ??
+              data['refreshToken'] ??
+              (data['data'] is Map ? data['data']['refresh'] : null);
 
-          if (newAccessToken != null) {
-            await StorageService.saveToken(newAccessToken.toString());
-          }
-          if (newRefreshToken != null) {
-            await StorageService.saveRefreshToken(newRefreshToken.toString());
-          }
+          if (newAccessToken != null && newAccessToken.toString().trim().isNotEmpty) {
+            await StorageService.saveToken(newAccessToken.toString().trim());
+            if (newRefreshToken != null && newRefreshToken.toString().trim().isNotEmpty) {
+              await StorageService.saveRefreshToken(newRefreshToken.toString().trim());
+            }
 
-          log('Access token successfully refreshed.');
-          return true;
+            log('Access token successfully refreshed.');
+            return true;
+          }
         }
       }
 

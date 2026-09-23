@@ -25,10 +25,13 @@ class SessionNotifier extends Notifier<SessionState> {
     final token = await StorageService.getToken();
     final role = await StorageService.getRole();
     final isApiConnected = await StorageService.getIsApiConnected();
-    final isAuth = token != null;
+    final isAuth = token != null && token.isNotEmpty;
+    final normalizedRole = (role != null && GlobalKeys.isValidRole(role.toLowerCase()))
+        ? role.toLowerCase()
+        : null;
     state = state.copyWith(
       isAuthenticated: isAuth,
-      userRole: role,
+      userRole: normalizedRole,
       isApiConnected: isApiConnected,
     );
     return isAuth;

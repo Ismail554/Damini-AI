@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:Braintech/core/constants/api_endpoints.dart';
+import 'package:Braintech/core/services/api_error_handler.dart';
 import 'package:Braintech/core/services/api_service.dart';
 import 'package:Braintech/core/services/storage_service.dart';
+import 'package:Braintech/shared/global_key.dart';
 import 'package:Braintech/views/auth/login/models/login_request_model.dart';
 
 abstract class LoginRepository {
@@ -20,22 +23,38 @@ class LoginRepositoryImpl implements LoginRepository {
         data: request.toJson(),
         requireAuth: false,
       );
-      final data = response.data;
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
       String? token;
       String? refreshToken;
       String? message;
+      UserModel? user;
       String? role;
 
       if (data is Map) {
+        final status = data['status']?.toString().toLowerCase();
+        if (status == 'error' || status == 'failed') {
+          return LoginResponseModel(
+            success: false,
+            message: data['message']?.toString() ?? "Login failed",
+          );
+        }
+
         token = data['access']?.toString();
         refreshToken = data['refresh']?.toString();
         message = data['message']?.toString();
 
-        final user = data['user'];
-        if (user is Map && user['role'] != null) {
-          role = user['role'].toString().toLowerCase();
+        final rawUser = data['user'];
+        if (rawUser is Map) {
+          user = UserModel.fromJson(Map<String, dynamic>.from(rawUser));
+          role = user.role;
         } else if (data['role'] != null) {
-          role = data['role'].toString().toLowerCase();
+          role = data['role']?.toString();
         }
       }
 
@@ -50,20 +69,35 @@ class LoginRepositoryImpl implements LoginRepository {
       if (refreshToken != null && refreshToken.isNotEmpty) {
         await StorageService.saveRefreshToken(refreshToken);
       }
-      if (role != null && role.isNotEmpty) {
-        await StorageService.saveRole(role);
+      if (user?.id != null) {
+        await StorageService.saveUuid(user!.id.toString());
       }
       await StorageService.saveIsApiConnected(true);
       await StorageService.saveHasSeenOnboarding();
 
+      final normalizedRole = role?.trim().toLowerCase() ?? 'none';
+      if (GlobalKeys.isValidRole(normalizedRole)) {
+        await StorageService.saveRole(normalizedRole);
+      } else {
+        await StorageService.clearRole();
+      }
+
       return LoginResponseModel(
         success: true,
         token: token,
-        role: role,
+        refreshToken: refreshToken,
+        user: user,
+        role: role ?? 'NONE',
         message: message ?? "Login successful",
       );
     } catch (e) {
-      return LoginResponseModel(success: false, message: e.toString());
+      String message = "Login failed. Please check your credentials.";
+      if (e is ApiException) {
+        message = e.message;
+      } else {
+        message = e.toString();
+      }
+      return LoginResponseModel(success: false, message: message);
     }
   }
 }

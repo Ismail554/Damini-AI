@@ -8,13 +8,18 @@ class StorageService {
 
   static Future<void> saveToken(String token) async {
     try {
-      await _storage.write(key: GlobalKeys.access, value: token);
+      final trimmed = token.trim();
+      if (trimmed.isNotEmpty) {
+        await _storage.write(key: GlobalKeys.access, value: trimmed);
+      }
     } catch (_) {}
   }
 
   static Future<String?> getToken() async {
     try {
-      return await _storage.read(key: GlobalKeys.access);
+      final val = await _storage.read(key: GlobalKeys.access);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
     } catch (_) {
       return null;
     }
@@ -22,13 +27,18 @@ class StorageService {
 
   static Future<void> saveRefreshToken(String token) async {
     try {
-      await _storage.write(key: GlobalKeys.refresh, value: token);
+      final trimmed = token.trim();
+      if (trimmed.isNotEmpty) {
+        await _storage.write(key: GlobalKeys.refresh, value: trimmed);
+      }
     } catch (_) {}
   }
 
   static Future<String?> getRefreshToken() async {
     try {
-      return await _storage.read(key: GlobalKeys.refresh);
+      final val = await _storage.read(key: GlobalKeys.refresh);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
     } catch (_) {
       return null;
     }
@@ -50,14 +60,17 @@ class StorageService {
 
   static Future<void> saveRole(String role) async {
     try {
-      await _storage.write(key: GlobalKeys.userRole, value: role);
+      final trimmed = role.trim();
+      await _storage.write(key: GlobalKeys.userRole, value: trimmed);
       await _storage.write(key: GlobalKeys.isRoleSelected, value: 'true');
     } catch (_) {}
   }
 
   static Future<String?> getRole() async {
     try {
-      return await _storage.read(key: GlobalKeys.userRole);
+      final val = await _storage.read(key: GlobalKeys.userRole);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
     } catch (_) {
       return null;
     }
@@ -105,6 +118,13 @@ class StorageService {
     }
   }
 
+  static Future<void> clearRole() async {
+    try {
+      await _storage.delete(key: GlobalKeys.userRole);
+      await _storage.delete(key: GlobalKeys.isRoleSelected);
+    } catch (_) {}
+  }
+
   static Future<void> clearAuthData() async {
     try {
       await _storage.delete(key: GlobalKeys.access);
@@ -112,5 +132,13 @@ class StorageService {
     } catch (_) {}
   }
 
-  static Future<void> clearAll() async => clearAuthData();
+  static Future<void> clearAll() async {
+    try {
+      await _storage.delete(key: GlobalKeys.access);
+      await _storage.delete(key: GlobalKeys.refresh);
+      await _storage.delete(key: GlobalKeys.uuid);
+      await _storage.delete(key: GlobalKeys.userRole);
+      await _storage.delete(key: GlobalKeys.isRoleSelected);
+    } catch (_) {}
+  }
 }
