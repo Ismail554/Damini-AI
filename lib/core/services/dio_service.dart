@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import '../constants/api_endpoints.dart';
+import 'api_logger_interceptor.dart';
 import 'auth_interceptor.dart';
 
 class DioService {
@@ -21,7 +22,7 @@ class DioService {
       headers: const {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
+        'ngrok-skip-browser-warning': '69420',
         'User-Agent': 'Braintech-Mobile-App/1.0',
       },
     );
@@ -41,9 +42,17 @@ class DioService {
     }
   }
 
+  static final InterceptorsWrapper _ngrokInterceptor = InterceptorsWrapper(
+    onRequest: (options, handler) {
+      options.headers['ngrok-skip-browser-warning'] = '69420';
+      handler.next(options);
+    },
+  );
+
   static Dio _createAuthDio() {
     final dio = Dio(_createBaseOptions());
     _configureHttpClient(dio);
+    dio.interceptors.add(_ngrokInterceptor);
     dio.interceptors.add(AuthInterceptor(dio));
 
     if (kDebugMode) {
@@ -56,6 +65,7 @@ class DioService {
   static Dio _createNoAuthDio() {
     final dio = Dio(_createBaseOptions());
     _configureHttpClient(dio);
+    dio.interceptors.add(_ngrokInterceptor);
 
     if (kDebugMode) {
       dio.interceptors.add(_loggingInterceptor);
@@ -64,14 +74,7 @@ class DioService {
     return dio;
   }
 
-  static final LogInterceptor _loggingInterceptor = LogInterceptor(
-    requestHeader: false,
-    requestBody: true,
-    responseBody: true,
-    responseHeader: false,
-    error: true,
-    logPrint: (o) => debugPrint(o.toString()),
-  );
+  static final ApiLoggerInterceptor _loggingInterceptor = ApiLoggerInterceptor();
 
   /// Close connections when resetting the app session if needed
   static void reset() {

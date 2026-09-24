@@ -122,6 +122,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
       _lastPressedAt = now;
 
       final tc = AppThemeColors.of(context);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -134,6 +135,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.fromLTRB(20.w, 0, 20.w, 90.h),
           backgroundColor: tc.cardHero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
@@ -142,6 +144,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
         ),
       );
     } else {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       SystemNavigator.pop();
     }
   }

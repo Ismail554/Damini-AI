@@ -32,7 +32,12 @@ class CustomSnackBar {
         behavior: SnackBarBehavior.floating,
         elevation: 8,
         backgroundColor: config.bgColor,
-        margin: EdgeInsets.all(AppDimens.screenHorizontal),
+        margin: EdgeInsets.fromLTRB(
+          AppDimens.screenHorizontal,
+          0,
+          AppDimens.screenHorizontal,
+          AppDimens.screenVertical,
+        ),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimens.radiusMd),

@@ -2,28 +2,36 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../constants/api_endpoints.dart';
 import '../routing/app_router.dart';
+import 'api_logger_interceptor.dart';
 import 'storage_service.dart';
 
 class AuthInterceptor extends Interceptor {
   final Dio _dio;
 
   // Dedicated clean Dio instance for token refresh (lazy singleton: allocated only once)
-  late final Dio _refreshDio = Dio(
-    BaseOptions(
-      baseUrl: ApiEndpoints.baseUrl,
-      connectTimeout: const Duration(seconds: 60),
-      receiveTimeout: const Duration(seconds: 60),
-      sendTimeout: const Duration(seconds: 60),
-      headers: const {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-        'User-Agent': 'Braintech-Mobile-App/1.0',
-      },
-    ),
-  );
+  late final Dio _refreshDio = () {
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: ApiEndpoints.baseUrl,
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 60),
+        headers: const {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'ngrok-skip-browser-warning': '69420',
+          'User-Agent': 'Braintech-Mobile-App/1.0',
+        },
+      ),
+    );
+    if (kDebugMode) {
+      dio.interceptors.add(ApiLoggerInterceptor());
+    }
+    return dio;
+  }();
 
   // Lock to handle concurrent 401 errors so only 1 refresh API call is triggered
   Completer<bool>? _refreshCompleter;
@@ -35,6 +43,9 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    // Always guarantee ngrok skip warning header
+    options.headers['ngrok-skip-browser-warning'] = '69420';
+
     // 1. Fast O(1) check: if the request explicitly opts out of authentication
     if (options.extra['requiresAuth'] == false) {
       return handler.next(options);

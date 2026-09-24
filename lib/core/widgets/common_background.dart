@@ -8,12 +8,17 @@ class CommonBackground extends StatelessWidget {
   final bool topSafeArea;
   final bool bottomSafeArea;
 
+  final bool? hasScaffold;
+  final bool? resizeToAvoidBottomInset;
+
   const CommonBackground({
     super.key,
     required this.child,
     this.showGrid = false,
     this.topSafeArea = true,
     this.bottomSafeArea = false,
+    this.hasScaffold,
+    this.resizeToAvoidBottomInset,
   });
 
   @override
@@ -54,84 +59,106 @@ class CommonBackground extends StatelessWidget {
 
     final scaffoldBg = isDark ? AppColors.darkBgStart : AppColors.lightBgStart;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: overlayStyle,
-      child: Scaffold(
-        backgroundColor: scaffoldBg,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              // Dynamic Gradient Background
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: gradientColors,
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
+    final bool hasAncestorScaffold =
+        context.findAncestorWidgetOfExactType<Scaffold>() != null;
+    final bool shouldCreateScaffold =
+        hasScaffold ?? (child is! Scaffold && !hasAncestorScaffold);
 
-              // Ambient Neon Glow (Top Right)
-              Positioned(
-                top: -100,
-                right: -100,
-                child: Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryColor.withValues(
-                          alpha: isDark ? 0.15 : 0.08,
-                        ),
-                        blurRadius: 120,
-                        spreadRadius: 40,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Ambient Neon Glow (Bottom Left)
-              Positioned(
-                bottom: -50,
-                left: -50,
-                child: Container(
-                  width: 250,
-                  height: 250,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.accentCyan.withValues(
-                          alpha: isDark ? 0.08 : 0.04,
-                        ),
-                        blurRadius: 100,
-                        spreadRadius: 30,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Optional Grid Overlay
-              if (showGrid)
-                Positioned.fill(
-                  child: Opacity(
-                    opacity: 0.05,
-                    child: CustomPaint(painter: GridPainter(isDark: isDark)),
-                  ),
-                ),
-
-              // Screen Content
-              SafeArea(top: topSafeArea, bottom: bottomSafeArea, child: child),
-            ],
+    final backgroundStack = Stack(
+      children: [
+        // Dynamic Gradient Background
+        Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: gradientColors,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
         ),
+
+        // Ambient Neon Glow (Top Right)
+        Positioned(
+          top: -100,
+          right: -100,
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryColor.withValues(
+                    alpha: isDark ? 0.15 : 0.08,
+                  ),
+                  blurRadius: 120,
+                  spreadRadius: 40,
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Ambient Neon Glow (Bottom Left)
+        Positioned(
+          bottom: -50,
+          left: -50,
+          child: Container(
+            width: 250,
+            height: 250,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.accentCyan.withValues(
+                    alpha: isDark ? 0.08 : 0.04,
+                  ),
+                  blurRadius: 100,
+                  spreadRadius: 30,
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Optional Grid Overlay
+        if (showGrid)
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.05,
+              child: CustomPaint(painter: GridPainter(isDark: isDark)),
+            ),
+          ),
+
+        // Screen Content
+        child is Scaffold
+            ? child
+            : SafeArea(
+                top: topSafeArea,
+                bottom: bottomSafeArea,
+                child: child,
+              ),
+      ],
+    );
+
+    if (shouldCreateScaffold) {
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: overlayStyle,
+        child: Scaffold(
+          backgroundColor: scaffoldBg,
+          resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+          body: backgroundStack,
+        ),
+      );
+    }
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlayStyle,
+      child: Material(
+        color: Colors.transparent,
+        child: backgroundStack,
       ),
     );
   }
