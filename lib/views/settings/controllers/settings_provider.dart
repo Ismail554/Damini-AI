@@ -1,32 +1,78 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/settings_model.dart';
 export '../models/settings_model.dart';
 import '../repositories/settings_repository.dart';
 
-final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
-  return SettingsRepositoryImpl();
-});
-
 class SettingsState {
+  final bool isLoading;
   final bool notificationsEnabled;
+  final UserSettingsModel? userSettings;
 
-  const SettingsState({this.notificationsEnabled = true});
+  const SettingsState({
+    this.isLoading = false,
+    this.notificationsEnabled = true,
+    this.userSettings,
+  });
 
-  SettingsState copyWith({bool? notificationsEnabled}) {
+  String get displayName => userSettings?.fullName ?? 'Member';
+  String get email => userSettings?.email ?? '';
+  String? get profilePhoto => userSettings?.profilePhoto;
+  String get subscriptionTier => userSettings?.subscriptionTier ?? 'FREE';
+  String get verificationStatus => userSettings?.verificationStatus ?? 'PENDING';
+  String get role => userSettings?.role ?? '';
+
+  SettingsState copyWith({
+    bool? isLoading,
+    bool? notificationsEnabled,
+    UserSettingsModel? userSettings,
+  }) {
     return SettingsState(
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      isLoading: isLoading ?? this.isLoading,
+      notificationsEnabled:
+          notificationsEnabled ?? this.notificationsEnabled,
+      userSettings: userSettings ?? this.userSettings,
     );
   }
 }
 
 final settingsProvider =
-    NotifierProvider.autoDispose<SettingsNotifier, SettingsState>(
+    NotifierProvider<SettingsNotifier, SettingsState>(
         SettingsNotifier.new);
 
 class SettingsNotifier extends Notifier<SettingsState> {
-  @override
-  SettingsState build() => const SettingsState();
+  late final SettingsRepository _repository;
 
-  void toggleNotifications(bool value) {
+  @override
+  SettingsState build() {
+    _repository = ref.watch(settingsRepositoryProvider);
+    _loadUserSettings();
+    return const SettingsState(isLoading: true);
+  }
+
+  Future<void> _loadUserSettings() async {
+    try {
+      final user = await _repository.getUserSettings();
+      state = state.copyWith(
+        isLoading: false,
+        userSettings: user,
+        notificationsEnabled: user.pushNotificationsEnabled,
+      );
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> refresh() async {
+    await _loadUserSettings();
+  }
+
+  Future<void> toggleNotifications(bool value) async {
+    // Optimistic UI update
     state = state.copyWith(notificationsEnabled: value);
+    final success = await _repository.updateNotificationPreference(value);
+    if (!success) {
+      // Revert if failed
+      state = state.copyWith(notificationsEnabled: !value);
+    }
   }
 }

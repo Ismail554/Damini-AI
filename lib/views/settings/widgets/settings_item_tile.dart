@@ -6,6 +6,7 @@ import '../../../../core/utils/app_theme_colors.dart';
 class SettingsItemTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String? subtitle;
   final Widget? trailing;
   final VoidCallback? onTap;
   final Color? textColor;
@@ -16,6 +17,7 @@ class SettingsItemTile extends StatelessWidget {
     super.key,
     required this.icon,
     required this.title,
+    this.subtitle,
     this.trailing,
     this.onTap,
     this.textColor,
@@ -32,7 +34,7 @@ class SettingsItemTile extends StatelessWidget {
       splashColor: Colors.transparent,
       highlightColor: Colors.white.withValues(alpha: 0.05),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         child: Row(
           children: [
             Container(
@@ -53,13 +55,31 @@ class SettingsItemTile extends StatelessWidget {
             ),
             SizedBox(width: 14.w),
             Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.outfit(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w600,
-                  color: textColor ?? tc.textPrimary,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.outfit(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: textColor ?? tc.textPrimary,
+                    ),
+                  ),
+                  if (subtitle != null && subtitle!.isNotEmpty) ...[
+                    SizedBox(height: 2.h),
+                    Text(
+                      subtitle!,
+                      style: GoogleFonts.outfit(
+                        fontSize: 12.sp,
+                        color: tc.textTertiary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
               ),
             ),
             trailing ??

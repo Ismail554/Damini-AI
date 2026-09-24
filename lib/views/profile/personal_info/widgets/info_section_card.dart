@@ -74,12 +74,16 @@ class InfoSectionCard extends StatelessWidget {
                       SizedBox(width: 12.w),
                       Expanded(
                         child: Text(
-                          item.value,
+                          item.value.trim().isEmpty ? 'Not set' : item.value,
                           textAlign: TextAlign.right,
                           style: GoogleFonts.outfit(
                             fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: tc.textPrimary,
+                            fontWeight: item.value.trim().isEmpty
+                                ? FontWeight.normal
+                                : FontWeight.w600,
+                            color: item.value.trim().isEmpty
+                                ? tc.textTertiary
+                                : tc.textPrimary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

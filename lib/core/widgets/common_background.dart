@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../utils/app_colors.dart';
 
 class CommonBackground extends StatelessWidget {
@@ -81,11 +82,11 @@ class CommonBackground extends StatelessWidget {
 
         // Ambient Neon Glow (Top Right)
         Positioned(
-          top: -100,
-          right: -100,
+          top: -100.h,
+          right: -100.w,
           child: Container(
-            width: 300,
-            height: 300,
+            width: 300.w,
+            height: 300.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
@@ -106,8 +107,8 @@ class CommonBackground extends StatelessWidget {
           bottom: -50,
           left: -50,
           child: Container(
-            width: 250,
-            height: 250,
+            width: 250.w,
+            height: 250.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [

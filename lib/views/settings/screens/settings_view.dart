@@ -48,19 +48,139 @@ class SettingsView extends ConsumerWidget {
           ),
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20.w,
-              vertical: 16.h,
+          child: RefreshIndicator(
+            onRefresh: () => ref.read(settingsProvider.notifier).refresh(),
+            color: const Color(0xFF2563EB),
+            backgroundColor: tc.cardBg,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 16.h,
+              ),
+              child: Column(
+                children: [
+                  _buildProfileHeaderCard(context, tc, provider),
+                  SizedBox(height: 16.h),
+                  _buildSettingsCard(context, tc, provider, theme, ref),
+                  SizedBox(height: 24.h),
+                  _buildDeleteAccountButton(context, tc, ref),
+                ],
+              ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeaderCard(
+    BuildContext context,
+    AppThemeColors tc,
+    SettingsState state,
+  ) {
+    final initials = state.displayName.isNotEmpty
+        ? state.displayName
+            .split(' ')
+            .where((w) => w.isNotEmpty)
+            .map((e) => e[0])
+            .take(2)
+            .join()
+        : 'U';
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: tc.isDark ? const Color(0xFF091E36) : Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: tc.isDark
+              ? Colors.white.withValues(alpha: 0.12)
+              : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 26.r,
+            backgroundColor: const Color(0xFF2563EB).withValues(alpha: 0.15),
+            backgroundImage: (state.profilePhoto != null &&
+                    state.profilePhoto!.isNotEmpty)
+                ? NetworkImage(state.profilePhoto!)
+                : null,
+            child: (state.profilePhoto == null || state.profilePhoto!.isEmpty)
+                ? Text(
+                    initials.toUpperCase(),
+                    style: GoogleFonts.outfit(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2563EB),
+                    ),
+                  )
+                : null,
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSettingsCard(context, tc, provider, theme, ref),
-                SizedBox(height: 24.h),
-                _buildDeleteAccountButton(context, tc, ref),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        state.displayName,
+                        style: GoogleFonts.outfit(
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.bold,
+                          color: tc.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (state.role.isNotEmpty) ...[
+                      SizedBox(width: 8.w),
+                      _buildRoleBadge(state.role),
+                    ],
+                  ],
+                ),
+                SizedBox(height: 3.h),
+                Text(
+                  state.email.isNotEmpty ? state.email : "Loading profile...",
+                  style: GoogleFonts.outfit(
+                    fontSize: 13.sp,
+                    color: tc.textTertiary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRoleBadge(String role) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2563EB).withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6.r),
+        border: Border.all(
+          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+        ),
+      ),
+      child: Text(
+        role.toUpperCase(),
+        style: GoogleFonts.outfit(
+          fontSize: 10.sp,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF38BDF8),
         ),
       ),
     );
@@ -73,6 +193,15 @@ class SettingsView extends ConsumerWidget {
     ThemeMode theme,
     WidgetRef ref,
   ) {
+    final verificationStatus = provider.verificationStatus.toUpperCase();
+    final isApproved = verificationStatus == 'APPROVED';
+    final isPending = verificationStatus == 'PENDING';
+    final statusColor = isApproved
+        ? const Color(0xFF10B981)
+        : isPending
+            ? const Color(0xFFF59E0B)
+            : const Color(0xFF64748B);
+
     return Container(
       decoration: BoxDecoration(
         color: tc.isDark ? const Color(0xFF091E36) : Colors.white,
@@ -88,12 +217,40 @@ class SettingsView extends ConsumerWidget {
           SettingsItemTile(
             icon: Icons.person_outline_rounded,
             title: "Personal Information",
+            subtitle: provider.email.isNotEmpty ? provider.email : null,
             onTap: () => context.push('/personal-info'),
           ),
           _divider(tc),
           SettingsItemTile(
             icon: Icons.verified_user_outlined,
             title: "Company Verification",
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6.r),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    verificationStatus,
+                    style: GoogleFonts.outfit(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: tc.textTertiary,
+                  size: 22.r,
+                ),
+              ],
+            ),
             onTap: () => context.push('/company-verification'),
           ),
           _divider(tc),
@@ -122,6 +279,35 @@ class SettingsView extends ConsumerWidget {
           SettingsItemTile(
             icon: Icons.auto_awesome_outlined,
             title: "Subscription Plan",
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2563EB).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6.r),
+                    border: Border.all(
+                      color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Text(
+                    provider.subscriptionTier,
+                    style: GoogleFonts.outfit(
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF38BDF8),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: tc.textTertiary,
+                  size: 22.r,
+                ),
+              ],
+            ),
             onTap: () => context.push('/subscription'),
           ),
           _divider(tc),

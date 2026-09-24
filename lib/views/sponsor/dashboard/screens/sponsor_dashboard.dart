@@ -27,159 +27,229 @@ class SponsorDashboard extends ConsumerWidget {
     final draftProvider = ref.watch(projectDraftProvider);
 
     final metrics = dashboardState.metrics;
-    final activeProject = dashboardState.activeProject;
+    final projects = dashboardState.projects;
     final requests = dashboardState.requests;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppDimens.screenHorizontal,
-        vertical: AppDimens.screenVertical,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildGreetingRow(context, tc),
-          SizedBox(height: AppDimens.spaceXl),
-          if (metrics.length >= 2)
+    return RefreshIndicator(
+      onRefresh: () => ref.read(sponsorDashboardProvider.notifier).refresh(),
+      color: AppColors.primaryColor,
+      backgroundColor: tc.cardBg,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDimens.screenHorizontal,
+          vertical: AppDimens.screenVertical,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildGreetingRow(context, tc, dashboardState),
+            SizedBox(height: AppDimens.spaceXl),
+
+            // Stats Cards
+            if (dashboardState.isLoading && metrics.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                child: const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+              )
+            else if (metrics.length >= 2)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: SponsorMetricCard(
+                      label: metrics[0].label,
+                      value: metrics[0].value,
+                      icon: metrics[0].icon,
+                    ),
+                  ),
+                  SizedBox(width: AppDimens.spaceSm),
+                  Expanded(
+                    child: SponsorMetricCard(
+                      label: metrics[1].label,
+                      value: metrics[1].value,
+                      icon: metrics[1].icon,
+                    ),
+                  ),
+                ],
+              )
+            else
+              const SizedBox.shrink(),
+
+            SizedBox(height: AppDimens.spaceXl),
+
+            // My Projects Section Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: SponsorMetricCard(
-                    label: metrics[0].label,
-                    value: metrics[0].value,
-                    icon: metrics[0].icon,
+                Text(
+                  "My Projects",
+                  style: GoogleFonts.outfit(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: tc.textPrimary,
                   ),
                 ),
-                SizedBox(width: AppDimens.spaceSm),
-                Expanded(
-                  child: SponsorMetricCard(
-                    label: metrics[1].label,
-                    value: metrics[1].value,
-                    icon: metrics[1].icon,
+                GestureDetector(
+                  onTap: () => context.push('/sponsor-projects'),
+                  child: Text(
+                    "View All",
+                    style: GoogleFonts.outfit(
+                      fontSize: 13.sp,
+                      color: AppColors.accentOrange,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
-            )
-          else
-            const SizedBox.shrink(),
-          SizedBox(height: AppDimens.spaceXl),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "My Projects",
-                style: GoogleFonts.outfit(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: tc.textPrimary,
+            ),
+            SizedBox(height: AppDimens.paddingMd),
+
+            // My Projects List
+            if (dashboardState.isLoading && projects.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.h),
+                child: const Center(
+                  child: CircularProgressIndicator.adaptive(),
                 ),
-              ),
-              GestureDetector(
-                onTap: () => context.push('/sponsor-projects'),
-                child: Text(
-                  "View All",
-                  style: GoogleFonts.outfit(
-                    fontSize: 13.sp,
-                    color: AppColors.accentOrange,
-                    fontWeight: FontWeight.w600,
+              )
+            else if (projects.isNotEmpty)
+              ...projects.map(
+                (project) => Padding(
+                  padding: EdgeInsets.only(bottom: AppDimens.paddingMd),
+                  child: SponsorActiveProjectCard(
+                    title: project.title,
+                    description: project.description,
+                    badgeText: project.badgeText,
+                    raisedAmount: project.raisedAmount,
+                    goalAmount: project.goalAmount,
+                    progress: project.progress,
+                    imageUrl: project.imageUrl,
+                    onTap: () => context.push(
+                      '/sponsor-project-details',
+                      extra: project.id,
+                    ),
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.h),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.folder_open_rounded,
+                        size: 38.r,
+                        color: tc.textTertiary,
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        "No projects created yet",
+                        style: GoogleFonts.outfit(
+                          fontSize: 14.sp,
+                          color: tc.textTertiary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: AppDimens.paddingMd),
-          if (activeProject != null)
-            SponsorActiveProjectCard(
-              title: activeProject.title,
-              description: activeProject.description,
-              badgeText: activeProject.badgeText,
-              raisedAmount: activeProject.raisedAmount,
-              goalAmount: activeProject.goalAmount,
-              progress: activeProject.progress,
-              imageUrl: activeProject.imageUrl,
-              onTap: () => context.push('/sponsor-project-details'),
-            ),
-          SizedBox(height: AppDimens.spaceXl),
-          Text(
-            "Collaboration Requests",
-            style: GoogleFonts.outfit(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: tc.textPrimary,
-            ),
-          ),
-          SizedBox(height: AppDimens.paddingMd),
-          if (requests.isNotEmpty)
-            ...requests.map(
-              (req) => SponsorRequestCard(
-                name: req.name,
-                subtitle: req.subtitle,
-                avatarUrl: req.avatarUrl,
-                onReview: () => context.push('/collaboration-requests'),
-              ),
-            )
-          else
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 12.h),
-              child: Text(
-                "No pending requests",
-                style: GoogleFonts.outfit(
-                  fontSize: 13.sp,
-                  color: tc.textTertiary,
-                ),
-              ),
-            ),
-          SizedBox(height: AppDimens.spaceXl),
-          Text(
-            "Drafts",
-            style: GoogleFonts.outfit(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: tc.textPrimary,
-            ),
-          ),
-          SizedBox(height: AppDimens.paddingMd),
 
-          if (draftProvider.drafts.isEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 12.h),
-              child: Text(
-                "No project drafts saved",
-                style: GoogleFonts.outfit(
-                  fontSize: 13.sp,
-                  color: tc.textTertiary,
-                ),
-              ),
-            )
-          else
-            ...draftProvider.drafts.map(
-              (draft) => Padding(
-                padding: EdgeInsets.only(bottom: AppDimens.paddingSm),
-                child: SponsorDraftCard(
-                  dismissKey: ValueKey(draft.id),
-                  title: draft.title,
-                  lastEdited: draft.lastEdited,
-                  onTap: () => context.push('/create-project', extra: draft),
-                  onDelete: () async {
-                    await ref
-                        .read(projectDraftProvider.notifier)
-                        .deleteDraft(draft.id);
-                    if (context.mounted) {
-                      CustomSnackBar.success(context, "Draft deleted");
-                    }
-                  },
-                ),
+            SizedBox(height: AppDimens.spaceXl),
+
+            // Collaboration Requests Header
+            Text(
+              "Collaboration Requests",
+              style: GoogleFonts.outfit(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: tc.textPrimary,
               ),
             ),
-          SizedBox(height: 80.h),
-        ],
+            SizedBox(height: AppDimens.paddingMd),
+            if (requests.isNotEmpty)
+              ...requests.map(
+                (req) => SponsorRequestCard(
+                  name: req.name,
+                  subtitle: req.subtitle,
+                  avatarUrl: req.avatarUrl,
+                  onReview: () => context.push('/collaboration-requests'),
+                ),
+              )
+            else
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                child: Text(
+                  "No pending requests",
+                  style: GoogleFonts.outfit(
+                    fontSize: 13.sp,
+                    color: tc.textTertiary,
+                  ),
+                ),
+              ),
+
+            SizedBox(height: AppDimens.spaceXl),
+
+            // Drafts Section Header
+            Text(
+              "Drafts",
+              style: GoogleFonts.outfit(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: tc.textPrimary,
+              ),
+            ),
+            SizedBox(height: AppDimens.paddingMd),
+
+            if (draftProvider.drafts.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                child: Text(
+                  "No project drafts saved",
+                  style: GoogleFonts.outfit(
+                    fontSize: 13.sp,
+                    color: tc.textTertiary,
+                  ),
+                ),
+              )
+            else
+              ...draftProvider.drafts.map(
+                (draft) => Padding(
+                  padding: EdgeInsets.only(bottom: AppDimens.paddingSm),
+                  child: SponsorDraftCard(
+                    dismissKey: ValueKey(draft.id),
+                    title: draft.title,
+                    lastEdited: draft.lastEdited,
+                    onTap: () => context.push('/create-project', extra: draft),
+                    onDelete: () async {
+                      await ref
+                          .read(projectDraftProvider.notifier)
+                          .deleteDraft(draft.id);
+                      if (context.mounted) {
+                        CustomSnackBar.success(context, "Draft deleted");
+                      }
+                    },
+                  ),
+                ),
+              ),
+            SizedBox(height: 80.h),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildGreetingRow(BuildContext context, AppThemeColors tc) {
+  Widget _buildGreetingRow(
+    BuildContext context,
+    AppThemeColors tc,
+    SponsorDashboardState state,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -199,7 +269,7 @@ class SponsorDashboard extends ConsumerWidget {
                 ),
                 SizedBox(height: AppDimens.spaceXxs),
                 Text(
-                  "Shawn Blake",
+                  state.displayName,
                   style: GoogleFonts.outfit(
                     fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
@@ -250,9 +320,13 @@ class SponsorDashboard extends ConsumerWidget {
               onTap: () => ProfileQuickViewSheet.show(context),
               child: CircleAvatar(
                 radius: AppDimens.avatarSm,
-                backgroundImage: const NetworkImage(
-                  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
-                ),
+                backgroundColor: tc.buttonSecondary,
+                backgroundImage: (state.profilePhoto != null &&
+                        state.profilePhoto!.isNotEmpty)
+                    ? NetworkImage(state.profilePhoto!)
+                    : const NetworkImage(
+                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
+                      ),
               ),
             ),
           ],

@@ -19,4 +19,9 @@ class ApiEndpoints {
   static const String industries = "/api/v1/profiles/industries/";
   static const String verificationStatus =
       "/api/v1/profiles/verification-status/";
+
+  // User & Projects
+  static const String currentUser = "/api/v1/users/me/";
+  static const String sponsorProjects = "/api/v1/projects/sponsor/";
+  static const String projects = "/api/v1/projects/";
 }

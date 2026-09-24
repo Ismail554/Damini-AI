@@ -1,7 +1,17 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/investor_dashboard_models.dart';
 
+final investorDashboardRepositoryProvider =
+    Provider<InvestorDashboardRepository>((ref) {
+  return InvestorDashboardRepositoryImpl(ref.watch(apiServiceProvider));
+});
+
 abstract class InvestorDashboardRepository {
+  Future<InvestorUserProfile> getUserProfile();
   Future<List<DashboardCategoryModel>> getCategories();
   Future<List<InvestorBannerModel>> getBanners();
   Future<List<FeaturedOpportunityModel>> getFeaturedOpportunities();
@@ -9,8 +19,78 @@ abstract class InvestorDashboardRepository {
 }
 
 class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
+  final ApiService _apiService;
+
+  InvestorDashboardRepositoryImpl(this._apiService);
+
+  @override
+  Future<InvestorUserProfile> getUserProfile() async {
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.currentUser,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      if (data is Map<String, dynamic>) {
+        return InvestorUserProfile.fromJson(data);
+      } else if (data is Map) {
+        return InvestorUserProfile.fromJson(Map<String, dynamic>.from(data));
+      }
+      return const InvestorUserProfile(firstName: '', lastName: '');
+    } catch (_) {
+      return const InvestorUserProfile(firstName: '', lastName: '');
+    }
+  }
+
   @override
   Future<List<DashboardCategoryModel>> getCategories() async {
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.industries,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      List<dynamic> list = [];
+      if (data is List) {
+        list = data;
+      } else if (data is Map && data['data'] is List) {
+        list = data['data'] as List;
+      } else if (data is Map && data['results'] is List) {
+        list = data['results'] as List;
+      }
+
+      if (list.isNotEmpty) {
+        final categories = <DashboardCategoryModel>[
+          const DashboardCategoryModel(label: "All", icon: Icons.grid_view_rounded),
+        ];
+
+        for (final item in list) {
+          final name = (item is Map ? item['name']?.toString() : null) ?? '';
+          if (name.isNotEmpty) {
+            categories.add(DashboardCategoryModel(
+              label: name,
+              icon: _getCategoryIcon(name),
+            ));
+          }
+        }
+        return categories;
+      }
+    } catch (_) {}
+
     return const [
       DashboardCategoryModel(label: "All", icon: Icons.grid_view_rounded),
       DashboardCategoryModel(label: "Tech", icon: Icons.memory_rounded),
@@ -18,6 +98,26 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
       DashboardCategoryModel(label: "Health", icon: Icons.favorite_outline_rounded),
       DashboardCategoryModel(label: "Energy", icon: Icons.bolt_rounded),
     ];
+  }
+
+  static IconData _getCategoryIcon(String category) {
+    final lower = category.toLowerCase();
+    if (lower.contains('real') || lower.contains('estate') || lower.contains('property')) {
+      return Icons.home_work_outlined;
+    }
+    if (lower.contains('tech') || lower.contains('software') || lower.contains('ai')) {
+      return Icons.memory_rounded;
+    }
+    if (lower.contains('health') || lower.contains('bio') || lower.contains('medical')) {
+      return Icons.favorite_outline_rounded;
+    }
+    if (lower.contains('energy') || lower.contains('clean') || lower.contains('solar')) {
+      return Icons.bolt_rounded;
+    }
+    if (lower.contains('agri') || lower.contains('farm')) {
+      return Icons.agriculture_rounded;
+    }
+    return Icons.business_outlined;
   }
 
   @override
@@ -49,6 +149,38 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
 
   @override
   Future<List<FeaturedOpportunityModel>> getFeaturedOpportunities() async {
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.projects,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      List list = [];
+      if (data is List) {
+        list = data;
+      } else if (data is Map) {
+        if (data['results'] is List) {
+          list = data['results'] as List;
+        } else if (data['data'] is List) {
+          list = data['data'] as List;
+        }
+      }
+
+      if (list.isNotEmpty) {
+        return list
+            .whereType<Map>()
+            .map((item) => FeaturedOpportunityModel.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+      }
+    } catch (_) {}
+
     return const [
       FeaturedOpportunityModel(
         title: "Downtown Tech Hub",
@@ -91,6 +223,38 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
 
   @override
   Future<List<TrendingProjectModel>> getTrendingProjects() async {
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.projects,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      List list = [];
+      if (data is List) {
+        list = data;
+      } else if (data is Map) {
+        if (data['results'] is List) {
+          list = data['results'] as List;
+        } else if (data['data'] is List) {
+          list = data['data'] as List;
+        }
+      }
+
+      if (list.isNotEmpty) {
+        return list
+            .whereType<Map>()
+            .map((item) => TrendingProjectModel.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+      }
+    } catch (_) {}
+
     return const [
       TrendingProjectModel(
         title: "BioTech Diagnostics Gene Test",

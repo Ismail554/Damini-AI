@@ -2,10 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/personal_info_model.dart';
 import '../repositories/personal_info_repository.dart';
 
-final personalInfoRepositoryProvider = Provider<PersonalInfoRepository>((ref) {
-  return PersonalInfoRepositoryImpl();
-});
-
 class PersonalInfoState {
   final PersonalInfoModel info;
   final bool isLoading;
@@ -27,23 +23,39 @@ class PersonalInfoState {
 }
 
 class PersonalInfoNotifier extends Notifier<PersonalInfoState> {
+  late final PersonalInfoRepository _repository;
+
   @override
   PersonalInfoState build() {
+    _repository = ref.watch(personalInfoRepositoryProvider);
+    _loadProfile();
     return const PersonalInfoState(
+      isLoading: true,
       info: PersonalInfoModel(
-        fullName: 'John Doe',
-        email: 'john@apexventures.com',
-        phone: '+1 (415) 555-0142',
-        country: 'United States',
-        location: 'San Francisco, CA',
-        companyName: 'Apex Ventures Ltd.',
-        position: 'CEO & Co-Founder',
-        website: 'apexventures.com',
-        bio: 'Venture capitalist focused on tech innovation and sustainable energy.',
-        profilePhotoUrl:
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop',
+        fullName: 'Loading...',
+        email: '',
+        phone: '',
+        country: '',
+        location: '',
+        companyName: '',
+        position: '',
+        website: '',
+        bio: '',
       ),
     );
+  }
+
+  Future<void> _loadProfile() async {
+    try {
+      final profile = await _repository.getProfile();
+      state = state.copyWith(info: profile, isLoading: false);
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> refresh() async {
+    await _loadProfile();
   }
 
   void updateInfo(PersonalInfoModel newInfo) {
@@ -52,13 +64,17 @@ class PersonalInfoNotifier extends Notifier<PersonalInfoState> {
 
   Future<bool> saveProfile(PersonalInfoModel updated) async {
     state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    state = state.copyWith(info: updated, isLoading: false);
-    return true;
+    final success = await _repository.updateProfile(updated);
+    if (success) {
+      state = state.copyWith(info: updated, isLoading: false);
+    } else {
+      state = state.copyWith(isLoading: false);
+    }
+    return success;
   }
 }
 
 final personalInfoProvider =
-    NotifierProvider.autoDispose<PersonalInfoNotifier, PersonalInfoState>(
+    NotifierProvider<PersonalInfoNotifier, PersonalInfoState>(
   PersonalInfoNotifier.new,
 );

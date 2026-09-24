@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,7 +28,7 @@ class PersonalInformationView extends ConsumerWidget {
             icon: Icon(
               Icons.arrow_back_rounded,
               color: tc.textPrimary,
-              size: 22.r,
+              size: 22.sp,
             ),
             onPressed: () => context.pop(),
           ),
@@ -41,38 +42,46 @@ class PersonalInformationView extends ConsumerWidget {
           ),
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20.w,
-              vertical: 16.h,
-            ),
-            child: Column(
-              children: [
-                _buildProfilePhotoHeader(info, tc),
-                SizedBox(height: 20.h),
-                InfoSectionCard(
-                  title: "Personal Information",
-                  rows: [
-                    InfoRowData("Full Name", info.fullName),
-                    InfoRowData("Email Address", info.email),
-                    InfoRowData("Phone Number", info.phone),
-                    InfoRowData("Country", info.country),
-                    InfoRowData("Location", info.location),
-                  ],
-                ),
-                SizedBox(height: 16.h),
-                InfoSectionCard(
-                  title: "Professional Information",
-                  rows: [
-                    InfoRowData("Company Name", info.companyName),
-                    InfoRowData("Position", info.position),
-                    InfoRowData("Website", info.website),
-                    InfoRowData("Bio", info.bio),
-                  ],
-                ),
-                SizedBox(height: 24.h),
-                _buildEditButton(context),
-              ],
+          child: RefreshIndicator(
+            onRefresh: () => ref.read(personalInfoProvider.notifier).refresh(),
+            color: const Color(0xFF006EDB),
+            backgroundColor: tc.cardBg,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 20.w,
+                vertical: 16.h,
+              ),
+              child: Column(
+                children: [
+                  _buildProfilePhotoHeader(info, tc),
+                  AppSpacing.h20,
+                  InfoSectionCard(
+                    title: "Personal Information",
+                    rows: [
+                      InfoRowData("Full Name", info.fullName),
+                      InfoRowData("Email Address", info.email),
+                      InfoRowData("Phone Number", info.phone),
+                      InfoRowData("Country", info.country),
+                      InfoRowData("Location", info.location),
+                    ],
+                  ),
+                  AppSpacing.h16,
+                  InfoSectionCard(
+                    title: "Professional Information",
+                    rows: [
+                      InfoRowData("Company Name", info.companyName),
+                      InfoRowData("Position", info.position),
+                      InfoRowData("Website", info.website),
+                      InfoRowData("Bio", info.bio),
+                    ],
+                  ),
+                  AppSpacing.h24,
+                  _buildEditButton(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -81,8 +90,31 @@ class PersonalInformationView extends ConsumerWidget {
   }
 
   Widget _buildProfilePhotoHeader(dynamic info, AppThemeColors tc) {
-    final photoUrl = info.profilePhotoUrl ??
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop";
+    final initials = (info.fullName as String).isNotEmpty
+        ? (info.fullName as String)
+            .split(' ')
+            .where((w) => w.isNotEmpty)
+            .map((e) => e[0])
+            .take(2)
+            .join()
+        : 'U';
+
+    final hasPhoto = info.profilePhotoUrl != null &&
+        (info.profilePhotoUrl as String).isNotEmpty;
+
+    final subtitleParts = [
+      if ((info.position as String).trim().isNotEmpty)
+        (info.position as String).trim(),
+      if ((info.companyName as String).trim().isNotEmpty)
+        (info.companyName as String).trim(),
+    ];
+    final subtitle = subtitleParts.isNotEmpty
+        ? subtitleParts.join(' • ')
+        : ((info.role as String).isNotEmpty
+            ? (info.role as String)
+            : ((info.email as String).isNotEmpty
+                ? (info.email as String)
+                : 'Member'));
 
     return Container(
       width: double.infinity,
@@ -109,10 +141,23 @@ class PersonalInformationView extends ConsumerWidget {
             ),
             child: CircleAvatar(
               radius: 44.r,
-              backgroundImage: NetworkImage(photoUrl),
+              backgroundColor: tc.buttonSecondary,
+              backgroundImage: hasPhoto
+                  ? NetworkImage(info.profilePhotoUrl!)
+                  : null,
+              child: !hasPhoto
+                  ? Text(
+                      initials.toUpperCase(),
+                      style: GoogleFonts.outfit(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF006EDB),
+                      ),
+                    )
+                  : null,
             ),
           ),
-          SizedBox(height: 12.h),
+          AppSpacing.h12,
           Text(
             info.fullName,
             style: GoogleFonts.outfit(
@@ -121,9 +166,9 @@ class PersonalInformationView extends ConsumerWidget {
               color: tc.textPrimary,
             ),
           ),
-          SizedBox(height: 4.h),
+          AppSpacing.h4,
           Text(
-            "${info.position} • ${info.companyName}",
+            subtitle,
             style: GoogleFonts.outfit(
               fontSize: 13.sp,
               color: tc.textSecondary,
@@ -157,7 +202,7 @@ class PersonalInformationView extends ConsumerWidget {
             Icon(
               Icons.edit_outlined,
               color: Colors.white,
-              size: 20.r,
+              size: 20.sp,
             ),
             SizedBox(width: 8.w),
             Text(

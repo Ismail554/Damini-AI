@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,7 @@ import '../widgets/featured_opportunity_card.dart';
 import '../widgets/investor_banner_carousel.dart';
 import '../widgets/investor_category_chip.dart';
 import '../widgets/trending_opportunity_card.dart';
+import '../../../profile/widgets/profile_quick_view_sheet.dart';
 
 class InvestorDashboard extends ConsumerStatefulWidget {
   const InvestorDashboard({super.key});
@@ -38,19 +40,25 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
     final filteredFeatured = dashboardState.filteredFeatured;
     final filteredTrending = dashboardState.filteredTrending;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppDimens.screenHorizontal,
-        vertical: AppDimens.screenVertical,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildGreetingRow(tc),
-          SizedBox(height: 18.h),
-          _buildSearchBar(tc),
-          SizedBox(height: AppDimens.spaceXl),
+    return RefreshIndicator(
+      onRefresh: () => ref.read(investorDashboardProvider.notifier).refresh(),
+      color: AppColors.primaryColor,
+      backgroundColor: tc.cardBg,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDimens.screenHorizontal,
+          vertical: AppDimens.screenVertical,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildGreetingRow(tc, dashboardState),
+            AppSpacing.h18, 
+            _buildSearchBar(tc),
+            SizedBox(height: AppDimens.spaceXl),
           if (isSearching) ...[
             _buildSearchResultsHeader(
               tc,
@@ -120,19 +128,27 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
           SizedBox(height: 80.h),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildGreetingRow(AppThemeColors tc) {
+  Widget _buildGreetingRow(AppThemeColors tc, InvestorDashboardState state) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            CircleAvatar(
-              radius: AppDimens.avatarSm,
-              backgroundImage: const NetworkImage(
-                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
+            GestureDetector(
+              onTap: () => ProfileQuickViewSheet.show(context),
+              child: CircleAvatar(
+                radius: AppDimens.avatarSm,
+                backgroundColor: tc.buttonSecondary,
+                backgroundImage: (state.profilePhoto != null &&
+                        state.profilePhoto!.isNotEmpty)
+                    ? NetworkImage(state.profilePhoto!)
+                    : const NetworkImage(
+                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
+                      ),
               ),
             ),
             SizedBox(width: AppDimens.spaceMd),
@@ -140,7 +156,7 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Hello, John Doe",
+                  "Hello, ${state.greetingName}",
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
                     color: tc.textTertiary,
@@ -164,8 +180,8 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
           child: Stack(
             children: [
               Container(
-                width: 44.r,
-                height: 44.r,
+                width: 44.w,
+                height: 44.h,
                 decoration: BoxDecoration(
                   color: tc.buttonSecondary,
                   shape: BoxShape.circle,
@@ -181,8 +197,8 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
                 top: 10.h,
                 right: 12.w,
                 child: Container(
-                  width: 8.r,
-                  height: 8.r,
+                  width: 8.w,
+                  height: 8.h,
                   decoration: const BoxDecoration(
                     color: AppColors.accentRed,
                     shape: BoxShape.circle,
@@ -215,7 +231,7 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
             color: tc.textTertiary,
             size: AppDimens.iconMd,
           ),
-          SizedBox(width: 10.w),
+           AppSpacing.w10, 
           Expanded(
             child: TextField(
               controller: _searchController,
@@ -304,10 +320,10 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
         children: [
           Icon(
             Icons.search_off_rounded,
-            size: 48.r,
+            size: 48.sp,
             color: tc.textTertiary,
           ),
-          SizedBox(height: 12.h),
+          AppSpacing.h12,
           Text(
             "No results found for \"$query\"",
             style: GoogleFonts.outfit(
@@ -317,7 +333,7 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 6.h),
+          AppSpacing.h6,
           Text(
             "Try searching for another keyword or category.",
             style: GoogleFonts.outfit(

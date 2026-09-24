@@ -1,20 +1,60 @@
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/settings_model.dart';
 
+final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
+  return SettingsRepositoryImpl(ref.watch(apiServiceProvider));
+});
+
 abstract class SettingsRepository {
-  Future<SettingsModel> getSettings();
-  Future<bool> saveSettings(SettingsModel settings);
+  Future<UserSettingsModel> getUserSettings();
+  Future<bool> updateNotificationPreference(bool enabled);
 }
 
 class SettingsRepositoryImpl implements SettingsRepository {
+  final ApiService _apiService;
+
+  SettingsRepositoryImpl(this._apiService);
+
   @override
-  Future<SettingsModel> getSettings() async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    return const SettingsModel();
+  Future<UserSettingsModel> getUserSettings() async {
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.currentUser,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      if (data is Map<String, dynamic>) {
+        return UserSettingsModel.fromJson(data);
+      } else if (data is Map) {
+        return UserSettingsModel.fromJson(Map<String, dynamic>.from(data));
+      }
+      return const UserSettingsModel();
+    } catch (_) {
+      return const UserSettingsModel();
+    }
   }
 
   @override
-  Future<bool> saveSettings(SettingsModel settings) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return true;
+  Future<bool> updateNotificationPreference(bool enabled) async {
+    try {
+      final response = await _apiService.patch(
+        ApiEndpoints.currentUser,
+        data: {'push_notifications_enabled': enabled},
+        requireAuth: true,
+      );
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (_) {
+      return false;
+    }
   }
 }
