@@ -69,8 +69,9 @@ class LoginRepositoryImpl implements LoginRepository {
       if (refreshToken != null && refreshToken.isNotEmpty) {
         await StorageService.saveRefreshToken(refreshToken);
       }
-      if (user?.id != null) {
-        await StorageService.saveUuid(user!.id.toString());
+      final userId = user?.id;
+      if (userId != null) {
+        await StorageService.saveUuid(userId.toString());
       }
       await StorageService.saveIsApiConnected(true);
       await StorageService.saveHasSeenOnboarding();

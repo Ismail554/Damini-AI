@@ -99,7 +99,7 @@ class InvestorDashboardNotifier extends Notifier<InvestorDashboardState> {
   @override
   InvestorDashboardState build() {
     _repository = ref.watch(investorDashboardRepositoryProvider);
-    loadDashboardData();
+    Future.microtask(() => loadDashboardData());
     return const InvestorDashboardState(isLoading: true);
   }
 

@@ -21,9 +21,14 @@ class InvestorProfileView extends ConsumerWidget {
     final tc = AppThemeColors.of(context);
     final profile = ref.watch(investorProfileProvider).profile;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+    return RefreshIndicator(
+      onRefresh: () =>
+          ref.read(investorProfileProvider.notifier).refreshProfile(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -116,6 +121,7 @@ class InvestorProfileView extends ConsumerWidget {
           SizedBox(height: 90.h),
         ],
       ),
-    );
+    ),
+  );
   }
 }

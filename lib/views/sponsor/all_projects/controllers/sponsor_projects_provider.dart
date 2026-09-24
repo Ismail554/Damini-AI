@@ -40,7 +40,7 @@ class SponsorProjectsNotifier extends Notifier<SponsorProjectsState> {
   @override
   SponsorProjectsState build() {
     _repository = ref.watch(sponsorProjectsRepositoryProvider);
-    _loadProjects();
+    Future.microtask(() => _loadProjects());
     return const SponsorProjectsState(isLoading: true);
   }
 

@@ -7,7 +7,7 @@ import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
 
 class ProfileHeroCard extends StatelessWidget {
-  final String name;
+  final String ? name;
   final String title;
   final String avatarUrl;
   final String investedAmount;
@@ -76,7 +76,7 @@ class ProfileHeroCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppDimens.spaceMd),
                 Text(
-                  name,
+                  name ?? "Member",
                   style: GoogleFonts.outfit(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,

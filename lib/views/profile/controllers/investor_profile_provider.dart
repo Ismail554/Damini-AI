@@ -2,11 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/investor_profile_model.dart';
 import '../repositories/investor_profile_repository.dart';
 
-final investorProfileRepositoryProvider =
-    Provider<InvestorProfileRepository>((ref) {
-  return InvestorProfileRepositoryImpl();
-});
-
 class InvestorProfileState {
   final InvestorProfileModel profile;
   final bool isLoading;
@@ -33,7 +28,7 @@ class InvestorProfileNotifier extends Notifier<InvestorProfileState> {
   @override
   InvestorProfileState build() {
     _repo = ref.read(investorProfileRepositoryProvider);
-    _loadProfile();
+    Future.microtask(() => _loadProfile());
     return const InvestorProfileState();
   }
 
@@ -41,6 +36,12 @@ class InvestorProfileNotifier extends Notifier<InvestorProfileState> {
     state = state.copyWith(isLoading: true);
     final data = await _repo.getProfile();
     state = state.copyWith(profile: data, isLoading: false);
+  }
+
+  Future<void> refreshProfile() async {
+    // Pull-to-refresh: update without blanking existing data (Workflow 7.3)
+    final data = await _repo.getProfile();
+    state = state.copyWith(profile: data);
   }
 
   void updateProfile(InvestorProfileModel model) {

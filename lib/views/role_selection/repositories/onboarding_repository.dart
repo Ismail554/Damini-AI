@@ -93,7 +93,16 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     } else if (data is Map && data['results'] is List) {
       list = data['results'] as List;
     }
-    return list.map((item) => IndustryModel.fromJson(item as Map<String, dynamic>)).toList();
+
+    final industries = <IndustryModel>[];
+    for (final item in list.whereType<Map>()) {
+      try {
+        industries.add(IndustryModel.fromJson(Map<String, dynamic>.from(item)));
+      } catch (_) {
+        continue;
+      }
+    }
+    return industries;
   }
 
   @override

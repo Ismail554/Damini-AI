@@ -9,6 +9,7 @@ import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
+import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import '../../create_project/controllers/project_draft_provider.dart';
 import '../controllers/sponsor_dashboard_provider.dart';
 import '../widgets/sponsor_active_project_card.dart';
@@ -112,10 +113,14 @@ class SponsorDashboard extends ConsumerWidget {
             // My Projects List
             if (dashboardState.isLoading && projects.isEmpty)
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.h),
-                child: const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                ),
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: const AppShimmer.card(height: 180),
+              )
+            else if (dashboardState.error != null && projects.isEmpty)
+              AppErrorView(
+                message: "Unable to load sponsor projects.",
+                onRetry: () =>
+                    ref.read(sponsorDashboardProvider.notifier).refresh(),
               )
             else if (projects.isNotEmpty)
               ...projects.map(
@@ -138,26 +143,10 @@ class SponsorDashboard extends ConsumerWidget {
               )
             else
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 20.h),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.folder_open_rounded,
-                        size: 38.r,
-                        color: tc.textTertiary,
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        "No projects created yet",
-                        style: GoogleFonts.outfit(
-                          fontSize: 14.sp,
-                          color: tc.textTertiary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                child: const AppEmptyView(
+                  message: "No projects created yet",
+                  icon: Icons.folder_open_rounded,
                 ),
               ),
 

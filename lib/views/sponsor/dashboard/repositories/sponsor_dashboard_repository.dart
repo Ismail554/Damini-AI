@@ -63,16 +63,26 @@ class SponsorDashboardRepository {
           rawList = data['results'] as List;
         } else if (data['data'] is List) {
           rawList = data['data'] as List;
+        } else if (data['data'] is Map && (data['data'] as Map)['results'] is List) {
+          rawList = (data['data'] as Map)['results'] as List;
+        } else if (data['data'] is Map && (data['data'] as Map)['projects'] is List) {
+          rawList = (data['data'] as Map)['projects'] as List;
         } else if (data['projects'] is List) {
           rawList = data['projects'] as List;
         }
       }
 
-      return rawList
-          .whereType<Map>()
-          .map((item) =>
-              SponsorActiveProjectData.fromJson(Map<String, dynamic>.from(item)))
-          .toList();
+      final projects = <SponsorActiveProjectData>[];
+      for (final item in rawList.whereType<Map>()) {
+        try {
+          projects.add(
+            SponsorActiveProjectData.fromJson(Map<String, dynamic>.from(item)),
+          );
+        } catch (_) {
+          continue;
+        }
+      }
+      return projects;
     } catch (e) {
       rethrow;
     }

@@ -1,19 +1,54 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/sponsor_profile_model.dart';
 
 final sponsorProfileRepositoryProvider = Provider<SponsorProfileRepository>((ref) {
-  return SponsorProfileRepository();
+  return SponsorProfileRepository(ref.watch(apiServiceProvider));
 });
 
 class SponsorProfileRepository {
+  final ApiService _apiService;
+
+  SponsorProfileRepository(this._apiService);
+
   Future<SponsorProfileData> fetchProfile() async {
-    return const SponsorProfileData(
-      name: "Shawn Blake",
-      title: "Managing Director at Austin Tech Capital",
-      avatarUrl:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
-      investedAmount: "\$1.2M",
-      projectsCount: "2",
-    );
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.currentUser,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      if (data is Map<String, dynamic>) {
+        return SponsorProfileData.fromJson(data);
+      } else if (data is Map) {
+        return SponsorProfileData.fromJson(Map<String, dynamic>.from(data));
+      }
+      return const SponsorProfileData(
+        name: "Shawn Blake",
+        title: "Managing Director at Austin Tech Capital",
+        avatarUrl:
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
+        investedAmount: "\$0.00",
+        projectsCount: "0",
+      );
+    } catch (_) {
+      return const SponsorProfileData(
+        name: "Shawn Blake",
+        title: "Managing Director at Austin Tech Capital",
+        avatarUrl:
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
+        investedAmount: "\$0.00",
+        projectsCount: "0",
+      );
+    }
   }
 }

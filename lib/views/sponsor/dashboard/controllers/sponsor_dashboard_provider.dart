@@ -64,7 +64,7 @@ class SponsorDashboardNotifier extends Notifier<SponsorDashboardState> {
   @override
   SponsorDashboardState build() {
     _repository = ref.watch(sponsorDashboardRepositoryProvider);
-    _loadDashboard();
+    Future.microtask(() => _loadDashboard());
     return const SponsorDashboardState(
       isLoading: true,
       metrics: [

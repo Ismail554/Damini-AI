@@ -56,7 +56,7 @@ class SponsorProfileView extends ConsumerWidget {
           SizedBox(height: AppDimens.spaceLg),
 
           ProfileHeroCard(
-            name: profile?.name ?? "Shawn Blake",
+            name: profile?.name ,
             title: profile?.title ?? "Managing Director at Austin Tech Capital",
             avatarUrl: profile?.avatarUrl ??
                 "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",

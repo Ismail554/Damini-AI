@@ -11,8 +11,11 @@ import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/custom_button.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
+import '../controllers/create_project_provider.dart';
 import '../controllers/project_draft_provider.dart';
+import '../models/create_project_models.dart';
 import '../models/project_draft_model.dart';
+import '../../../role_selection/provider/onboarding_provider.dart';
 import '../widgets/additional_images_section.dart';
 import '../widgets/financials_section.dart';
 import '../widgets/project_details_section.dart';
@@ -43,6 +46,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
   late final TextEditingController _minInvestmentController;
   late final TextEditingController _fundingGoalController;
   late final TextEditingController _targetRoiController;
+  late final TextEditingController _locationController;
 
   // Details Controllers
   late final TextEditingController _statusController;
@@ -66,9 +70,6 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
   String? _selectedCountry;
   String? _selectedFundingStage;
   String? _selectedTimeline;
-
-  bool _isPublishing = false;
-
   // File Upload States
   String? _coverImagePath;
   String? _confidentialDocPath;
@@ -134,6 +135,12 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       text: d?.fundingGoal ?? '5000000',
     );
     _targetRoiController = TextEditingController(text: d?.targetRoi ?? '18');
+    final initialCountry = d?.country;
+    _locationController = TextEditingController(
+      text: (initialCountry != null && initialCountry.isNotEmpty)
+          ? initialCountry
+          : 'Austin, TX',
+    );
 
     _statusController = TextEditingController(text: d?.status ?? '');
     _milestonesController = TextEditingController(text: d?.milestones ?? '');
@@ -183,6 +190,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     _minInvestmentController.dispose();
     _fundingGoalController.dispose();
     _targetRoiController.dispose();
+    _locationController.dispose();
     _statusController.dispose();
     _milestonesController.dispose();
     _useOfFundsController.dispose();
@@ -268,18 +276,106 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     context.push('/public-view', extra: draft);
   }
 
+  double _parseNumber(String text, [double fallback = 0.0]) {
+    final clean = text.replaceAll(RegExp(r'[^0-9.]'), '');
+    return double.tryParse(clean) ?? fallback;
+  }
+
+  int _parseIntMonths(String text, [int fallback = 12]) {
+    final clean = text.replaceAll(RegExp(r'[^0-9]'), '');
+    return int.tryParse(clean) ?? fallback;
+  }
+
   void _onPublish() async {
-    setState(() => _isPublishing = true);
-    await Future.delayed(const Duration(seconds: 1));
+    final title = _titleController.text.trim();
+    if (title.isEmpty) {
+      CustomSnackBar.error(context, "Please enter a project title");
+      return;
+    }
+    final fundingGoal = _parseNumber(_fundingGoalController.text);
+    if (fundingGoal <= 0) {
+      CustomSnackBar.error(context, "Please enter a valid funding goal");
+      return;
+    }
+
+    final industriesList =
+        ref.read(industriesProvider).whenOrNull(data: (d) => d) ?? [];
+    String industryId = '1';
+    for (final ind in industriesList) {
+      if (ind.name.toLowerCase() == (_selectedIndustry ?? '').toLowerCase()) {
+        industryId = ind.id.toString();
+        break;
+      }
+    }
+
+    final request = CreateProjectRequestModel(
+      title: title,
+      shortDescription: _shortDescController.text.trim().isNotEmpty
+          ? _shortDescController.text.trim()
+          : title,
+      businessDescription: _fullDescController.text.trim().isNotEmpty
+          ? _fullDescController.text.trim()
+          : (_shortDescController.text.trim().isNotEmpty
+              ? _shortDescController.text.trim()
+              : title),
+      fundingGoal: fundingGoal,
+      minimumInvestment: _parseNumber(_minInvestmentController.text, 1000.0),
+      targetRoi: _parseNumber(_targetRoiController.text, 18.0),
+      country: _selectedCountry ?? "United States",
+      location: _locationController.text.trim().isNotEmpty
+          ? _locationController.text.trim()
+          : (_selectedCountry ?? "Austin, TX"),
+      industry: industryId,
+      categoryIds: industryId,
+      fundingStage: _selectedFundingStage ?? "Seed",
+      timelineMonths: _parseIntMonths(_selectedTimeline ?? "36 months", 36),
+      currentStatus: _statusController.text.trim().isNotEmpty
+          ? _statusController.text.trim()
+          : "Permits secured, planning phase",
+      nextMilestones: _milestonesController.text.trim().isNotEmpty
+          ? _milestonesController.text.trim()
+          : "Initial architectural setup and capital deployment",
+      useOfFunds: _useOfFundsController.text.trim().isNotEmpty
+          ? _useOfFundsController.text.trim()
+          : "Capital expenditure, operations, and scaling",
+      skinInTheGame: _parseNumber(_sponsorInvestmentController.text, 0.0),
+      potentialMonthlyRevenue:
+          _parseNumber(_monthlyRevenueController.text, 0.0),
+      holdPeriodMonths: _parseIntMonths(_holdPeriodController.text, 36),
+      timelineToOperationsMonths:
+          _parseIntMonths(_timelineOpsController.text, 6),
+      teamMembersText: _teamMembersController.text.trim().isNotEmpty
+          ? _teamMembersController.text.trim()
+          : "Core Founding & Executive Team",
+      confidentialityAgreementText:
+          _ndaAgreementController.text.trim().isNotEmpty
+              ? _ndaAgreementController.text.trim()
+              : "Standard bilateral non-disclosure agreement required prior to accessing proprietary financials.",
+      coverImagePath: _coverImagePath,
+      status: 'ACTIVE',
+    );
+
+    final result =
+        await ref.read(createProjectProvider.notifier).submitProject(request);
+
     if (!mounted) return;
-    setState(() => _isPublishing = false);
-    CustomSnackBar.success(context, "Project published successfully!");
-    context.pop();
+
+    if (result.success) {
+      CustomSnackBar.success(context, "Project published successfully!");
+      context.pop();
+    } else {
+      CustomSnackBar.error(context, result.message);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
+    final createProjectState = ref.watch(createProjectProvider);
+    final industriesAsync = ref.watch(industriesProvider);
+    final industriesList =
+        industriesAsync.whenOrNull(data: (d) => d) ?? [];
+    final industryNames = industriesList.map((e) => e.name).toList();
 
     return CommonBackground(
       showGrid: false,
@@ -338,8 +434,14 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
                         controller: _minInvestmentController,
                         keyboardType: TextInputType.number,
                       ),
+                      ProjectFormField(
+                        label: "Location (City, State)",
+                        hint: "e.g. Austin, TX",
+                        controller: _locationController,
+                        prefixIcon: Icons.location_on_outlined,
+                      ),
                       SizedBox(height: AppDimens.spaceMd),
-                      _buildDropdownRow(),
+                      _buildDropdownRow(industryNames),
                       SizedBox(height: AppDimens.spaceMd),
                       _buildGoalRoiRow(),
                       SizedBox(height: AppDimens.spaceMd),
@@ -390,7 +492,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
                             : null,
                       ),
                       SizedBox(height: AppDimens.spaceXxl),
-                      _buildActionButtons(),
+                      _buildActionButtons(createProjectState.isLoading),
                       SizedBox(height: 40.h),
                     ],
                   ),
@@ -455,7 +557,16 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     );
   }
 
-  Widget _buildDropdownRow() {
+  Widget _buildDropdownRow(List<String> industries) {
+    final industryList = industries.isNotEmpty
+        ? industries
+        : const [
+            "Technology",
+            "Clean Energy",
+            "Real Estate",
+            "Healthcare",
+            "Fintech",
+          ];
     return Row(
       children: [
         Expanded(
@@ -463,13 +574,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
             label: "Industry",
             hint: "Select....",
             value: _selectedIndustry,
-            items: const [
-              "Technology",
-              "Clean Energy",
-              "Real Estate",
-              "Healthcare",
-              "Fintech",
-            ],
+            items: industryList,
             onChanged: (val) => setState(() => _selectedIndustry = val),
           ),
         ),
@@ -543,7 +648,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(bool isPublishing) {
     return Column(
       children: [
         Row(
@@ -570,7 +675,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
           text: "Publish project",
           textColor: Colors.white,
           variant: CustomButtonVariant.primary,
-          isLoading: _isPublishing,
+          isLoading: isPublishing,
           onPressed: _onPublish,
         ),
       ],

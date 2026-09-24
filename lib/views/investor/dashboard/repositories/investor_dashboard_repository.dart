@@ -174,10 +174,21 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
       }
 
       if (list.isNotEmpty) {
-        return list
-            .whereType<Map>()
-            .map((item) => FeaturedOpportunityModel.fromJson(Map<String, dynamic>.from(item)))
-            .toList();
+        final opportunities = <FeaturedOpportunityModel>[];
+        for (final item in list.whereType<Map>()) {
+          try {
+            opportunities.add(
+              FeaturedOpportunityModel.fromJson(
+                Map<String, dynamic>.from(item),
+              ),
+            );
+          } catch (_) {
+            continue;
+          }
+        }
+        if (opportunities.isNotEmpty) {
+          return opportunities;
+        }
       }
     } catch (_) {}
 
@@ -248,10 +259,21 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
       }
 
       if (list.isNotEmpty) {
-        return list
-            .whereType<Map>()
-            .map((item) => TrendingProjectModel.fromJson(Map<String, dynamic>.from(item)))
-            .toList();
+        final trending = <TrendingProjectModel>[];
+        for (final item in list.whereType<Map>()) {
+          try {
+            trending.add(
+              TrendingProjectModel.fromJson(
+                Map<String, dynamic>.from(item),
+              ),
+            );
+          } catch (_) {
+            continue;
+          }
+        }
+        if (trending.isNotEmpty) {
+          return trending;
+        }
       }
     } catch (_) {}
 
