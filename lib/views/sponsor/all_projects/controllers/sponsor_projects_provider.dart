@@ -4,6 +4,8 @@ import '../repositories/sponsor_projects_repository.dart';
 
 class SponsorProjectsState {
   final bool isLoading;
+  final bool isRefreshing;
+  final List<SponsorProjectModel> allProjects;
   final List<SponsorProjectModel> activeProjects;
   final List<SponsorProjectModel> completedProjects;
   final List<SponsorProjectModel> terminatedProjects;
@@ -11,6 +13,8 @@ class SponsorProjectsState {
 
   const SponsorProjectsState({
     this.isLoading = false,
+    this.isRefreshing = false,
+    this.allProjects = const [],
     this.activeProjects = const [],
     this.completedProjects = const [],
     this.terminatedProjects = const [],
@@ -19,6 +23,8 @@ class SponsorProjectsState {
 
   SponsorProjectsState copyWith({
     bool? isLoading,
+    bool? isRefreshing,
+    List<SponsorProjectModel>? allProjects,
     List<SponsorProjectModel>? activeProjects,
     List<SponsorProjectModel>? completedProjects,
     List<SponsorProjectModel>? terminatedProjects,
@@ -26,6 +32,8 @@ class SponsorProjectsState {
   }) {
     return SponsorProjectsState(
       isLoading: isLoading ?? this.isLoading,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
+      allProjects: allProjects ?? this.allProjects,
       activeProjects: activeProjects ?? this.activeProjects,
       completedProjects: completedProjects ?? this.completedProjects,
       terminatedProjects: terminatedProjects ?? this.terminatedProjects,
@@ -44,25 +52,48 @@ class SponsorProjectsNotifier extends Notifier<SponsorProjectsState> {
     return const SponsorProjectsState(isLoading: true);
   }
 
-  Future<void> _loadProjects() async {
+  Future<void> _loadProjects({bool isRefresh = false}) async {
+    if (isRefresh) {
+      state = state.copyWith(isRefreshing: true, error: null);
+    } else {
+      state = state.copyWith(isLoading: true, error: null);
+    }
+
     try {
-      final active = await _repository.fetchActiveProjects();
-      final completed = await _repository.fetchCompletedProjects();
-      final terminated = await _repository.fetchTerminatedProjects();
+      final projects = await _repository.fetchProjects();
+
+      final active = projects
+          .where((p) => p.status == SponsorProjectStatus.active)
+          .toList();
+      final completed = projects
+          .where((p) => p.status == SponsorProjectStatus.completed)
+          .toList();
+      final terminated = projects
+          .where((p) => p.status == SponsorProjectStatus.terminated)
+          .toList();
+
       state = state.copyWith(
         isLoading: false,
+        isRefreshing: false,
+        allProjects: projects,
         activeProjects: active,
         completedProjects: completed,
         terminatedProjects: terminated,
+        error: null,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        isRefreshing: false,
+        error: state.allProjects.isEmpty
+            ? 'Failed to load projects: $e'
+            : null,
+      );
     }
   }
 
   Future<void> refresh() async {
-    state = state.copyWith(isLoading: true);
-    await _loadProjects();
+    await _loadProjects(isRefresh: true);
   }
 }
 

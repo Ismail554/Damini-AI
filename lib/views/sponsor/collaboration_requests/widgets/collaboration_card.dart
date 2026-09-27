@@ -67,7 +67,14 @@ class CollaborationCard extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: AppDimens.avatarMd,
-                            backgroundImage: NetworkImage(item.avatarUrl),
+                            backgroundColor: tc.cardInner,
+                            backgroundImage: item.avatarUrl.isNotEmpty
+                                ? NetworkImage(item.avatarUrl)
+                                : null,
+                            child: item.avatarUrl.isEmpty
+                                ? Icon(Icons.person,
+                                    color: tc.textSecondary, size: 20.r)
+                                : null,
                           ),
                           SizedBox(width: AppDimens.spaceMd),
                           Expanded(

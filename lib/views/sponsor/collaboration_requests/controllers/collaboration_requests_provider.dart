@@ -4,6 +4,7 @@ import '../repositories/collaboration_requests_repository.dart';
 
 class CollaborationRequestsState {
   final bool isLoading;
+  final bool isRefreshing;
   final List<CollaborationRequestModel> pendingList;
   final List<CollaborationRequestModel> approvedList;
   final List<CollaborationRequestModel> confirmationList;
@@ -11,6 +12,7 @@ class CollaborationRequestsState {
 
   const CollaborationRequestsState({
     this.isLoading = false,
+    this.isRefreshing = false,
     this.pendingList = const [],
     this.approvedList = const [],
     this.confirmationList = const [],
@@ -19,6 +21,7 @@ class CollaborationRequestsState {
 
   CollaborationRequestsState copyWith({
     bool? isLoading,
+    bool? isRefreshing,
     List<CollaborationRequestModel>? pendingList,
     List<CollaborationRequestModel>? approvedList,
     List<CollaborationRequestModel>? confirmationList,
@@ -26,6 +29,7 @@ class CollaborationRequestsState {
   }) {
     return CollaborationRequestsState(
       isLoading: isLoading ?? this.isLoading,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
       pendingList: pendingList ?? this.pendingList,
       approvedList: approvedList ?? this.approvedList,
       confirmationList: confirmationList ?? this.confirmationList,
@@ -41,46 +45,72 @@ class CollaborationRequestsNotifier
   @override
   CollaborationRequestsState build() {
     _repository = ref.watch(collaborationRequestsRepositoryProvider);
-    _loadRequests();
+    Future.microtask(() => _loadRequests());
     return const CollaborationRequestsState(isLoading: true);
   }
 
-  Future<void> _loadRequests() async {
+  Future<void> _loadRequests({bool isRefresh = false}) async {
+    if (isRefresh) {
+      state = state.copyWith(isRefreshing: true, error: null);
+    } else {
+      state = state.copyWith(isLoading: true, error: null);
+    }
+
     try {
-      final pending = await _repository.fetchPendingRequests();
-      final approved = await _repository.fetchApprovedRequests();
-      final confirmations = await _repository.fetchConfirmationRequests();
+      final all = await _repository.fetchCollaborationRequests();
+
+      final pending =
+          all.where((r) => r.status.toUpperCase() == 'PENDING').toList();
+      final approved = all
+          .where((r) =>
+              r.status.toUpperCase() == 'APPROVED' ||
+              r.status.toUpperCase() == 'ACCEPTED')
+          .toList();
+      final confirmations = all
+          .where((r) =>
+              r.status.toUpperCase() == 'CONFIRMED' ||
+              r.status.toUpperCase() == 'RECEIVED')
+          .toList();
+
       state = state.copyWith(
         isLoading: false,
+        isRefreshing: false,
         pendingList: pending,
         approvedList: approved,
         confirmationList: confirmations,
+        error: null,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      // If error occurs, keep previous data if available, otherwise set error
+      state = state.copyWith(
+        isLoading: false,
+        isRefreshing: false,
+        error: state.pendingList.isEmpty &&
+                state.approvedList.isEmpty &&
+                state.confirmationList.isEmpty
+            ? 'Failed to load requests: $e'
+            : null,
+      );
     }
+  }
+
+  Future<void> refresh() async {
+    await _loadRequests(isRefresh: true);
   }
 
   void approvePendingRequest(CollaborationRequestModel item) {
     final pending = List<CollaborationRequestModel>.from(state.pendingList)
       ..removeWhere((req) => req.id == item.id);
 
+    final approvedItem = item.copyWith(
+      badgeText: 'Approved',
+      isApprovedBadge: true,
+      isHistory: true,
+      status: 'APPROVED',
+    );
+
     final approved = List<CollaborationRequestModel>.from(state.approvedList)
-      ..insert(
-        0,
-        CollaborationRequestModel(
-          id: item.id,
-          investorName: item.investorName,
-          investorType: item.investorType,
-          avatarUrl: item.avatarUrl,
-          badgeText: 'Approved',
-          isApprovedBadge: true,
-          projectName: item.projectName,
-          proposedBudget: item.proposedBudget,
-          proposalText: item.proposalText,
-          isHistory: true,
-        ),
-      );
+      ..insert(0, approvedItem);
 
     state = state.copyWith(
       pendingList: pending,
@@ -90,9 +120,31 @@ class CollaborationRequestsNotifier
 
   void rejectPendingRequest(String id) {
     state = state.copyWith(
-      pendingList:
-          state.pendingList.where((req) => req.id != id).toList(),
+      pendingList: state.pendingList.where((req) => req.id != id).toList(),
     );
+  }
+
+  void removeApprovedRequest(String id) {
+    state = state.copyWith(
+      approvedList: state.approvedList.where((req) => req.id != id).toList(),
+    );
+  }
+
+  void markFundReceived(String confirmationId) {
+    final confirmations =
+        List<CollaborationRequestModel>.from(state.confirmationList);
+    final index =
+        confirmations.indexWhere((item) => item.id == confirmationId);
+    if (index == -1) return;
+
+    confirmations[index] = confirmations[index].copyWith(
+      badgeText: 'Received',
+      isApprovedBadge: true,
+      hasFundReceivedButton: false,
+      status: 'RECEIVED',
+    );
+
+    state = state.copyWith(confirmationList: confirmations);
   }
 }
 

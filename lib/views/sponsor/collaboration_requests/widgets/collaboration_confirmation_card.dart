@@ -73,7 +73,14 @@ class CollaborationConfirmationCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 22.r,
-                  backgroundImage: NetworkImage(item.avatarUrl),
+                  backgroundColor: tc.cardInner,
+                  backgroundImage: item.avatarUrl.isNotEmpty
+                      ? NetworkImage(item.avatarUrl)
+                      : null,
+                  child: item.avatarUrl.isEmpty
+                      ? Icon(Icons.person,
+                          color: tc.textSecondary, size: 20.r)
+                      : null,
                 ),
                 AppSpacing.w12,
                 Expanded(

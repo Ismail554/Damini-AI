@@ -48,7 +48,12 @@ class SponsorRequestCard extends StatelessWidget {
                   CircleAvatar(
                     radius: AppDimens.avatarSm,
                     backgroundColor: tc.chatAvatarBg,
-                    backgroundImage: NetworkImage(avatarUrl),
+                    backgroundImage: avatarUrl.isNotEmpty
+                        ? NetworkImage(avatarUrl)
+                        : null,
+                    child: avatarUrl.isEmpty
+                        ? Icon(Icons.person, color: tc.textSecondary, size: 18.r)
+                        : null,
                   ),
                   SizedBox(width: AppDimens.spaceMd),
                   Expanded(

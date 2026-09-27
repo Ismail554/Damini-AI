@@ -86,7 +86,7 @@ class AppRouter {
       GoRoute(
         path: '/otp',
         pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final extra = state.extra is Map ? (state.extra as Map) : const {};
           final email = extra['email'] as String? ?? '';
           final isRecovery = extra['isRecovery'] as bool? ?? false;
           return buildNativePage(
@@ -123,7 +123,7 @@ class AppRouter {
       GoRoute(
         path: '/role-onboarding',
         pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final extra = state.extra is Map ? (state.extra as Map) : const {};
           final role = extra['role'] as String? ?? 'investor';
           return buildNativePage(
             context: context,
@@ -143,10 +143,11 @@ class AppRouter {
       GoRoute(
         path: '/create-project',
         pageBuilder: (context, state) {
-          final extraMap = state.extra as Map<String, dynamic>?;
           final draft = state.extra is ProjectDraftModel
               ? state.extra as ProjectDraftModel
-              : extraMap?['draft'] as ProjectDraftModel?;
+              : (state.extra is Map
+                  ? (state.extra as Map)['draft'] as ProjectDraftModel?
+                  : null);
 
           return buildNativePage(
             context: context,
@@ -168,10 +169,13 @@ class AppRouter {
       GoRoute(
         path: '/sponsor-project-details',
         pageBuilder: (context, state) {
-          final project = state.extra is SponsorProjectDetailsModel
-              ? state.extra as SponsorProjectDetailsModel
-              : (state.extra as Map<String, dynamic>?)?['project']
-                  as SponsorProjectDetailsModel?;
+          SponsorProjectDetailsModel? project;
+          if (state.extra is SponsorProjectDetailsModel) {
+            project = state.extra as SponsorProjectDetailsModel;
+          } else if (state.extra is Map) {
+            project = (state.extra as Map)['project']
+                as SponsorProjectDetailsModel?;
+          }
           return buildNativePage(
             context: context,
             state: state,
@@ -195,8 +199,8 @@ class AppRouter {
             project = state.extra as ProjectPublicViewModel;
           } else if (state.extra is ProjectDraftModel) {
             project = ProjectPublicViewModel.fromDraft(state.extra as ProjectDraftModel);
-          } else if (state.extra is Map<String, dynamic>) {
-            final extraMap = state.extra as Map<String, dynamic>;
+          } else if (state.extra is Map) {
+            final extraMap = state.extra as Map;
             if (extraMap['project'] is ProjectPublicViewModel) {
               project = extraMap['project'] as ProjectPublicViewModel;
             } else if (extraMap['project'] is ProjectDraftModel) {
@@ -213,7 +217,7 @@ class AppRouter {
       GoRoute(
         path: '/public-profile',
         pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
+          final extra = state.extra is Map ? (state.extra as Map) : null;
           return buildNativePage(
             context: context,
             state: state,
@@ -247,7 +251,7 @@ class AppRouter {
       GoRoute(
         path: '/nda',
         pageBuilder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final extra = state.extra is Map ? (state.extra as Map) : const {};
           final disclosingParty =
               extra['disclosingParty'] as String? ?? 'Acme Corp';
           return buildNativePage(
@@ -262,7 +266,9 @@ class AppRouter {
         pageBuilder: (context, state) {
           final title = state.extra is String
               ? state.extra as String
-              : (state.extra as Map<String, dynamic>?)?['title'] as String?;
+              : (state.extra is Map
+                  ? (state.extra as Map)['title'] as String?
+                  : null);
           return buildNativePage(
             context: context,
             state: state,
@@ -273,7 +279,15 @@ class AppRouter {
       GoRoute(
         path: '/direct-chat',
         pageBuilder: (context, state) {
-          final item = state.extra as ChatItemModel;
+          final item = state.extra is ChatItemModel
+              ? state.extra as ChatItemModel
+              : const ChatItemModel(
+                  id: 'chat_default',
+                  name: 'Chat',
+                  initials: 'CH',
+                  lastMessage: '',
+                  time: '',
+                );
           return buildNativePage(
             context: context,
             state: state,

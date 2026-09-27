@@ -96,7 +96,10 @@ class SponsorDashboard extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => context.push('/sponsor-projects'),
+                  onTap: () async {
+                    await context.push('/sponsor-projects');
+                    ref.read(sponsorDashboardProvider.notifier).refresh();
+                  },
                   child: Text(
                     "View All",
                     style: GoogleFonts.outfit(
@@ -123,21 +126,20 @@ class SponsorDashboard extends ConsumerWidget {
                     ref.read(sponsorDashboardProvider.notifier).refresh(),
               )
             else if (projects.isNotEmpty)
-              ...projects.map(
-                (project) => Padding(
-                  padding: EdgeInsets.only(bottom: AppDimens.paddingMd),
-                  child: SponsorActiveProjectCard(
-                    title: project.title,
-                    description: project.description,
-                    badgeText: project.badgeText,
-                    raisedAmount: project.raisedAmount,
-                    goalAmount: project.goalAmount,
-                    progress: project.progress,
-                    imageUrl: project.imageUrl,
-                    onTap: () => context.push(
-                      '/sponsor-project-details',
-                      extra: project.id,
-                    ),
+              Padding(
+                padding: EdgeInsets.only(bottom: AppDimens.paddingMd),
+                child: SponsorActiveProjectCard(
+                  title: projects.first.title,
+                  description: projects.first.description,
+                  badgeText: projects.first.badgeText,
+                  raisedAmount: projects.first.raisedAmount,
+                  goalAmount: projects.first.goalAmount,
+                  progress: projects.first.progress,
+                  imageUrl: projects.first.imageUrl,
+                  category: projects.first.category,
+                  onTap: () => context.push(
+                    '/sponsor-project-details',
+                    extra: projects.first.id,
                   ),
                 ),
               )
@@ -162,14 +164,17 @@ class SponsorDashboard extends ConsumerWidget {
               ),
             ),
             SizedBox(height: AppDimens.paddingMd),
-            if (requests.isNotEmpty)
-              ...requests.map(
-                (req) => SponsorRequestCard(
-                  name: req.name,
-                  subtitle: req.subtitle,
-                  avatarUrl: req.avatarUrl,
-                  onReview: () => context.push('/collaboration-requests'),
-                ),
+            if (dashboardState.isLoading && requests.isEmpty)
+              const AppShimmer.card(height: 76)
+            else if (requests.isNotEmpty)
+              SponsorRequestCard(
+                name: requests.first.name,
+                subtitle: requests.first.subtitle,
+                avatarUrl: requests.first.avatarUrl,
+                onReview: () async {
+                  await context.push('/collaboration-requests');
+                  ref.read(sponsorDashboardProvider.notifier).refresh();
+                },
               )
             else
               Padding(

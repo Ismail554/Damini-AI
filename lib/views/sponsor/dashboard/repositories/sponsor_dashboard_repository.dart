@@ -82,6 +82,17 @@ class SponsorDashboardRepository {
           continue;
         }
       }
+
+      // Sort by most recent first
+      projects.sort((a, b) {
+        if (a.createdAt != null && b.createdAt != null) {
+          return b.createdAt!.compareTo(a.createdAt!);
+        }
+        final aId = int.tryParse(a.id) ?? 0;
+        final bId = int.tryParse(b.id) ?? 0;
+        return bId.compareTo(aId);
+      });
+
       return projects;
     } catch (e) {
       rethrow;
@@ -109,16 +120,54 @@ class SponsorDashboardRepository {
     }
   }
 
-  /// Pending collaboration requests preview
-  Future<List<SponsorCollaborationRequestPreview>> fetchCollaborationRequests() async {
-    return const [
-      SponsorCollaborationRequestPreview(
-        id: "req_sarah_jenkins",
-        name: "Sarah Jenkins",
-        subtitle: "Interested in EcoTech Solar Farm",
-        avatarUrl:
-            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-      ),
-    ];
+  /// Pending collaboration requests preview from GET /api/v1/projects/sponsor/requests/
+  Future<List<SponsorCollaborationRequestPreview>>
+      fetchCollaborationRequests() async {
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.sponsorCollaborationRequests,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      List rawList = [];
+      if (data is Map && data['data'] is List) {
+        rawList = data['data'] as List;
+      } else if (data is List) {
+        rawList = data;
+      } else if (data is Map && data['results'] is List) {
+        rawList = data['results'] as List;
+      }
+
+      final requests = <SponsorCollaborationRequestPreview>[];
+      for (final item in rawList.whereType<Map>()) {
+        try {
+          requests.add(
+            SponsorCollaborationRequestPreview.fromJson(
+              Map<String, dynamic>.from(item),
+            ),
+          );
+        } catch (_) {
+          continue;
+        }
+      }
+
+      // Sort by most recent first
+      requests.sort((a, b) {
+        final aDate = a.createdAt ?? DateTime(0);
+        final bDate = b.createdAt ?? DateTime(0);
+        return bDate.compareTo(aDate);
+      });
+
+      return requests;
+    } catch (_) {
+      return [];
+    }
   }
 }

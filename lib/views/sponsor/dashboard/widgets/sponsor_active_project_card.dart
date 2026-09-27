@@ -16,6 +16,7 @@ class SponsorActiveProjectCard extends StatelessWidget {
   final double progress;
   final String? imageUrl;
   final VoidCallback? onTap;
+  final String? category;
 
   const SponsorActiveProjectCard({
     super.key,
@@ -27,6 +28,7 @@ class SponsorActiveProjectCard extends StatelessWidget {
     required this.progress,
     this.imageUrl,
     this.onTap,
+    this.category,
   });
 
   @override
@@ -91,24 +93,55 @@ class SponsorActiveProjectCard extends StatelessWidget {
                       Positioned(
                         top: 12.h,
                         left: 12.w,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 12.w,
-                            vertical: 6.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: tc.pillBg,
-                            borderRadius:
-                                BorderRadius.circular(AppDimens.radiusMd),
-                          ),
-                          child: Text(
-                            badgeText,
-                            style: GoogleFonts.outfit(
-                              fontSize: 12.sp,
-                              color: tc.pillText,
-                              fontWeight: FontWeight.bold,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                                vertical: 6.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: tc.pillBg,
+                                borderRadius:
+                                    BorderRadius.circular(AppDimens.radiusMd),
+                              ),
+                              child: Text(
+                                badgeText,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12.sp,
+                                  color: tc.pillText,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                          ),
+                            if (category != null && category!.isNotEmpty) ...[
+                              SizedBox(width: 6.w),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w,
+                                  vertical: 6.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: tc.cardInner.withValues(alpha: 0.85),
+                                  borderRadius:
+                                      BorderRadius.circular(AppDimens.radiusMd),
+                                  border: Border.all(
+                                    color: tc.borderColor.withValues(alpha: 0.5),
+                                    width: AppDimens.borderThin,
+                                  ),
+                                ),
+                                child: Text(
+                                  category!,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 11.sp,
+                                    color: tc.textSecondary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                       Positioned(
@@ -161,24 +194,55 @@ class SponsorActiveProjectCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: tc.pillBg,
-                          borderRadius:
-                              BorderRadius.circular(AppDimens.radiusMd),
-                        ),
-                        child: Text(
-                          badgeText,
-                          style: GoogleFonts.outfit(
-                            fontSize: 12.sp,
-                            color: tc.pillText,
-                            fontWeight: FontWeight.bold,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: tc.pillBg,
+                              borderRadius:
+                                  BorderRadius.circular(AppDimens.radiusMd),
+                            ),
+                            child: Text(
+                              badgeText,
+                              style: GoogleFonts.outfit(
+                                fontSize: 12.sp,
+                                color: tc.pillText,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
+                          if (category != null && category!.isNotEmpty) ...[
+                            SizedBox(width: 6.w),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 10.w,
+                                vertical: 6.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: tc.cardInner,
+                                borderRadius:
+                                    BorderRadius.circular(AppDimens.radiusMd),
+                                border: Border.all(
+                                  color: tc.borderColor.withValues(alpha: 0.5),
+                                  width: AppDimens.borderThin,
+                                ),
+                              ),
+                              child: Text(
+                                category!,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 11.sp,
+                                  color: tc.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       Container(
                         padding: EdgeInsets.all(10.r),

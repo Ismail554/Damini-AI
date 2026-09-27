@@ -14,7 +14,12 @@ class ProjectsTabBar extends StatefulWidget {
     super.key,
     required this.selectedIndex,
     required this.onTabSelected,
-    this.tabs = const ["Active Projects", "Completed", "Terminated"],
+    this.tabs = const [
+      "All Projects",
+      "Active Projects",
+      "Completed",
+      "Terminated",
+    ],
   });
 
   @override

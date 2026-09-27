@@ -170,6 +170,8 @@ class SponsorActiveProjectData {
   final double progress;
   final String? imageUrl;
   final String? status;
+  final String? category;
+  final DateTime? createdAt;
 
   const SponsorActiveProjectData({
     required this.id,
@@ -181,12 +183,17 @@ class SponsorActiveProjectData {
     required this.progress,
     this.imageUrl,
     this.status,
+    this.category,
+    this.createdAt,
   });
 
   factory SponsorActiveProjectData.fromJson(Map<String, dynamic> json) {
     final id = json['id']?.toString() ?? '';
     final title = json['title']?.toString() ?? 'Untitled Project';
-    final description = json['description']?.toString() ?? '';
+    final description = json['description']?.toString() ??
+        json['short_description']?.toString() ??
+        json['business_description']?.toString() ??
+        '';
 
     // Status: convert to badgeText
     final rawStatus = json['status']?.toString() ?? 'Funding Active';
@@ -232,6 +239,24 @@ class SponsorActiveProjectData {
       }
     }
 
+    String? category;
+    if (json['industry'] != null && json['industry'].toString().isNotEmpty) {
+      category = json['industry'].toString();
+    } else if (json['category'] != null) {
+      if (json['category'] is Map) {
+        category = json['category']['name']?.toString() ??
+            json['category']['title']?.toString();
+      } else {
+        category = json['category'].toString();
+      }
+    } else if (json['category_name'] != null) {
+      category = json['category_name'].toString();
+    }
+
+    final createdAtStr = json['created_at']?.toString();
+    final createdAt =
+        createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
+
     return SponsorActiveProjectData(
       id: id,
       title: title,
@@ -242,6 +267,8 @@ class SponsorActiveProjectData {
       progress: progress,
       imageUrl: imageUrl,
       status: rawStatus,
+      category: category,
+      createdAt: createdAt,
     );
   }
 }
@@ -251,13 +278,57 @@ class SponsorCollaborationRequestPreview {
   final String name;
   final String subtitle;
   final String avatarUrl;
+  final DateTime? createdAt;
 
   const SponsorCollaborationRequestPreview({
     required this.id,
     required this.name,
     required this.subtitle,
     required this.avatarUrl,
+    this.createdAt,
   });
+
+  factory SponsorCollaborationRequestPreview.fromJson(
+      Map<String, dynamic> json) {
+    final id = json['id']?.toString() ?? '';
+    final investor = json['investor'] is Map
+        ? Map<String, dynamic>.from(json['investor'] as Map)
+        : const <String, dynamic>{};
+    final name = investor['name']?.toString() ?? 'Investor';
+
+    final project = json['project'] is Map
+        ? Map<String, dynamic>.from(json['project'] as Map)
+        : const <String, dynamic>{};
+    final projectTitle = project['title']?.toString() ?? 'Project';
+    final subtitle = 'Interested in $projectTitle';
+
+    final rawPhoto = investor['photo']?.toString();
+    String avatarUrl =
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop';
+    if (rawPhoto != null && rawPhoto != 'null' && rawPhoto.isNotEmpty) {
+      if (rawPhoto.startsWith('http://') || rawPhoto.startsWith('https://')) {
+        avatarUrl = rawPhoto;
+      } else {
+        final base = ApiEndpoints.baseUrl.endsWith('/')
+            ? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)
+            : ApiEndpoints.baseUrl;
+        final path = rawPhoto.startsWith('/') ? rawPhoto : '/$rawPhoto';
+        avatarUrl = '$base$path';
+      }
+    }
+
+    final createdAtStr = json['created_at']?.toString();
+    final createdAt =
+        createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
+
+    return SponsorCollaborationRequestPreview(
+      id: id,
+      name: name,
+      subtitle: subtitle,
+      avatarUrl: avatarUrl,
+      createdAt: createdAt,
+    );
+  }
 }
 
 // ── Formatting Helpers ──────────────────────────────────────────

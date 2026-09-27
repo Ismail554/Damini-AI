@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
+import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import '../../dashboard/widgets/sponsor_active_project_card.dart';
 import '../controllers/sponsor_projects_provider.dart';
@@ -16,12 +18,20 @@ class SponsorProjectsView extends ConsumerStatefulWidget {
   const SponsorProjectsView({super.key});
 
   @override
-  ConsumerState<SponsorProjectsView> createState() => _SponsorProjectsViewState();
+  ConsumerState<SponsorProjectsView> createState() =>
+      _SponsorProjectsViewState();
 }
 
 class _SponsorProjectsViewState extends ConsumerState<SponsorProjectsView> {
   int _selectedTabIndex = 0;
   late final PageController _pageController;
+
+  static const _tabs = [
+    "All Projects",
+    "Active Projects",
+    "Completed",
+    "Terminated",
+  ];
 
   @override
   void initState() {
@@ -65,6 +75,7 @@ class _SponsorProjectsViewState extends ConsumerState<SponsorProjectsView> {
             ProjectsTabBar(
               selectedIndex: _selectedTabIndex,
               onTabSelected: _onTabSelected,
+              tabs: _tabs,
             ),
             SizedBox(height: 12.h),
             Expanded(
@@ -75,9 +86,18 @@ class _SponsorProjectsViewState extends ConsumerState<SponsorProjectsView> {
                   setState(() => _selectedTabIndex = index);
                 },
                 children: [
-                  _buildAnimatedListView(projectsState.activeProjects),
-                  _buildAnimatedListView(projectsState.completedProjects),
-                  _buildAnimatedListView(projectsState.terminatedProjects),
+                  _buildTabContent(projectsState, projectsState.allProjects,
+                      "No projects found"),
+                  _buildTabContent(projectsState, projectsState.activeProjects,
+                      "No active projects found"),
+                  _buildTabContent(
+                      projectsState,
+                      projectsState.completedProjects,
+                      "No completed projects found"),
+                  _buildTabContent(
+                      projectsState,
+                      projectsState.terminatedProjects,
+                      "No terminated projects found"),
                 ],
               ),
             ),
@@ -129,57 +149,107 @@ class _SponsorProjectsViewState extends ConsumerState<SponsorProjectsView> {
     );
   }
 
-  Widget _buildAnimatedListView(List<SponsorProjectModel> list) {
+  Widget _buildTabContent(
+    SponsorProjectsState state,
+    List<SponsorProjectModel> list,
+    String emptyMessage,
+  ) {
+    final tc = AppThemeColors.of(context);
+
+    if (state.isLoading && state.allProjects.isEmpty) {
+      return _buildShimmerList();
+    }
+
+    if (state.error != null && state.allProjects.isEmpty) {
+      return AppErrorView(
+        message: state.error!,
+        onRetry: () => ref.read(sponsorProjectsProvider.notifier).refresh(),
+      );
+    }
+
     if (list.isEmpty) {
-      final tc = AppThemeColors.of(context);
-      return Center(
-        child: Text(
-          "No projects found",
-          style: GoogleFonts.outfit(
-            fontSize: 14.sp,
-            color: tc.textTertiary,
+      return RefreshIndicator(
+        onRefresh: () => ref.read(sponsorProjectsProvider.notifier).refresh(),
+        color: AppColors.primaryColor,
+        backgroundColor: tc.cardBg,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
+          children: [
+            SizedBox(height: 120.h),
+            AppEmptyView(
+              message: emptyMessage,
+              icon: Icons.folder_open_rounded,
+            ),
+          ],
         ),
       );
     }
 
+    return RefreshIndicator(
+      onRefresh: () => ref.read(sponsorProjectsProvider.notifier).refresh(),
+      color: AppColors.primaryColor,
+      backgroundColor: tc.cardBg,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppDimens.screenHorizontal,
+          vertical: AppDimens.paddingSm,
+        ),
+        itemCount: list.length,
+        itemBuilder: (context, index) {
+          final item = list[index];
+          return TweenAnimationBuilder<double>(
+            duration: Duration(milliseconds: 250 + (index * 60)),
+            curve: Curves.easeOutCubic,
+            tween: Tween<double>(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, (1 - value) * 16),
+                child: Opacity(
+                  opacity: value,
+                  child: child,
+                ),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
+              child: SponsorActiveProjectCard(
+                title: item.title,
+                description: item.description,
+                badgeText: item.badgeText,
+                raisedAmount: item.raisedAmount,
+                goalAmount: item.goalAmount,
+                progress: item.progress,
+                imageUrl: item.imageUrl,
+                category: item.category,
+                onTap: () => context.push(
+                  '/sponsor-project-details',
+                  extra: item.id,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildShimmerList() {
     return ListView.builder(
-      physics: const BouncingScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.symmetric(
         horizontal: AppDimens.screenHorizontal,
         vertical: AppDimens.paddingSm,
       ),
-      itemCount: list.length,
-      itemBuilder: (context, index) {
-        final item = list[index];
-        return TweenAnimationBuilder<double>(
-          duration: Duration(milliseconds: 300 + (index * 80)),
-          curve: Curves.easeOutCubic,
-          tween: Tween<double>(begin: 0.0, end: 1.0),
-          builder: (context, value, child) {
-            return Transform.translate(
-              offset: Offset(0, (1 - value) * 20),
-              child: Opacity(
-                opacity: value,
-                child: child,
-              ),
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
-            child: SponsorActiveProjectCard(
-              title: item.title,
-              description: item.description,
-              badgeText: item.badgeText,
-              raisedAmount: item.raisedAmount,
-              goalAmount: item.goalAmount,
-              progress: item.progress,
-              imageUrl: item.imageUrl,
-              onTap: () => context.push('/sponsor-project-details'),
-            ),
-          ),
-        );
-      },
+      itemCount: 3,
+      itemBuilder: (context, index) => Padding(
+        padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
+        child: const AppShimmer.card(height: 180),
+      ),
     );
   }
 }

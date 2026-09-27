@@ -23,5 +23,7 @@ class ApiEndpoints {
   // User & Projects
   static const String currentUser = "/api/v1/users/me/";
   static const String sponsorProjects = "/api/v1/projects/sponsor/";
+  static const String sponsorCollaborationRequests =
+      "/api/v1/projects/sponsor/requests/";
   static const String projects = "/api/v1/projects/";
 }
