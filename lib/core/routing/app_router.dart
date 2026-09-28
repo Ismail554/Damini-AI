@@ -199,32 +199,73 @@ class AppRouter {
       ),
       GoRoute(
         path: '/collaboration-requests',
-        pageBuilder: (context, state) => buildNativePage(
-          context: context,
-          state: state,
-          child: const CollaborationRequestsView(),
-        ),
+        pageBuilder: (context, state) {
+          String? projectId;
+          String? projectTitle;
+          if (state.extra is Map) {
+            final map = state.extra as Map;
+            projectId = map['projectId']?.toString();
+            projectTitle = map['projectTitle']?.toString();
+          } else if (state.extra is String) {
+            projectId = state.extra as String;
+          } else if (state.uri.queryParameters.containsKey('projectId')) {
+            projectId = state.uri.queryParameters['projectId'];
+            projectTitle = state.uri.queryParameters['projectTitle'];
+          }
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: CollaborationRequestsView(
+              projectId: projectId,
+              projectTitle: projectTitle,
+            ),
+          );
+        },
       ),
       GoRoute(
         path: '/public-view',
         pageBuilder: (context, state) {
           ProjectPublicViewModel? project;
+          String? projectId;
           if (state.extra is ProjectPublicViewModel) {
             project = state.extra as ProjectPublicViewModel;
+            projectId = project.id;
+          } else if (state.extra is SponsorProjectDetailsModel) {
+            final details = state.extra as SponsorProjectDetailsModel;
+            project = details.toPublicViewModel();
+            projectId = details.id;
           } else if (state.extra is ProjectDraftModel) {
-            project = ProjectPublicViewModel.fromDraft(state.extra as ProjectDraftModel);
+            project = ProjectPublicViewModel.fromDraft(
+              state.extra as ProjectDraftModel,
+            );
+            projectId = project.id;
+          } else if (state.extra is String) {
+            projectId = state.extra as String;
+          } else if (state.extra is int) {
+            projectId = (state.extra as int).toString();
           } else if (state.extra is Map) {
             final extraMap = state.extra as Map;
             if (extraMap['project'] is ProjectPublicViewModel) {
               project = extraMap['project'] as ProjectPublicViewModel;
+            } else if (extraMap['project'] is SponsorProjectDetailsModel) {
+              project = (extraMap['project'] as SponsorProjectDetailsModel)
+                  .toPublicViewModel();
             } else if (extraMap['project'] is ProjectDraftModel) {
-              project = ProjectPublicViewModel.fromDraft(extraMap['project'] as ProjectDraftModel);
+              project = ProjectPublicViewModel.fromDraft(
+                extraMap['project'] as ProjectDraftModel,
+              );
+            }
+            if (extraMap['id'] != null) {
+              projectId = extraMap['id'].toString();
             }
           }
           return buildNativePage(
             context: context,
             state: state,
-            child: ProjectPublicView(project: project),
+            child: ProjectPublicView(
+              projectId: projectId,
+              project: project,
+            ),
           );
         },
       ),

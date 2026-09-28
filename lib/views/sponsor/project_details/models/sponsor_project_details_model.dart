@@ -1,4 +1,5 @@
 import '../../../../core/constants/api_endpoints.dart';
+import '../../public_view/models/project_public_view_model.dart';
 
 class ProjectDocumentModel {
   final int id;
@@ -69,17 +70,22 @@ class InvestorContributionModel {
   });
 
   factory InvestorContributionModel.fromJson(Map<String, dynamic> json) {
-    final id = json['id']?.toString() ?? '';
+    final id = json['id']?.toString() ??
+        json['investor_id']?.toString() ??
+        '';
     final investor = json['investor'] is Map ? json['investor'] as Map : json;
-    final name = investor['name']?.toString() ??
+    final name = json['investor_name']?.toString() ??
+        investor['name']?.toString() ??
         json['name']?.toString() ??
         'Investor';
     final type = _formatInvestorType(
-      investor['investor_type']?.toString() ?? json['type']?.toString(),
+      json['investor_type']?.toString() ??
+          investor['investor_type']?.toString() ??
+          json['type']?.toString(),
     );
-    final rawPhoto = investor['photo']?.toString() ??
-        json['avatarUrl']?.toString() ??
-        json['photo']?.toString();
+    final rawPhoto = json['photo']?.toString() ??
+        investor['photo']?.toString() ??
+        json['avatarUrl']?.toString();
 
     String avatarUrl = '';
     if (rawPhoto != null && rawPhoto.isNotEmpty && rawPhoto != 'null') {
@@ -94,18 +100,19 @@ class InvestorContributionModel {
       }
     }
 
-    final rawBudget = json['proposed_budget'] ?? json['amount'] ?? 0;
+    final rawBudget = json['amount'] ?? json['proposed_budget'] ?? 0;
     final amount = _formatCurrency(rawBudget);
 
     final createdAtStr =
-        json['created_at']?.toString() ?? json['date']?.toString();
+        json['date']?.toString() ?? json['created_at']?.toString();
     final date = _formatDate(createdAtStr);
 
     final status = json['status']?.toString().toUpperCase() ?? '';
     final isFunded = json['is_funded'] == true ||
         status == 'APPROVED' ||
         status == 'RECEIVED' ||
-        status == 'CONFIRMED';
+        status == 'CONFIRMED' ||
+        true; // Confirmed investments in contributions list are funded by definition
 
     return InvestorContributionModel(
       id: id,
@@ -134,13 +141,29 @@ class SponsorProjectDetailsModel {
   final String pendingReviewAmount;
   final List<InvestorContributionModel> contributions;
 
-  // Additional backend metadata
+  // Investment Metrics (The Numbers)
+  final String? potentialMonthlyRevenue;
+  final int? holdPeriodMonths;
+  final int? timelineToOperationsMonths;
+  final int timelineMonths;
+  final String skinInTheGame;
+
+  // The "Details" Tab (Long-form Text)
   final String shortDescription;
   final String businessDescription;
+  final String currentStatus;
+  final String nextMilestones;
+  final String useOfFunds;
+
+  // Legal & Team
+  final List<TeamMemberModel> teamMembers;
+  final String teamMembersText;
+  final String confidentialityAgreementText;
+
+  // Industry & Media
   final String industry;
   final String? category;
   final String minimumInvestment;
-  final int timelineMonths;
   final String? coverImageUrl;
   final String? sponsorCompanyName;
   final bool isSponsorVerified;
@@ -161,12 +184,22 @@ class SponsorProjectDetailsModel {
     required this.targetRoi,
     required this.pendingReviewAmount,
     required this.contributions,
+    this.potentialMonthlyRevenue,
+    this.holdPeriodMonths,
+    this.timelineToOperationsMonths,
+    this.timelineMonths = 24,
+    this.skinInTheGame = '\$0.00',
     this.shortDescription = '',
     this.businessDescription = '',
+    this.currentStatus = '',
+    this.nextMilestones = '',
+    this.useOfFunds = '',
+    this.teamMembers = const [],
+    this.teamMembersText = '',
+    this.confidentialityAgreementText = '',
     this.industry = '',
     this.category,
     this.minimumInvestment = '\$0.00',
-    this.timelineMonths = 24,
     this.coverImageUrl,
     this.sponsorCompanyName,
     this.isSponsorVerified = false,
@@ -219,6 +252,53 @@ class SponsorProjectDetailsModel {
     final pendingReviewAmount = _formatCurrency(
       json['pending_review_amount'] ?? json['proposed_budget'] ?? 0,
     );
+
+    // Investment Metrics
+    final rawMonthlyRev = json['potential_monthly_revenue'];
+    final potentialMonthlyRevenue = rawMonthlyRev != null
+        ? _formatCurrency(rawMonthlyRev)
+        : null;
+
+    final holdPeriodMonths = json['hold_period_months'] != null
+        ? _parseInt(json['hold_period_months'])
+        : null;
+
+    final timelineToOperationsMonths =
+        json['timeline_to_operations_months'] != null
+            ? _parseInt(json['timeline_to_operations_months'])
+            : null;
+
+    final timelineMonths = _parseInt(json['timeline_months'] ?? 24);
+    final skinInTheGame = _formatCurrency(json['skin_in_the_game'] ?? 0);
+
+    // Long-form Text
+    final shortDescription = json['short_description']?.toString() ?? '';
+    final businessDescription = json['business_description']?.toString() ?? '';
+    final currentStatus = json['current_status']?.toString() ?? '';
+    final nextMilestones = json['next_milestones']?.toString() ?? '';
+    final useOfFunds = json['use_of_funds']?.toString() ?? '';
+
+    // Legal & Team
+    final teamMembersText = json['team_members_text']?.toString() ?? '';
+    final confidentialityAgreementText =
+        json['confidentiality_agreement_text']?.toString() ?? '';
+
+    final teamMembers = <TeamMemberModel>[];
+    if (json['team_members'] is List) {
+      for (final m in (json['team_members'] as List).whereType<Map>()) {
+        final name = m['name']?.toString() ?? 'Team Member';
+        final role = m['role']?.toString() ?? 'Contributor';
+        final initials = name.isNotEmpty
+            ? name.trim().split(RegExp(r'\s+')).map((w) => w[0].toUpperCase()).take(2).join()
+            : 'TM';
+        teamMembers.add(TeamMemberModel(
+          name: name,
+          role: role,
+          initials: initials,
+          avatarUrl: m['photo']?.toString() ?? m['avatar']?.toString(),
+        ));
+      }
+    }
 
     // Sponsor info
     final sponsor = json['sponsor'] is Map
@@ -282,8 +362,6 @@ class SponsorProjectDetailsModel {
       rawContribList = json['contributions'] as List;
     } else if (json['investors'] is List) {
       rawContribList = json['investors'] as List;
-    } else if (json['team_members'] is List) {
-      rawContribList = json['team_members'] as List;
     }
     for (final c in rawContribList.whereType<Map>()) {
       try {
@@ -311,17 +389,58 @@ class SponsorProjectDetailsModel {
       targetRoi: targetRoi,
       pendingReviewAmount: pendingReviewAmount,
       contributions: contributions,
-      shortDescription: json['short_description']?.toString() ?? '',
-      businessDescription: json['business_description']?.toString() ?? '',
+      potentialMonthlyRevenue: potentialMonthlyRevenue,
+      holdPeriodMonths: holdPeriodMonths,
+      timelineToOperationsMonths: timelineToOperationsMonths,
+      timelineMonths: timelineMonths,
+      skinInTheGame: skinInTheGame,
+      shortDescription: shortDescription,
+      businessDescription: businessDescription,
+      currentStatus: currentStatus,
+      nextMilestones: nextMilestones,
+      useOfFunds: useOfFunds,
+      teamMembers: teamMembers,
+      teamMembersText: teamMembersText,
+      confidentialityAgreementText: confidentialityAgreementText,
       industry: json['industry']?.toString() ?? '',
       category: category,
       minimumInvestment: _formatCurrency(json['minimum_investment']),
-      timelineMonths: _parseInt(json['timeline_months'] ?? 24),
       coverImageUrl: coverImageUrl,
       sponsorCompanyName: sponsorCompanyName,
       isSponsorVerified: isSponsorVerified,
       documents: documents,
       createdAt: createdAt,
+    );
+  }
+
+  ProjectPublicViewModel toPublicViewModel() {
+    return ProjectPublicViewModel(
+      id: id,
+      title: title,
+      location: location,
+      category: category ?? industry,
+      stage: badgeText,
+      targetRaise: goalAmount,
+      targetRoi: targetRoi,
+      sponsorName: sponsorCompanyName ?? 'Global Ventures LLC',
+      sponsorTagline: 'Commercial Real Estate & Tech Development',
+      sponsorAvatarUrl: coverImageUrl,
+      isVerifiedSponsor: isSponsorVerified,
+      imageUrls: coverImageUrl != null ? [coverImageUrl!] : const [],
+      overviewText: shortDescription.isNotEmpty
+          ? shortDescription
+          : businessDescription,
+      timeline: '$timelineMonths months',
+      teamSize: '${teamMembers.length} Members',
+      teamMembers: teamMembers,
+      businessDescription: businessDescription,
+      minContribution: minimumInvestment,
+      expectedRoi: targetRoi,
+      monthlyRevenue: potentialMonthlyRevenue ?? '\$0.00',
+      holdPeriod: holdPeriodMonths != null ? '$holdPeriodMonths months' : 'N/A',
+      timelineToOperations: timelineToOperationsMonths != null
+          ? '$timelineToOperationsMonths months'
+          : 'N/A',
     );
   }
 
@@ -339,6 +458,16 @@ class SponsorProjectDetailsModel {
       investorsCount: 3,
       targetRoi: "18.0%",
       pendingReviewAmount: "\$200k",
+      potentialMonthlyRevenue: "\$18,000",
+      holdPeriodMonths: 36,
+      timelineToOperationsMonths: 6,
+      timelineMonths: 24,
+      skinInTheGame: "\$150,000",
+      businessDescription:
+          "Developing a premier commercial workspace for emerging tech firms.",
+      currentStatus: "Permits approved, groundbreaking underway.",
+      nextMilestones: "Phase 1 framing completion by Q4.",
+      useOfFunds: "60% construction, 25% equipment, 15% contingency.",
       contributions: [
         InvestorContributionModel(
           id: "inv_1",
@@ -348,26 +477,6 @@ class SponsorProjectDetailsModel {
               "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
           amount: "\$600k",
           date: "Mar 12, 2026",
-          isFunded: true,
-        ),
-        InvestorContributionModel(
-          id: "inv_2",
-          name: "Horizon Capital",
-          type: "Private Equity",
-          avatarUrl:
-              "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
-          amount: "\$400k",
-          date: "Mar 18, 2026",
-          isFunded: true,
-        ),
-        InvestorContributionModel(
-          id: "inv_3",
-          name: "Sarah Jenkins",
-          type: "Angel Investor",
-          avatarUrl:
-              "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-          amount: "\$200k",
-          date: "Apr 02, 2026",
           isFunded: true,
         ),
       ],

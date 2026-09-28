@@ -5,6 +5,7 @@ import '../repositories/collaboration_requests_repository.dart';
 class CollaborationRequestsState {
   final bool isLoading;
   final bool isRefreshing;
+  final String? projectId;
   final List<CollaborationRequestModel> pendingList;
   final List<CollaborationRequestModel> approvedList;
   final List<CollaborationRequestModel> confirmationList;
@@ -13,6 +14,7 @@ class CollaborationRequestsState {
   const CollaborationRequestsState({
     this.isLoading = false,
     this.isRefreshing = false,
+    this.projectId,
     this.pendingList = const [],
     this.approvedList = const [],
     this.confirmationList = const [],
@@ -22,6 +24,7 @@ class CollaborationRequestsState {
   CollaborationRequestsState copyWith({
     bool? isLoading,
     bool? isRefreshing,
+    String? projectId,
     List<CollaborationRequestModel>? pendingList,
     List<CollaborationRequestModel>? approvedList,
     List<CollaborationRequestModel>? confirmationList,
@@ -30,6 +33,7 @@ class CollaborationRequestsState {
     return CollaborationRequestsState(
       isLoading: isLoading ?? this.isLoading,
       isRefreshing: isRefreshing ?? this.isRefreshing,
+      projectId: projectId ?? this.projectId,
       pendingList: pendingList ?? this.pendingList,
       approvedList: approvedList ?? this.approvedList,
       confirmationList: confirmationList ?? this.confirmationList,
@@ -41,12 +45,20 @@ class CollaborationRequestsState {
 class CollaborationRequestsNotifier
     extends Notifier<CollaborationRequestsState> {
   late final CollaborationRequestsRepository _repository;
+  String? _projectId;
 
   @override
   CollaborationRequestsState build() {
     _repository = ref.watch(collaborationRequestsRepositoryProvider);
     Future.microtask(() => _loadRequests());
     return const CollaborationRequestsState(isLoading: true);
+  }
+
+  /// Initialize with an optional projectId to filter requests for a specific project
+  Future<void> init({String? projectId}) async {
+    _projectId = projectId;
+    state = state.copyWith(projectId: projectId);
+    await _loadRequests();
   }
 
   Future<void> _loadRequests({bool isRefresh = false}) async {
@@ -57,7 +69,8 @@ class CollaborationRequestsNotifier
     }
 
     try {
-      final all = await _repository.fetchCollaborationRequests();
+      final all =
+          await _repository.fetchCollaborationRequests(projectId: _projectId);
 
       final pending =
           all.where((r) => r.status.toUpperCase() == 'PENDING').toList();

@@ -93,8 +93,8 @@ class _SplashViewState extends ConsumerState<SplashView>
                   children: [
                     Image.asset(
                       IconAssets.appLogo,
-                      width: 160.r,
-                      height: 160.r,
+                      width: 160.w,
+                      height: 160.h,
                     ),
                     AppSpacing.h20,
                   ],

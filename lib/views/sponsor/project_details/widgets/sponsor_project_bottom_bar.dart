@@ -1,19 +1,20 @@
 import 'dart:ui';
 import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 import '../../../../core/widgets/custom_button.dart';
 
 class SponsorProjectBottomBar extends StatelessWidget {
   final VoidCallback onViewRequests;
-  final VoidCallback onPublicView;
+  final VoidCallback? onPublicView;
   final VoidCallback? onGroupChatWithAi;
 
   const SponsorProjectBottomBar({
     super.key,
     required this.onViewRequests,
-    required this.onPublicView,
+    this.onPublicView,
     this.onGroupChatWithAi,
   });
 
@@ -61,7 +62,8 @@ class SponsorProjectBottomBar extends StatelessWidget {
                       borderColor: tc.borderColor,
                       backgroundColor: tc.cardInner,
                       textColor: tc.textPrimary,
-                      onPressed: onPublicView,
+                      onPressed:
+                          onPublicView ?? () => context.push('/public-view'),
                     ),
                   ),
                 ],
@@ -70,7 +72,9 @@ class SponsorProjectBottomBar extends StatelessWidget {
               CustomButton(
                 text: "Group Chat with AI",
                 variant: CustomButtonVariant.gradient,
-                onPressed: onGroupChatWithAi ?? onPublicView,
+                onPressed: onGroupChatWithAi ??
+                    onPublicView ??
+                    () => context.push('/public-view'),
               ),
             ],
           ),

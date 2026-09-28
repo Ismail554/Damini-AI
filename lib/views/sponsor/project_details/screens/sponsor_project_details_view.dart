@@ -133,13 +133,29 @@ class _SponsorProjectDetailsViewState
                             ),
                             SizedBox(height: AppDimens.spaceLg),
                             SponsorProjectStatsCard(project: project),
-                            if (project.documents.isNotEmpty)
+                            SizedBox(height: AppDimens.spaceLg),
+
+                            // 1. Investment Metrics Breakdown
+                            _buildInvestmentMetricsCard(tc, project),
+                            SizedBox(height: AppDimens.spaceLg),
+
+                            // 2. Project Details (Long-form Text)
+                            if (_hasDetailsContent(project)) ...[
+                              _buildProjectDetailsCard(tc, project),
+                              SizedBox(height: AppDimens.spaceLg),
+                            ],
+
+                            // 3. Documents Section
+                            if (project.documents.isNotEmpty) ...[
                               _buildDocumentsSection(
                                 context,
                                 tc,
                                 project.documents,
                               ),
-                            SizedBox(height: AppDimens.spaceLg),
+                              SizedBox(height: AppDimens.spaceLg),
+                            ],
+
+                            // 4. NDA Signed Header
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -256,8 +272,17 @@ class _SponsorProjectDetailsViewState
 
             // Bottom Action Bar
             SponsorProjectBottomBar(
-              onViewRequests: () => context.push('/collaboration-requests'),
-              onPublicView: () => context.push('/public-view'),
+              onViewRequests: () => context.push(
+                '/collaboration-requests',
+                extra: {
+                  'projectId': project.id,
+                  'projectTitle': project.title,
+                },
+              ),
+              onPublicView: () => context.push(
+                '/public-view',
+                extra: project.toPublicViewModel(),
+              ),
               onGroupChatWithAi: () => context.push(
                 '/group-chat',
                 extra: "${project.title} || Group Chat with Ai",
@@ -269,6 +294,254 @@ class _SponsorProjectDetailsViewState
     );
   }
 
+  // ── 1. Investment Metrics Breakdown ─────────────────────────────
+
+  Widget _buildInvestmentMetricsCard(
+    AppThemeColors tc,
+    SponsorProjectDetailsModel project,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(AppDimens.paddingLg),
+      decoration: BoxDecoration(
+        color: tc.cardBg,
+        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+        border: Border.all(
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.analytics_outlined,
+                color: AppColors.accentOrange,
+                size: 20.r,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                "Investment Metrics",
+                style: GoogleFonts.outfit(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: tc.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimens.spaceMd),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetricTile(
+                  tc,
+                  "Skin in the Game",
+                  project.skinInTheGame,
+                  Icons.shield_outlined,
+                ),
+              ),
+              SizedBox(width: AppDimens.spaceSm),
+              Expanded(
+                child: _buildMetricTile(
+                  tc,
+                  "Hold Period",
+                  project.holdPeriodMonths != null
+                      ? "${project.holdPeriodMonths} Mos"
+                      : "N/A",
+                  Icons.lock_clock_outlined,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppDimens.spaceSm),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetricTile(
+                  tc,
+                  "To Operations",
+                  project.timelineToOperationsMonths != null
+                      ? "${project.timelineToOperationsMonths} Mos"
+                      : "N/A",
+                  Icons.schedule_outlined,
+                ),
+              ),
+              SizedBox(width: AppDimens.spaceSm),
+              Expanded(
+                child: _buildMetricTile(
+                  tc,
+                  "Monthly Revenue",
+                  project.potentialMonthlyRevenue ?? "N/A",
+                  Icons.payments_outlined,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricTile(
+    AppThemeColors tc,
+    String label,
+    String value,
+    IconData icon,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(12.r),
+      decoration: BoxDecoration(
+        color: tc.cardInner,
+        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14.r, color: tc.textTertiary),
+              SizedBox(width: 4.w),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.outfit(
+                    fontSize: 11.sp,
+                    color: tc.textTertiary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            value,
+            style: GoogleFonts.outfit(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.bold,
+              color: tc.textPrimary,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── 2. Project Details (Long-form Text) ──────────────────────────
+
+  bool _hasDetailsContent(SponsorProjectDetailsModel project) {
+    return project.businessDescription.isNotEmpty ||
+        project.currentStatus.isNotEmpty ||
+        project.nextMilestones.isNotEmpty ||
+        project.useOfFunds.isNotEmpty;
+  }
+
+  Widget _buildProjectDetailsCard(
+    AppThemeColors tc,
+    SponsorProjectDetailsModel project,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(AppDimens.paddingLg),
+      decoration: BoxDecoration(
+        color: tc.cardBg,
+        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+        border: Border.all(
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.text_snippet_outlined,
+                color: AppColors.accentOrange,
+                size: 20.r,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                "Project Overview & Milestones",
+                style: GoogleFonts.outfit(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: tc.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          if (project.businessDescription.isNotEmpty) ...[
+            SizedBox(height: AppDimens.spaceMd),
+            _buildSectionBlock(
+              tc,
+              "Business Description",
+              project.businessDescription,
+            ),
+          ],
+          if (project.currentStatus.isNotEmpty) ...[
+            SizedBox(height: AppDimens.spaceMd),
+            _buildSectionBlock(
+              tc,
+              "Current Status",
+              project.currentStatus,
+            ),
+          ],
+          if (project.nextMilestones.isNotEmpty) ...[
+            SizedBox(height: AppDimens.spaceMd),
+            _buildSectionBlock(
+              tc,
+              "Next Milestones",
+              project.nextMilestones,
+            ),
+          ],
+          if (project.useOfFunds.isNotEmpty) ...[
+            SizedBox(height: AppDimens.spaceMd),
+            _buildSectionBlock(
+              tc,
+              "Use of Funds",
+              project.useOfFunds,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionBlock(AppThemeColors tc, String title, String body) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.outfit(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.bold,
+            color: tc.textSecondary,
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          body,
+          style: GoogleFonts.outfit(
+            fontSize: 13.sp,
+            color: tc.textPrimary,
+            height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── 3. Documents Section ────────────────────────────────────────
+
   Widget _buildDocumentsSection(
     BuildContext context,
     AppThemeColors tc,
@@ -277,7 +550,6 @@ class _SponsorProjectDetailsViewState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: AppDimens.spaceLg),
         Text(
           "Documents",
           style: GoogleFonts.outfit(

@@ -10,15 +10,22 @@ import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
 import 'package:Braintech/shared/global_key.dart';
+import '../../project_details/controllers/sponsor_project_details_provider.dart';
+import '../../project_details/repositories/sponsor_project_details_repository.dart';
 import '../models/project_public_view_model.dart';
 import '../widgets/project_public_compact_app_bar.dart';
 import '../widgets/project_public_sheet_content.dart';
 import '../widgets/public_view_image_header.dart';
 
 class ProjectPublicView extends ConsumerStatefulWidget {
+  final String? projectId;
   final ProjectPublicViewModel? project;
 
-  const ProjectPublicView({super.key, this.project});
+  const ProjectPublicView({
+    super.key,
+    this.projectId,
+    this.project,
+  });
 
   @override
   ConsumerState<ProjectPublicView> createState() => _ProjectPublicViewState();
@@ -34,7 +41,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
   late final PageController _pageController;
   late final DraggableScrollableController _sheetController;
 
-  late final ProjectPublicViewModel _project;
+  late ProjectPublicViewModel _project;
 
   /// Live sheet extent, used to drive header parallax / dimming / app bar fade.
   double _sheetExtent = _kRest;
@@ -42,10 +49,47 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
   @override
   void initState() {
     super.initState();
-    _project = widget.project ?? ProjectPublicViewModel.mockData();
+    final activeProject = ref.read(sponsorProjectProvider).project;
+    if (widget.project != null) {
+      _project = widget.project!;
+    } else if (activeProject.id.isNotEmpty &&
+        (widget.projectId == null || widget.projectId == activeProject.id)) {
+      _project = activeProject.toPublicViewModel();
+    } else {
+      _project = ProjectPublicViewModel.mockData();
+    }
+
+    if (widget.projectId != null &&
+        widget.projectId!.isNotEmpty &&
+        widget.project == null) {
+      _loadProjectDetails(widget.projectId!);
+    }
+
     _pageController = PageController(initialPage: _selectedTabIndex);
     _sheetController = DraggableScrollableController()
       ..addListener(_onSheetMoved);
+  }
+
+  Future<void> _loadProjectDetails(String id) async {
+    try {
+      final repo = ref.read(sponsorProjectDetailsRepositoryProvider);
+      final details = await repo.fetchProjectDetails(id);
+      if (mounted) {
+        setState(() {
+          _project = details.toPublicViewModel();
+        });
+      }
+    } catch (_) {}
+  }
+
+  @override
+  void didUpdateWidget(covariant ProjectPublicView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.project != null && widget.project != oldWidget.project) {
+      setState(() {
+        _project = widget.project!;
+      });
+    }
   }
 
   @override

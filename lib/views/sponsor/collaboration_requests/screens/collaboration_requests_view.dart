@@ -15,7 +15,14 @@ import '../widgets/collaboration_confirmation_card.dart';
 import '../widgets/collaboration_requests_header.dart';
 
 class CollaborationRequestsView extends ConsumerStatefulWidget {
-  const CollaborationRequestsView({super.key});
+  final String? projectId;
+  final String? projectTitle;
+
+  const CollaborationRequestsView({
+    super.key,
+    this.projectId,
+    this.projectTitle,
+  });
 
   @override
   ConsumerState<CollaborationRequestsView> createState() =>
@@ -31,6 +38,11 @@ class _CollaborationRequestsViewState
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedTabIndex);
+    Future.microtask(() {
+      ref
+          .read(collaborationRequestsProvider.notifier)
+          .init(projectId: widget.projectId);
+    });
   }
 
   @override
@@ -60,6 +72,7 @@ class _CollaborationRequestsViewState
             CollaborationRequestsHeader(
               selectedTabIndex: _selectedTabIndex,
               onTabSelected: _onTabSelected,
+              projectTitle: widget.projectTitle,
             ),
             Expanded(
               child: PageView(

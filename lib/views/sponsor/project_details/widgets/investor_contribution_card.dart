@@ -48,7 +48,21 @@ class InvestorContributionCard extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: AppDimens.avatarMd,
-                    backgroundImage: NetworkImage(contribution.avatarUrl),
+                    backgroundColor: tc.cardInner,
+                    backgroundImage: contribution.avatarUrl.isNotEmpty
+                        ? NetworkImage(contribution.avatarUrl)
+                        : null,
+                    child: contribution.avatarUrl.isEmpty
+                        ? Text(
+                            contribution.name.isNotEmpty
+                                ? contribution.name.trim()[0].toUpperCase()
+                                : 'I',
+                            style: GoogleFonts.outfit(
+                              fontWeight: FontWeight.bold,
+                              color: tc.textPrimary,
+                            ),
+                          )
+                        : null,
                   ),
                 ),
                 SizedBox(width: AppDimens.spaceMd),

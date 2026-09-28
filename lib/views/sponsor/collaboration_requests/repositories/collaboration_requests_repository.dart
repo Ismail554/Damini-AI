@@ -15,10 +15,17 @@ class CollaborationRequestsRepository {
   CollaborationRequestsRepository(this._apiService);
 
   /// Fetch collaboration requests from GET /api/v1/projects/sponsor/requests/
-  Future<List<CollaborationRequestModel>> fetchCollaborationRequests() async {
+  /// or project-specific GET /api/v1/projects/sponsor/{id}/requests/
+  Future<List<CollaborationRequestModel>> fetchCollaborationRequests({
+    String? projectId,
+  }) async {
     try {
+      final endpoint = (projectId != null && projectId.isNotEmpty)
+          ? ApiEndpoints.sponsorProjectRequests(projectId)
+          : ApiEndpoints.sponsorCollaborationRequests;
+
       final response = await _apiService.get(
-        ApiEndpoints.sponsorCollaborationRequests,
+        endpoint,
         requireAuth: true,
       );
 
