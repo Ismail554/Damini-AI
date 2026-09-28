@@ -218,6 +218,7 @@ class _SponsorProjectsViewState extends ConsumerState<SponsorProjectsView> {
             child: Padding(
               padding: EdgeInsets.only(bottom: AppDimens.spaceLg),
               child: SponsorActiveProjectCard(
+                id: item.id,
                 title: item.title,
                 description: item.description,
                 badgeText: item.badgeText,

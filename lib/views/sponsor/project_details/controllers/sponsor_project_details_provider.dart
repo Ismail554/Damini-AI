@@ -1,14 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../collaboration_requests/models/collaboration_request_model.dart';
 import '../models/sponsor_project_details_model.dart';
+import '../repositories/sponsor_project_details_repository.dart';
 
 class SponsorProjectState {
+  final bool isLoading;
+  final String? error;
   final SponsorProjectDetailsModel project;
   final List<CollaborationRequestModel> pendingList;
   final List<CollaborationRequestModel> approvedList;
   final List<CollaborationRequestModel> confirmationList;
 
   const SponsorProjectState({
+    this.isLoading = false,
+    this.error,
     required this.project,
     required this.pendingList,
     required this.approvedList,
@@ -16,12 +21,16 @@ class SponsorProjectState {
   });
 
   SponsorProjectState copyWith({
+    bool? isLoading,
+    String? error,
     SponsorProjectDetailsModel? project,
     List<CollaborationRequestModel>? pendingList,
     List<CollaborationRequestModel>? approvedList,
     List<CollaborationRequestModel>? confirmationList,
   }) {
     return SponsorProjectState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
       project: project ?? this.project,
       pendingList: pendingList ?? this.pendingList,
       approvedList: approvedList ?? this.approvedList,
@@ -32,17 +41,47 @@ class SponsorProjectState {
 
 final sponsorProjectProvider =
     NotifierProvider<SponsorProjectNotifier, SponsorProjectState>(
-        SponsorProjectNotifier.new);
+  SponsorProjectNotifier.new,
+);
 
 class SponsorProjectNotifier extends Notifier<SponsorProjectState> {
+  late final SponsorProjectDetailsRepository _repository;
+
   @override
   SponsorProjectState build() {
+    _repository = ref.watch(sponsorProjectDetailsRepositoryProvider);
     return SponsorProjectState(
+      isLoading: false,
       project: SponsorProjectDetailsModel.mockData(),
       pendingList: CollaborationRequestModel.mockPendingList(),
       approvedList: CollaborationRequestModel.mockHistoryList(),
       confirmationList: CollaborationRequestModel.mockConfirmationList(),
     );
+  }
+
+  /// Load project from backend API: GET /api/v1/projects/{id}/
+  Future<void> loadProject(String projectId, {bool isRefresh = false}) async {
+    if (projectId.isEmpty) return;
+
+    if (isRefresh) {
+      state = state.copyWith(isLoading: false, error: null);
+    } else {
+      state = state.copyWith(isLoading: true, error: null);
+    }
+
+    try {
+      final project = await _repository.fetchProjectDetails(projectId);
+      state = state.copyWith(
+        isLoading: false,
+        error: null,
+        project: project,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to load project details: $e',
+      );
+    }
   }
 
   void approvePendingRequest(CollaborationRequestModel item) {
@@ -105,6 +144,17 @@ class SponsorProjectNotifier extends Notifier<SponsorProjectState> {
       targetRoi: state.project.targetRoi,
       pendingReviewAmount: state.project.pendingReviewAmount,
       contributions: updatedContributions,
+      shortDescription: state.project.shortDescription,
+      businessDescription: state.project.businessDescription,
+      industry: state.project.industry,
+      category: state.project.category,
+      minimumInvestment: state.project.minimumInvestment,
+      timelineMonths: state.project.timelineMonths,
+      coverImageUrl: state.project.coverImageUrl,
+      sponsorCompanyName: state.project.sponsorCompanyName,
+      isSponsorVerified: state.project.isSponsorVerified,
+      documents: state.project.documents,
+      createdAt: state.project.createdAt,
     );
 
     // Add to Confirmation Tab list
@@ -187,6 +237,17 @@ class SponsorProjectNotifier extends Notifier<SponsorProjectState> {
       targetRoi: state.project.targetRoi,
       pendingReviewAmount: state.project.pendingReviewAmount,
       contributions: updatedContributions,
+      shortDescription: state.project.shortDescription,
+      businessDescription: state.project.businessDescription,
+      industry: state.project.industry,
+      category: state.project.category,
+      minimumInvestment: state.project.minimumInvestment,
+      timelineMonths: state.project.timelineMonths,
+      coverImageUrl: state.project.coverImageUrl,
+      sponsorCompanyName: state.project.sponsorCompanyName,
+      isSponsorVerified: state.project.isSponsorVerified,
+      documents: state.project.documents,
+      createdAt: state.project.createdAt,
     );
 
     state = state.copyWith(

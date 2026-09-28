@@ -129,6 +129,7 @@ class SponsorDashboard extends ConsumerWidget {
               Padding(
                 padding: EdgeInsets.only(bottom: AppDimens.paddingMd),
                 child: SponsorActiveProjectCard(
+                  id: projects.first.id,
                   title: projects.first.title,
                   description: projects.first.description,
                   badgeText: projects.first.badgeText,

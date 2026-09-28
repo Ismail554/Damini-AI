@@ -98,30 +98,44 @@ class CollaborationRequestsNotifier
     await _loadRequests(isRefresh: true);
   }
 
-  void approvePendingRequest(CollaborationRequestModel item) {
-    final pending = List<CollaborationRequestModel>.from(state.pendingList)
-      ..removeWhere((req) => req.id == item.id);
+  Future<bool> approvePendingRequest(CollaborationRequestModel item) async {
+    try {
+      await _repository.approveRequest(item.id);
 
-    final approvedItem = item.copyWith(
-      badgeText: 'Approved',
-      isApprovedBadge: true,
-      isHistory: true,
-      status: 'APPROVED',
-    );
+      final pending = List<CollaborationRequestModel>.from(state.pendingList)
+        ..removeWhere((req) => req.id == item.id);
 
-    final approved = List<CollaborationRequestModel>.from(state.approvedList)
-      ..insert(0, approvedItem);
+      final approvedItem = item.copyWith(
+        badgeText: 'Approved',
+        isApprovedBadge: true,
+        isHistory: true,
+        status: 'APPROVED',
+        hasFundReceivedButton: true,
+      );
 
-    state = state.copyWith(
-      pendingList: pending,
-      approvedList: approved,
-    );
+      final approved = List<CollaborationRequestModel>.from(state.approvedList)
+        ..insert(0, approvedItem);
+
+      state = state.copyWith(
+        pendingList: pending,
+        approvedList: approved,
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  void rejectPendingRequest(String id) {
-    state = state.copyWith(
-      pendingList: state.pendingList.where((req) => req.id != id).toList(),
-    );
+  Future<bool> rejectPendingRequest(String id) async {
+    try {
+      await _repository.rejectRequest(id);
+      state = state.copyWith(
+        pendingList: state.pendingList.where((req) => req.id != id).toList(),
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   void removeApprovedRequest(String id) {
@@ -130,21 +144,27 @@ class CollaborationRequestsNotifier
     );
   }
 
-  void markFundReceived(String confirmationId) {
-    final confirmations =
-        List<CollaborationRequestModel>.from(state.confirmationList);
-    final index =
-        confirmations.indexWhere((item) => item.id == confirmationId);
-    if (index == -1) return;
-
-    confirmations[index] = confirmations[index].copyWith(
-      badgeText: 'Received',
-      isApprovedBadge: true,
-      hasFundReceivedButton: false,
-      status: 'RECEIVED',
-    );
-
-    state = state.copyWith(confirmationList: confirmations);
+  Future<bool> markFundReceived(String confirmationId) async {
+    try {
+      await _repository.fundReceivedRequest(confirmationId);
+      final confirmations =
+          List<CollaborationRequestModel>.from(state.confirmationList);
+      final index =
+          confirmations.indexWhere((item) => item.id == confirmationId);
+      if (index != -1) {
+        confirmations[index] = confirmations[index].copyWith(
+          badgeText: 'Received',
+          isApprovedBadge: true,
+          hasFundReceivedButton: false,
+          status: 'RECEIVED',
+          projectStatusText: 'Received',
+        );
+        state = state.copyWith(confirmationList: confirmations);
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
 

@@ -169,17 +169,31 @@ class AppRouter {
       GoRoute(
         path: '/sponsor-project-details',
         pageBuilder: (context, state) {
+          String? projectId;
           SponsorProjectDetailsModel? project;
           if (state.extra is SponsorProjectDetailsModel) {
             project = state.extra as SponsorProjectDetailsModel;
+            projectId = project.id;
+          } else if (state.extra is String) {
+            projectId = state.extra as String;
+          } else if (state.extra is int) {
+            projectId = (state.extra as int).toString();
           } else if (state.extra is Map) {
-            project = (state.extra as Map)['project']
-                as SponsorProjectDetailsModel?;
+            final map = state.extra as Map;
+            if (map['project'] is SponsorProjectDetailsModel) {
+              project = map['project'] as SponsorProjectDetailsModel;
+              projectId = project.id;
+            } else if (map['id'] != null) {
+              projectId = map['id'].toString();
+            }
           }
           return buildNativePage(
             context: context,
             state: state,
-            child: SponsorProjectDetailsView(initialProject: project),
+            child: SponsorProjectDetailsView(
+              projectId: projectId,
+              initialProject: project,
+            ),
           );
         },
       ),

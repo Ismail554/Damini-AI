@@ -25,5 +25,12 @@ class ApiEndpoints {
   static const String sponsorProjects = "/api/v1/projects/sponsor/";
   static const String sponsorCollaborationRequests =
       "/api/v1/projects/sponsor/requests/";
+  static String approveCollaborationRequest(String id) =>
+      "/api/v1/projects/sponsor/requests/$id/approve/";
+  static String rejectCollaborationRequest(String id) =>
+      "/api/v1/projects/sponsor/requests/$id/reject/";
+  static String fundReceivedCollaborationRequest(String id) =>
+      "/api/v1/projects/sponsor/requests/$id/fund-received/";
   static const String projects = "/api/v1/projects/";
+  static String projectDetails(String id) => "/api/v1/projects/$id/";
 }

@@ -8,6 +8,7 @@ import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 
 class SponsorActiveProjectCard extends StatelessWidget {
+  final String? id;
   final String title;
   final String description;
   final String badgeText;
@@ -20,6 +21,7 @@ class SponsorActiveProjectCard extends StatelessWidget {
 
   const SponsorActiveProjectCard({
     super.key,
+    this.id,
     required this.title,
     required this.description,
     required this.badgeText,
@@ -31,12 +33,22 @@ class SponsorActiveProjectCard extends StatelessWidget {
     this.category,
   });
 
+  void _handleTap(BuildContext context) {
+    if (onTap != null) {
+      onTap!();
+    } else if (id != null && id!.isNotEmpty) {
+      context.push('/sponsor-project-details', extra: id);
+    } else {
+      context.push('/sponsor-project-details');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
     return GestureDetector(
-      onTap: onTap ?? () => context.push('/sponsor-project-details'),
+      onTap: () => _handleTap(context),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         child: BackdropFilter(
@@ -147,17 +159,20 @@ class SponsorActiveProjectCard extends StatelessWidget {
                       Positioned(
                         top: 12.h,
                         right: 12.w,
-                        child: Container(
-                          padding: EdgeInsets.all(10.r),
-                          decoration: BoxDecoration(
-                            color: tc.cardHeader,
-                            borderRadius:
-                                BorderRadius.circular(AppDimens.radiusSm),
-                          ),
-                          child: Icon(
-                            Icons.trending_up_rounded,
-                            color: tc.textPrimary,
-                            size: AppDimens.iconMd,
+                        child: GestureDetector(
+                          onTap: () => _handleTap(context),
+                          child: Container(
+                            padding: EdgeInsets.all(10.r),
+                            decoration: BoxDecoration(
+                              color: tc.cardHeader,
+                              borderRadius:
+                                  BorderRadius.circular(AppDimens.radiusSm),
+                            ),
+                            child: Icon(
+                              Icons.trending_up_rounded,
+                              color: tc.textPrimary,
+                              size: AppDimens.iconMd,
+                            ),
                           ),
                         ),
                       ),
@@ -244,17 +259,20 @@ class SponsorActiveProjectCard extends StatelessWidget {
                           ],
                         ],
                       ),
-                      Container(
-                        padding: EdgeInsets.all(10.r),
-                        decoration: BoxDecoration(
-                          color: tc.cardHeader,
-                          borderRadius:
-                              BorderRadius.circular(AppDimens.radiusSm),
-                        ),
-                        child: Icon(
-                          Icons.trending_up_rounded,
-                          color: tc.textPrimary,
-                          size: AppDimens.iconMd,
+                      GestureDetector(
+                        onTap: () => _handleTap(context),
+                        child: Container(
+                          padding: EdgeInsets.all(10.r),
+                          decoration: BoxDecoration(
+                            color: tc.cardHeader,
+                            borderRadius:
+                                BorderRadius.circular(AppDimens.radiusSm),
+                          ),
+                          child: Icon(
+                            Icons.trending_up_rounded,
+                            color: tc.textPrimary,
+                            size: AppDimens.iconMd,
+                          ),
                         ),
                       ),
                     ],

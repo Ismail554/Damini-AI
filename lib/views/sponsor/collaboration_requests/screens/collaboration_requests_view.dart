@@ -133,17 +133,77 @@ class _CollaborationRequestsViewState
           final item = list[index];
           return CollaborationCard(
             item: item,
-            onLeftAction: () => ref
-                .read(collaborationRequestsProvider.notifier)
-                .rejectPendingRequest(item.id),
-            onRightAction: () {
-              ref
+            onLeftAction: () async {
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: tc.cardBg,
+                  title: Text(
+                    "Reject Request",
+                    style: GoogleFonts.outfit(
+                      color: tc.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  content: Text(
+                    "Are you sure you want to reject the request from ${item.investorName}?",
+                    style: GoogleFonts.outfit(color: tc.textSecondary),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text(
+                        "Cancel",
+                        style: GoogleFonts.outfit(color: tc.textTertiary),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: Text(
+                        "Reject",
+                        style: GoogleFonts.outfit(
+                          color: AppColors.accentRed,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmed == true && context.mounted) {
+                final success = await ref
+                    .read(collaborationRequestsProvider.notifier)
+                    .rejectPendingRequest(item.id);
+                if (context.mounted) {
+                  if (success) {
+                    CustomSnackBar.info(context, "Request rejected");
+                  } else {
+                    CustomSnackBar.error(
+                      context,
+                      "Failed to reject request. Please try again.",
+                    );
+                  }
+                }
+              }
+            },
+            onRightAction: () async {
+              final success = await ref
                   .read(collaborationRequestsProvider.notifier)
                   .approvePendingRequest(item);
-              CustomSnackBar.success(
-                context,
-                "Approved request from ${item.investorName}!",
-              );
+              if (context.mounted) {
+                if (success) {
+                  CustomSnackBar.success(
+                    context,
+                    "Approved request from ${item.investorName}!",
+                  );
+                } else {
+                  CustomSnackBar.error(
+                    context,
+                    "Failed to approve request. Please try again.",
+                  );
+                }
+              }
             },
           );
         },
@@ -249,14 +309,23 @@ class _CollaborationRequestsViewState
           final item = list[index];
           return CollaborationConfirmationCard(
             item: item,
-            onFundReceived: () {
-              ref
+            onFundReceived: () async {
+              final success = await ref
                   .read(collaborationRequestsProvider.notifier)
                   .markFundReceived(item.id);
-              CustomSnackBar.success(
-                context,
-                "Fund received marked for ${item.investorName}!",
-              );
+              if (context.mounted) {
+                if (success) {
+                  CustomSnackBar.success(
+                    context,
+                    "Fund received marked for ${item.investorName}!",
+                  );
+                } else {
+                  CustomSnackBar.error(
+                    context,
+                    "Failed to mark fund received. Please try again.",
+                  );
+                }
+              }
             },
           );
         },

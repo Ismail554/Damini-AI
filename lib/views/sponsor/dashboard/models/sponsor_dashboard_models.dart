@@ -215,7 +215,9 @@ class SponsorActiveProjectData {
           0,
     );
 
-    final double progress = rawGoal > 0 ? (rawRaised / rawGoal).clamp(0.0, 1.0) : 0.0;
+    final double progress = json['progress'] != null
+        ? _parseNumber(json['progress']).clamp(0.0, 1.0)
+        : (rawGoal > 0 ? (rawRaised / rawGoal).clamp(0.0, 1.0) : 0.0);
 
     final raisedAmount = _formatCurrency(rawRaised);
     final goalAmount = _formatCurrency(rawGoal);

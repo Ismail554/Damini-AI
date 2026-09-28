@@ -104,4 +104,46 @@ class CollaborationRequestsRepository {
       return CollaborationRequestModel.mockConfirmationList();
     }
   }
+
+  /// POST /api/v1/projects/sponsor/requests/{id}/approve/
+  Future<bool> approveRequest(String id) async {
+    try {
+      final response = await _apiService.post(
+        ApiEndpoints.approveCollaborationRequest(id),
+        data: {},
+        requireAuth: true,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// POST /api/v1/projects/sponsor/requests/{id}/reject/
+  Future<bool> rejectRequest(String id) async {
+    try {
+      final response = await _apiService.post(
+        ApiEndpoints.rejectCollaborationRequest(id),
+        data: {},
+        requireAuth: true,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// POST /api/v1/projects/sponsor/requests/{id}/fund-received/
+  Future<bool> fundReceivedRequest(String id) async {
+    try {
+      final response = await _apiService.post(
+        ApiEndpoints.fundReceivedCollaborationRequest(id),
+        data: {},
+        requireAuth: true,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
