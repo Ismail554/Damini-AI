@@ -15,10 +15,14 @@ import '../widgets/remove_participant_modal.dart';
 
 class GroupChatView extends ConsumerWidget {
   final String? projectTitle;
+  final int? conversationId;
+  final int? projectId;
 
   const GroupChatView({
     super.key,
     this.projectTitle,
+    this.conversationId,
+    this.projectId,
   });
 
   @override

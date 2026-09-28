@@ -1,8 +1,58 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/chat_item_model.dart';
 import '../models/chat_message_model.dart';
+import '../models/conversation_model.dart';
+
+final chatRepositoryProvider = Provider<ChatRepository>((ref) {
+  return ChatRepository(ref.watch(apiServiceProvider));
+});
 
 class ChatRepository {
+  final ApiService? _apiService;
+
+  ChatRepository([this._apiService]);
+
+  ApiService get _api => _apiService ?? ApiService();
+
+  /// POST /api/v1/notifications/chat/conversations/start/
+  Future<ConversationModel> startConversation({
+    int? targetUserId,
+    int? projectId,
+  }) async {
+    try {
+      final response = await _api.post(
+        ApiEndpoints.startConversation,
+        data: {
+          'target_user_id': targetUserId ?? 0,
+          'project_id': projectId ?? 0,
+        },
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      Map<String, dynamic> payload = {};
+      if (data is Map && data['data'] is Map) {
+        payload = Map<String, dynamic>.from(data['data'] as Map);
+      } else if (data is Map) {
+        payload = Map<String, dynamic>.from(data);
+      }
+
+      return ConversationModel.fromJson(payload);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   List<ChatItemModel> fetchChats() {
     return [
       const ChatItemModel(

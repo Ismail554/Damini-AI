@@ -319,15 +319,29 @@ class AppRouter {
       GoRoute(
         path: '/group-chat',
         pageBuilder: (context, state) {
-          final title = state.extra is String
-              ? state.extra as String
-              : (state.extra is Map
-                  ? (state.extra as Map)['title'] as String?
-                  : null);
+          String? title;
+          int? conversationId;
+          int? projectId;
+          if (state.extra is String) {
+            title = state.extra as String;
+          } else if (state.extra is Map) {
+            final map = state.extra as Map;
+            title = map['title'] as String?;
+            conversationId = map['conversationId'] is int
+                ? map['conversationId'] as int
+                : int.tryParse(map['conversationId']?.toString() ?? '');
+            projectId = map['projectId'] is int
+                ? map['projectId'] as int
+                : int.tryParse(map['projectId']?.toString() ?? '');
+          }
           return buildNativePage(
             context: context,
             state: state,
-            child: GroupChatView(projectTitle: title),
+            child: GroupChatView(
+              projectTitle: title,
+              conversationId: conversationId,
+              projectId: projectId,
+            ),
           );
         },
       ),

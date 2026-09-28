@@ -113,7 +113,20 @@ class CollaborationRequestsNotifier
 
   Future<bool> approvePendingRequest(CollaborationRequestModel item) async {
     try {
-      await _repository.approveRequest(item.id);
+      final projId = item.projectId?.toString() ?? state.projectId;
+      final reqId = int.tryParse(item.id);
+
+      bool success = false;
+      if (projId != null && projId.isNotEmpty && reqId != null) {
+        success = await _repository.confirmInvestors(
+          projectId: projId,
+          requestIds: [reqId],
+        );
+      } else {
+        success = await _repository.approveRequest(item.id);
+      }
+
+      if (!success) return false;
 
       final pending = List<CollaborationRequestModel>.from(state.pendingList)
         ..removeWhere((req) => req.id == item.id);
@@ -141,11 +154,14 @@ class CollaborationRequestsNotifier
 
   Future<bool> rejectPendingRequest(String id) async {
     try {
-      await _repository.rejectRequest(id);
-      state = state.copyWith(
-        pendingList: state.pendingList.where((req) => req.id != id).toList(),
-      );
-      return true;
+      final success = await _repository.rejectRequest(id);
+      if (success) {
+        state = state.copyWith(
+          pendingList: state.pendingList.where((req) => req.id != id).toList(),
+        );
+        return true;
+      }
+      return false;
     } catch (e) {
       return false;
     }

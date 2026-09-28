@@ -11,6 +11,7 @@ import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
+import '../../chat/repositories/chat_repository.dart';
 import '../models/sponsor_project_details_model.dart';
 import '../widgets/investor_contribution_card.dart';
 import '../widgets/sponsor_project_bottom_bar.dart';
@@ -283,10 +284,33 @@ class _SponsorProjectDetailsViewState
                 '/public-view',
                 extra: project.toPublicViewModel(),
               ),
-              onGroupChatWithAi: () => context.push(
-                '/group-chat',
-                extra: "${project.title} || Group Chat with Ai",
-              ),
+              onGroupChatWithAi: () async {
+                final projId = int.tryParse(project.id);
+                try {
+                  final chatRepo = ref.read(chatRepositoryProvider);
+                  final conversation = await chatRepo.startConversation(
+                    targetUserId: 0,
+                    projectId: projId,
+                  );
+                  if (context.mounted) {
+                    context.push(
+                      '/group-chat',
+                      extra: {
+                        'title': conversation.name,
+                        'conversationId': conversation.id,
+                        'projectId': conversation.project,
+                      },
+                    );
+                  }
+                } catch (_) {
+                  if (context.mounted) {
+                    context.push(
+                      '/group-chat',
+                      extra: "${project.title} || Group Chat with Ai",
+                    );
+                  }
+                }
+              },
             ),
           ],
         ),

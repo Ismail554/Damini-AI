@@ -112,12 +112,39 @@ class CollaborationRequestsRepository {
     }
   }
 
+  /// POST /api/v1/projects/{projectId}/confirm-investors/
+  /// Confirms / approves investor requests for a project.
+  Future<bool> confirmInvestors({
+    required String projectId,
+    required List<int> requestIds,
+  }) async {
+    try {
+      final response = await _apiService.post(
+        ApiEndpoints.confirmInvestors(projectId),
+        data: {
+          'request_ids': requestIds,
+        },
+        requireAuth: true,
+      );
+      final data = response.data;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+      if (data is Map &&
+          (data['status'] == 'success' || data['success'] == true)) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// POST /api/v1/projects/sponsor/requests/{id}/approve/
   Future<bool> approveRequest(String id) async {
     try {
       final response = await _apiService.post(
         ApiEndpoints.approveCollaborationRequest(id),
-        data: {},
         requireAuth: true,
       );
       return response.statusCode == 200 || response.statusCode == 201;
@@ -127,14 +154,22 @@ class CollaborationRequestsRepository {
   }
 
   /// POST /api/v1/projects/sponsor/requests/{id}/reject/
+  /// Rejects an investor collaboration request. No request body needed.
   Future<bool> rejectRequest(String id) async {
     try {
       final response = await _apiService.post(
         ApiEndpoints.rejectCollaborationRequest(id),
-        data: {},
         requireAuth: true,
       );
-      return response.statusCode == 200 || response.statusCode == 201;
+      final data = response.data;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+      if (data is Map &&
+          (data['status'] == 'success' || data['success'] == true)) {
+        return true;
+      }
+      return false;
     } catch (e) {
       rethrow;
     }

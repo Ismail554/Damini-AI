@@ -9,6 +9,7 @@ import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
+import '../../chat/repositories/chat_repository.dart';
 import '../controllers/collaboration_requests_provider.dart';
 import '../widgets/collaboration_card.dart';
 import '../widgets/collaboration_confirmation_card.dart';
@@ -271,7 +272,29 @@ class _CollaborationRequestsViewState
             onLeftAction: () => ref
                 .read(collaborationRequestsProvider.notifier)
                 .removeApprovedRequest(item.id),
-            onRightAction: () => context.push('/group-chat'),
+            onRightAction: () async {
+              try {
+                final repo = ref.read(chatRepositoryProvider);
+                final conversation = await repo.startConversation(
+                  targetUserId: item.investorId,
+                  projectId: item.projectId,
+                );
+                if (context.mounted) {
+                  context.push(
+                    '/group-chat',
+                    extra: {
+                      'title': conversation.name,
+                      'conversationId': conversation.id,
+                      'projectId': conversation.project,
+                    },
+                  );
+                }
+              } catch (_) {
+                if (context.mounted) {
+                  context.push('/group-chat', extra: item.projectName);
+                }
+              }
+            },
           );
         },
       ),

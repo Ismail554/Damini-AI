@@ -35,4 +35,10 @@ class ApiEndpoints {
       "/api/v1/projects/sponsor/requests/$id/fund-received/";
   static const String projects = "/api/v1/projects/";
   static String projectDetails(String id) => "/api/v1/projects/$id/";
+  static String confirmInvestors(String projectId) =>
+      "/api/v1/projects/$projectId/confirm-investors/";
+
+  // Chat & Notifications
+  static const String startConversation =
+      "/api/v1/notifications/chat/conversations/start/";
 }
