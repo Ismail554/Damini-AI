@@ -38,6 +38,7 @@ class ProjectPublicViewModel {
   final String monthlyRevenue;
   final String holdPeriod;
   final String timelineToOperations;
+  final bool isSaved;
 
   const ProjectPublicViewModel({
     required this.id,
@@ -63,6 +64,7 @@ class ProjectPublicViewModel {
     this.monthlyRevenue = "\$18,000",
     this.holdPeriod = "36 months",
     this.timelineToOperations = "6 months",
+    this.isSaved = false,
   });
 
   factory ProjectPublicViewModel.fromDraft(ProjectDraftModel draft) {

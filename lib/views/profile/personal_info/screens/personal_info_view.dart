@@ -50,10 +50,7 @@ class PersonalInformationView extends ConsumerWidget {
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              padding: EdgeInsets.symmetric(
-                horizontal: 20.w,
-                vertical: 16.h,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
               child: Column(
                 children: [
                   _buildProfilePhotoHeader(info, tc),
@@ -73,7 +70,7 @@ class PersonalInformationView extends ConsumerWidget {
                     title: "Professional Information",
                     rows: [
                       InfoRowData("Company Name", info.companyName),
-                      InfoRowData("Position", info.position),
+                      InfoRowData("Info", info.position),
                       InfoRowData("Website", info.website),
                       InfoRowData("Bio", info.bio),
                     ],
@@ -92,14 +89,15 @@ class PersonalInformationView extends ConsumerWidget {
   Widget _buildProfilePhotoHeader(dynamic info, AppThemeColors tc) {
     final initials = (info.fullName as String).isNotEmpty
         ? (info.fullName as String)
-            .split(' ')
-            .where((w) => w.isNotEmpty)
-            .map((e) => e[0])
-            .take(2)
-            .join()
+              .split(' ')
+              .where((w) => w.isNotEmpty)
+              .map((e) => e[0])
+              .take(2)
+              .join()
         : 'U';
 
-    final hasPhoto = info.profilePhotoUrl != null &&
+    final hasPhoto =
+        info.profilePhotoUrl != null &&
         (info.profilePhotoUrl as String).isNotEmpty;
 
     final subtitleParts = [
@@ -111,10 +109,10 @@ class PersonalInformationView extends ConsumerWidget {
     final subtitle = subtitleParts.isNotEmpty
         ? subtitleParts.join(' • ')
         : ((info.role as String).isNotEmpty
-            ? (info.role as String)
-            : ((info.email as String).isNotEmpty
-                ? (info.email as String)
-                : 'Member'));
+              ? (info.role as String)
+              : ((info.email as String).isNotEmpty
+                    ? (info.email as String)
+                    : 'Member'));
 
     return Container(
       width: double.infinity,
@@ -134,10 +132,7 @@ class PersonalInformationView extends ConsumerWidget {
             padding: EdgeInsets.all(3.r),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFF006EDB),
-                width: 2.w,
-              ),
+              border: Border.all(color: const Color(0xFF006EDB), width: 2.w),
             ),
             child: CircleAvatar(
               radius: 44.r,
@@ -169,10 +164,7 @@ class PersonalInformationView extends ConsumerWidget {
           AppSpacing.h4,
           Text(
             subtitle,
-            style: GoogleFonts.outfit(
-              fontSize: 13.sp,
-              color: tc.textSecondary,
-            ),
+            style: GoogleFonts.outfit(fontSize: 13.sp, color: tc.textSecondary),
           ),
         ],
       ),
@@ -199,11 +191,7 @@ class PersonalInformationView extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.edit_outlined,
-              color: Colors.white,
-              size: 20.sp,
-            ),
+            Icon(Icons.edit_outlined, color: Colors.white, size: 20.sp),
             SizedBox(width: 8.w),
             Text(
               "Edit",

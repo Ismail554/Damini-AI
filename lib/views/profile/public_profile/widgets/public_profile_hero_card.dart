@@ -1,38 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/utils/app_colors.dart';
+import '../../../../core/utils/app_dimens.dart';
+import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 
 class PublicProfileHeroCard extends StatelessWidget {
   final String name;
   final String title;
-  final String avatarUrl;
+  final String? avatarUrl;
   final String role;
   final bool isVerified;
+  final String? heroTag;
 
   const PublicProfileHeroCard({
     super.key,
     required this.name,
     required this.title,
-    required this.avatarUrl,
+    this.avatarUrl,
     this.role = "Sponsor",
     this.isVerified = true,
+    this.heroTag,
   });
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
+    final cleanName = name.trim().isEmpty ? 'Member' : name.trim();
+    final initials = cleanName
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .map((e) => e[0])
+        .take(2)
+        .join()
+        .toUpperCase();
+
+    final hasValidAvatar = avatarUrl != null &&
+        avatarUrl!.trim().isNotEmpty &&
+        (avatarUrl!.startsWith('http://') || avatarUrl!.startsWith('https://'));
+
+    Widget avatarWidget = CircleAvatar(
+      radius: 44.r,
+      backgroundColor: tc.cardInner,
+      backgroundImage: hasValidAvatar ? NetworkImage(avatarUrl!.trim()) : null,
+      onBackgroundImageError:
+          hasValidAvatar ? (exception, stackTrace) {} : null,
+      child: !hasValidAvatar
+          ? Text(
+              initials.isNotEmpty ? initials : 'U',
+              style: GoogleFonts.outfit(
+                fontSize: 22.sp,
+                fontWeight: FontWeight.bold,
+                color: tc.textPrimary,
+              ),
+            )
+          : null,
+    );
+
+    if (heroTag != null && heroTag!.isNotEmpty) {
+      avatarWidget = Hero(tag: heroTag!, child: avatarWidget);
+    }
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(24.r),
+      padding: EdgeInsets.all(AppDimens.paddingXl),
       decoration: BoxDecoration(
         color: tc.isDark ? const Color(0xFF092444) : Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         border: Border.all(
-          color: tc.isDark
-              ? Colors.white.withValues(alpha: 0.12)
-              : const Color(0xFFE2E8F0),
+          color: tc.borderColor,
+          width: AppDimens.borderThin,
         ),
       ),
       child: Column(
@@ -43,12 +81,14 @@ class PublicProfileHeroCard extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2.w),
+                  border: Border.all(
+                    color: tc.isDark
+                        ? Colors.white.withValues(alpha: 0.15)
+                        : AppColors.primaryColor.withValues(alpha: 0.2),
+                    width: AppDimens.borderMedium,
+                  ),
                 ),
-                child: CircleAvatar(
-                  radius: 44.r,
-                  backgroundImage: NetworkImage(avatarUrl),
-                ),
+                child: avatarWidget,
               ),
               if (isVerified)
                 Positioned(
@@ -57,7 +97,7 @@ class PublicProfileHeroCard extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(4.r),
                     decoration: const BoxDecoration(
-                      color: Color(0xFF10B981),
+                      color: AppColors.successGreen,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -69,74 +109,89 @@ class PublicProfileHeroCard extends StatelessWidget {
                 ),
             ],
           ),
-          SizedBox(height: 14.h),
+          AppSpacing.h14,
           Text(
-            name,
+            cleanName,
+            textAlign: TextAlign.center,
             style: GoogleFonts.outfit(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
               color: tc.textPrimary,
             ),
           ),
-          SizedBox(height: 4.h),
-          Text(
-            title,
-            style: GoogleFonts.outfit(fontSize: 14.sp, color: tc.textSecondary),
-          ),
-          SizedBox(height: 14.h),
+          if (title.trim().isNotEmpty) ...[
+            AppSpacing.h4,
+            Text(
+              title.trim(),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                fontSize: 14.sp,
+                color: tc.textSecondary,
+              ),
+            ),
+          ],
 
           // Badges Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1D4ED8),
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Text(
-                  role,
-                  style: GoogleFonts.outfit(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              if (isVerified) ...[
-                SizedBox(width: 8.w),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 6.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: tc.greenPillBg,
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.shield_outlined,
-                        color: const Color(0xFF10B981),
-                        size: 13.r,
+          if (role.trim().isNotEmpty || isVerified)
+            Padding(
+              padding: EdgeInsets.only(top: 14.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (role.trim().isNotEmpty)
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 6.h,
                       ),
-                      SizedBox(width: 4.w),
-                      Text(
-                        "Verified",
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryDark,
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      child: Text(
+                        role.trim(),
                         style: GoogleFonts.outfit(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF10B981),
+                          color: Colors.white,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
+                    ),
+                  if (isVerified) ...[
+                    if (role.trim().isNotEmpty) AppSpacing.w8,
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 6.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: tc.greenPillBg,
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.shield_outlined,
+                            color: AppColors.successGreen,
+                            size: 13.r,
+                          ),
+                          AppSpacing.w4,
+                          Text(
+                            "Verified",
+                            style: GoogleFonts.outfit(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.successGreen,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_theme_colors.dart';
@@ -6,19 +7,16 @@ import '../../../../core/utils/app_theme_colors.dart';
 class InfoRowData {
   final String label;
   final String value;
+  final bool? isMultiline;
 
-  const InfoRowData(this.label, this.value);
+  const InfoRowData(this.label, this.value, {this.isMultiline});
 }
 
 class InfoSectionCard extends StatelessWidget {
   final String title;
   final List<InfoRowData> rows;
 
-  const InfoSectionCard({
-    super.key,
-    required this.title,
-    required this.rows,
-  });
+  const InfoSectionCard({super.key, required this.title, required this.rows});
 
   @override
   Widget build(BuildContext context) {
@@ -57,39 +55,99 @@ class InfoSectionCard extends StatelessWidget {
           ...rows.asMap().entries.map((entry) {
             final idx = entry.key;
             final item = entry.value;
+            final rawValue = item.value.trim();
+            final isEmpty = rawValue.isEmpty;
+            final isLong = (item.isMultiline ?? false) ||
+                (!isEmpty &&
+                    (rawValue.length > 45 ||
+                        rawValue.contains('\n') ||
+                        item.label.toLowerCase() == 'bio' ||
+                        item.label.toLowerCase() == 'about'));
+            final displayValue = isEmpty ? 'Not set' : rawValue;
+
             return Column(
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        item.label,
-                        style: GoogleFonts.outfit(
-                          fontSize: 14.sp,
-                          color: tc.textTertiary,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Text(
-                          item.value.trim().isEmpty ? 'Not set' : item.value,
-                          textAlign: TextAlign.right,
-                          style: GoogleFonts.outfit(
-                            fontSize: 14.sp,
-                            fontWeight: item.value.trim().isEmpty
-                                ? FontWeight.normal
-                                : FontWeight.w600,
-                            color: item.value.trim().isEmpty
-                                ? tc.textTertiary
-                                : tc.textPrimary,
+                InkWell(
+                  onLongPress: !isEmpty
+                      ? () {
+                          Clipboard.setData(ClipboardData(text: rawValue));
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('${item.label} copied to clipboard'),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      : null,
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    child: isLong
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.label,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14.sp,
+                                  color: tc.textTertiary,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              Text(
+                                displayValue,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14.sp,
+                                  fontWeight: isEmpty
+                                      ? FontWeight.normal
+                                      : FontWeight.w500,
+                                  fontStyle: isEmpty
+                                      ? FontStyle.italic
+                                      : FontStyle.normal,
+                                  color: isEmpty
+                                      ? tc.textTertiary
+                                      : tc.textPrimary,
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.label,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 14.sp,
+                                  color: tc.textTertiary,
+                                ),
+                              ),
+                              SizedBox(width: 16.w),
+                              Expanded(
+                                child: Text(
+                                  displayValue,
+                                  textAlign: TextAlign.end,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 14.sp,
+                                    fontWeight: isEmpty
+                                        ? FontWeight.normal
+                                        : FontWeight.w600,
+                                    fontStyle: isEmpty
+                                        ? FontStyle.italic
+                                        : FontStyle.normal,
+                                    color: isEmpty
+                                        ? tc.textTertiary
+                                        : tc.textPrimary,
+                                    height: 1.35,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
                 if (idx < rows.length - 1)

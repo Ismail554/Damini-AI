@@ -1,34 +1,109 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/services/api_error_handler.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
+import '../../saved/controllers/sponsor_saved_provider.dart';
+import '../repositories/project_public_repository.dart';
 
-class PublicViewImageHeader extends StatefulWidget {
+class PublicViewImageHeader extends ConsumerStatefulWidget {
+  final String? projectId;
   final List<String>? imageUrls;
   final bool isBookmarked;
   final VoidCallback? onBookmarkTap;
 
   const PublicViewImageHeader({
     super.key,
+    this.projectId,
     this.imageUrls,
     this.isBookmarked = false,
     this.onBookmarkTap,
   });
 
   @override
-  State<PublicViewImageHeader> createState() => _PublicViewImageHeaderState();
+  ConsumerState<PublicViewImageHeader> createState() =>
+      _PublicViewImageHeaderState();
 }
 
-class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
+class _PublicViewImageHeaderState extends ConsumerState<PublicViewImageHeader> {
   int _currentIndex = 0;
+  bool? _localBookmarked;
+  bool _isSaving = false;
+
+  bool get _currentBookmarked => _localBookmarked ?? widget.isBookmarked;
 
   static const String _defaultImage =
       "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&auto=format&fit=crop";
+
+  @override
+  void didUpdateWidget(covariant PublicViewImageHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isBookmarked != widget.isBookmarked) {
+      _localBookmarked = widget.isBookmarked;
+    }
+  }
+
+  Future<void> _handleBookmarkTap() async {
+    if (widget.onBookmarkTap != null) {
+      widget.onBookmarkTap!();
+      return;
+    }
+
+    final projectId = widget.projectId;
+    if (projectId == null || projectId.isEmpty || _isSaving) return;
+
+    HapticFeedback.lightImpact();
+    final prev = _currentBookmarked;
+    setState(() {
+      _localBookmarked = !prev;
+      _isSaving = true;
+    });
+
+    try {
+      final repo = ref.read(projectPublicRepositoryProvider);
+      final res = await repo.toggleSaveProject(projectId);
+      final isNowSaved = res ?? !prev;
+
+      // Notify SponsorSavedView and provider to update /api/v1/projects/saved/
+      ref.read(sponsorSavedProvider.notifier).onProjectBookmarkToggled(
+        projectId: projectId,
+        isSaved: isNowSaved,
+      );
+      if (mounted) {
+        setState(() {
+          _localBookmarked = isNowSaved;
+        });
+        if (isNowSaved) {
+          CustomSnackBar.success(context, "Project added to your saved list!");
+        } else {
+          CustomSnackBar.info(context, "Project removed from your saved list.");
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _localBookmarked = prev;
+        });
+        CustomSnackBar.error(
+          context,
+          e is AppException ? e.message : "Failed to update bookmark: $e",
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +116,7 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
     final displayIndex = (_currentIndex < totalCount) ? _currentIndex + 1 : 1;
 
     final topPadding = MediaQuery.of(context).padding.top;
+    final isBookmarked = _currentBookmarked;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -111,13 +187,11 @@ class _PublicViewImageHeaderState extends State<PublicViewImageHeader> {
             right: AppDimens.screenHorizontal,
             child: _buildGlassIconButton(
               tc: tc,
-              icon: widget.isBookmarked
+              icon: isBookmarked
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
-              iconColor: widget.isBookmarked
-                  ? AppColors.accentRed
-                  : Colors.white,
-              onTap: widget.onBookmarkTap ?? () {},
+              iconColor: isBookmarked ? AppColors.accentRed : Colors.white,
+              onTap: _handleBookmarkTap,
             ),
           ),
 

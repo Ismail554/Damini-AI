@@ -29,24 +29,30 @@ class SponsorSavedProjectCard extends StatelessWidget {
             title: item.title,
             location: item.location,
             category: item.category,
-            stage: "Active Raising",
+            stage: item.fundingStage.isNotEmpty
+                ? item.fundingStage
+                : "Active Raising",
             targetRaise: item.targetRaise,
             targetRoi: item.targetRoi,
-            sponsorName: "Acme Corp",
-            sponsorTagline: "Verified Sponsor · 3 Projects",
+            sponsorName: item.sponsor.isNotEmpty ? item.sponsor : "Verified Sponsor",
+            sponsorTagline: "Verified Sponsor",
             imageUrls: [
               item.imageUrl,
-              "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&auto=format&fit=crop",
             ],
-            overviewText:
-                "${item.title} located in ${item.location} is a high-yield ${item.category} project with a target raise of ${item.targetRaise} and minimum contribution of ${item.minInvestmentAmt}.",
-            timeline: "24 Months",
+            overviewText: item.shortDescription.isNotEmpty
+                ? item.shortDescription
+                : "${item.title} located in ${item.location} is a high-yield ${item.category} project with a target raise of ${item.targetRaise} and minimum contribution of ${item.minInvestmentAmt}.",
+            timeline: item.timelineMonths != null
+                ? "${item.timelineMonths} Months"
+                : "24 Months",
             teamSize: "4 Members",
             teamMembers: ProjectPublicViewModel.mockData().teamMembers,
-            businessDescription:
-                "Detailed opportunity analysis for ${item.title}. Minimum investment amount starts at ${item.minInvestmentAmt} with projected ROI of ${item.targetRoi}.",
+            businessDescription: item.shortDescription.isNotEmpty
+                ? item.shortDescription
+                : "Detailed opportunity analysis for ${item.title}. Minimum investment amount starts at ${item.minInvestmentAmt} with projected ROI of ${item.targetRoi}.",
             minContribution: item.minInvestmentAmt,
             expectedRoi: item.targetRoi,
+            isSaved: item.isSaved,
           );
           context.push('/public-view', extra: publicProject);
         },
@@ -82,6 +88,18 @@ class SponsorSavedProjectCard extends StatelessWidget {
                     height: 165.h,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 165.h,
+                      width: double.infinity,
+                      color: tc.isDark
+                          ? const Color(0xFF132742)
+                          : const Color(0xFFE2E8F0),
+                      child: Icon(
+                        Icons.business_rounded,
+                        size: 40.r,
+                        color: tc.textTertiary,
+                      ),
+                    ),
                   ),
                 ),
                 // Top Left Category Badge

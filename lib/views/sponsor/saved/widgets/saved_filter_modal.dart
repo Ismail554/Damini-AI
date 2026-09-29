@@ -2,14 +2,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/utils/app_colors.dart';
-import '../../../../core/utils/app_dimens.dart';
+import '../../../../core/utils/app_theme_colors.dart';
 
 class SavedFilterModal extends StatelessWidget {
   final String selectedFilter;
   final ValueChanged<String> onFilterSelected;
 
   static const List<String> filterOptions = [
+    'All',
     'Active',
     'Completed',
     'Terminated',
@@ -38,6 +38,9 @@ class SavedFilterModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+    final isDark = tc.isDark;
+
     return ClipRRect(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       child: BackdropFilter(
@@ -45,10 +48,12 @@ class SavedFilterModal extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 32.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF07192F),
+            color: isDark ? const Color(0xFF07192F) : Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.15)
+                  : const Color(0xFFE2E8F0),
               width: 1.0,
             ),
           ),
@@ -61,19 +66,38 @@ class SavedFilterModal extends StatelessWidget {
                   width: 40.w,
                   height: 4.h,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(AppDimens.radiusPill),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : const Color(0xFFCBD5E1),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
               ),
               SizedBox(height: 16.h),
-              Text(
-                "Filter Status",
-                style: GoogleFonts.outfit(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Filter Status",
+                    style: GoogleFonts.outfit(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: tc.textPrimary,
+                    ),
+                  ),
+                  if (selectedFilter.toLowerCase() != 'all')
+                    GestureDetector(
+                      onTap: () => onFilterSelected('All'),
+                      child: Text(
+                        "Reset",
+                        style: GoogleFonts.outfit(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFFF97316),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               SizedBox(height: 14.h),
               ...filterOptions.map((option) {
@@ -94,13 +118,22 @@ class SavedFilterModal extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.thirdColor.withValues(alpha: 0.15)
-                              : const Color(0xFF0C1D3A),
+                              ? (isDark
+                                  ? const Color(0xFF064E3B).withValues(alpha: 0.4)
+                                  : const Color(0xFFD1FAE5))
+                              : (isDark
+                                  ? const Color(0xFF0C1D3A)
+                                  : const Color(0xFFF8FAFC)),
                           borderRadius: BorderRadius.circular(14.r),
                           border: Border.all(
                             color: isSelected
-                                ? AppColors.thirdColor
-                                : Colors.white.withValues(alpha: 0.08),
+                                ? (isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF10B981))
+                                : (isDark
+                                    ? Colors.white.withValues(alpha: 0.05)
+                                    : const Color(0xFFE2E8F0)),
+                            width: isSelected ? 1.5 : 1.0,
                           ),
                         ),
                         child: Row(
@@ -114,14 +147,18 @@ class SavedFilterModal extends StatelessWidget {
                                     ? FontWeight.bold
                                     : FontWeight.w500,
                                 color: isSelected
-                                    ? AppColors.thirdColor
-                                    : Colors.white,
+                                    ? (isDark
+                                        ? const Color(0xFF34D399)
+                                        : const Color(0xFF059669))
+                                    : tc.textPrimary,
                               ),
                             ),
                             if (isSelected)
                               Icon(
                                 Icons.check_circle_rounded,
-                                color: AppColors.thirdColor,
+                                color: isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF059669),
                                 size: 20.sp,
                               ),
                           ],
@@ -138,3 +175,4 @@ class SavedFilterModal extends StatelessWidget {
     );
   }
 }
+

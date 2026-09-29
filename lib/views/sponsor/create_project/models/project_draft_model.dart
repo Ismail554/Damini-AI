@@ -10,6 +10,7 @@ class ProjectDraftModel {
   final String targetRoi;
   final String? industry;
   final String? country;
+  final String location;
   final String fundingStage;
   final String timeline;
   final String status;
@@ -23,7 +24,9 @@ class ProjectDraftModel {
   final String timelineOps;
   final String teamMembers;
   final String ndaAgreement;
-  final String lastEdited;
+  final String? coverImagePath;
+  final int lastEditedMs;
+  final String? customLastEdited;
 
   const ProjectDraftModel({
     required this.id,
@@ -35,6 +38,7 @@ class ProjectDraftModel {
     this.targetRoi = '18',
     this.industry,
     this.country,
+    this.location = '',
     this.fundingStage = 'Seed',
     this.timeline = '36 months',
     this.status = '',
@@ -48,8 +52,26 @@ class ProjectDraftModel {
     this.timelineOps = '',
     this.teamMembers = '',
     this.ndaAgreement = '',
-    required this.lastEdited,
-  });
+    this.coverImagePath,
+    this.lastEditedMs = 0,
+    String? lastEdited,
+  }) : customLastEdited = lastEdited;
+
+  /// Human-readable relative time string computed dynamically
+  String get lastEdited {
+    if (customLastEdited != null && customLastEdited!.isNotEmpty) {
+      return customLastEdited!;
+    }
+    if (lastEditedMs <= 0) return 'Last edited just now';
+    final now = DateTime.now();
+    final edited = DateTime.fromMillisecondsSinceEpoch(lastEditedMs);
+    final diff = now.difference(edited);
+    if (diff.inMinutes < 1) return 'Last edited just now';
+    if (diff.inMinutes < 60) return 'Last edited ${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return 'Last edited ${diff.inHours}h ago';
+    if (diff.inDays < 7) return 'Last edited ${diff.inDays}d ago';
+    return 'Last edited ${edited.month}/${edited.day}/${edited.year}';
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -62,6 +84,7 @@ class ProjectDraftModel {
       'targetRoi': targetRoi,
       'industry': industry,
       'country': country,
+      'location': location,
       'fundingStage': fundingStage,
       'timeline': timeline,
       'status': status,
@@ -75,35 +98,43 @@ class ProjectDraftModel {
       'timelineOps': timelineOps,
       'teamMembers': teamMembers,
       'ndaAgreement': ndaAgreement,
-      'lastEdited': lastEdited,
+      'coverImagePath': coverImagePath,
+      'lastEditedMs': lastEditedMs > 0
+          ? lastEditedMs
+          : DateTime.now().millisecondsSinceEpoch,
     };
   }
 
   factory ProjectDraftModel.fromMap(Map<String, dynamic> map) {
     return ProjectDraftModel(
-      id: map['id'] ?? '',
-      title: map['title'] ?? '',
-      shortDesc: map['shortDesc'] ?? '',
-      fullDesc: map['fullDesc'] ?? '',
-      minInvestment: map['minInvestment'] ?? '',
-      fundingGoal: map['fundingGoal'] ?? '5000000',
-      targetRoi: map['targetRoi'] ?? '18',
-      industry: map['industry'],
-      country: map['country'],
-      fundingStage: map['fundingStage'] ?? 'Seed',
-      timeline: map['timeline'] ?? '36 months',
-      status: map['status'] ?? '',
-      milestones: map['milestones'] ?? '',
-      useOfFunds: map['useOfFunds'] ?? '',
-      sponsorInvestment: map['sponsorInvestment'] ?? '',
-      minContribution: map['minContribution'] ?? '',
-      expectedRoi: map['expectedRoi'] ?? '',
-      monthlyRevenue: map['monthlyRevenue'] ?? '',
-      holdPeriod: map['holdPeriod'] ?? '',
-      timelineOps: map['timelineOps'] ?? '',
-      teamMembers: map['teamMembers'] ?? '',
-      ndaAgreement: map['ndaAgreement'] ?? '',
-      lastEdited: map['lastEdited'] ?? 'Just now',
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      shortDesc: map['shortDesc']?.toString() ?? '',
+      fullDesc: map['fullDesc']?.toString() ?? '',
+      minInvestment: map['minInvestment']?.toString() ?? '',
+      fundingGoal: map['fundingGoal']?.toString() ?? '5000000',
+      targetRoi: map['targetRoi']?.toString() ?? '18',
+      industry: map['industry'] as String?,
+      country: map['country'] as String?,
+      location: map['location']?.toString() ?? '',
+      fundingStage: map['fundingStage']?.toString() ?? 'Seed',
+      timeline: map['timeline']?.toString() ?? '36 months',
+      status: map['status']?.toString() ?? '',
+      milestones: map['milestones']?.toString() ?? '',
+      useOfFunds: map['useOfFunds']?.toString() ?? '',
+      sponsorInvestment: map['sponsorInvestment']?.toString() ?? '',
+      minContribution: map['minContribution']?.toString() ?? '',
+      expectedRoi: map['expectedRoi']?.toString() ?? '',
+      monthlyRevenue: map['monthlyRevenue']?.toString() ?? '',
+      holdPeriod: map['holdPeriod']?.toString() ?? '',
+      timelineOps: map['timelineOps']?.toString() ?? '',
+      teamMembers: map['teamMembers']?.toString() ?? '',
+      ndaAgreement: map['ndaAgreement']?.toString() ?? '',
+      coverImagePath: map['coverImagePath'] as String?,
+      lastEditedMs: map['lastEditedMs'] is int
+          ? map['lastEditedMs'] as int
+          : (int.tryParse(map['lastEditedMs']?.toString() ?? '') ?? 0),
+      lastEdited: map['lastEdited'] as String?,
     );
   }
 
@@ -111,24 +142,4 @@ class ProjectDraftModel {
 
   factory ProjectDraftModel.fromJson(String source) =>
       ProjectDraftModel.fromMap(json.decode(source));
-
-  static List<ProjectDraftModel> mockDrafts() {
-    return const [
-      ProjectDraftModel(
-        id: 'draft_1',
-        title: 'Urban Logistics Hub',
-        shortDesc: 'Next-gen automated fulfillment center in downtown LA',
-        fullDesc:
-            'Strategic logistics center focusing on last-mile electric delivery automation.',
-        minInvestment: '5000',
-        fundingGoal: '3500000',
-        targetRoi: '16',
-        industry: 'Real Estate',
-        country: 'United States',
-        fundingStage: 'Seed',
-        timeline: '24 months',
-        lastEdited: 'Last edited 2 days ago',
-      ),
-    ];
-  }
 }

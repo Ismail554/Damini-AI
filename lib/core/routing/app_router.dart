@@ -202,15 +202,18 @@ class AppRouter {
         pageBuilder: (context, state) {
           String? projectId;
           String? projectTitle;
+          String? heroTag;
           if (state.extra is Map) {
             final map = state.extra as Map;
             projectId = map['projectId']?.toString();
             projectTitle = map['projectTitle']?.toString();
+            heroTag = map['heroTag']?.toString();
           } else if (state.extra is String) {
             projectId = state.extra as String;
           } else if (state.uri.queryParameters.containsKey('projectId')) {
             projectId = state.uri.queryParameters['projectId'];
             projectTitle = state.uri.queryParameters['projectTitle'];
+            heroTag = state.uri.queryParameters['heroTag'];
           }
           return buildNativePage(
             context: context,
@@ -218,6 +221,7 @@ class AppRouter {
             child: CollaborationRequestsView(
               projectId: projectId,
               projectTitle: projectTitle,
+              heroTag: heroTag ?? 'collaboration_requests_hero',
             ),
           );
         },
@@ -283,6 +287,14 @@ class AppRouter {
               avatarUrl: extra?['avatarUrl'] as String?,
               country: extra?['country'] as String?,
               phone: extra?['phone'] as String?,
+              email: extra?['email'] as String?,
+              location: extra?['location'] as String?,
+              website: extra?['website'] as String?,
+              bio: extra?['bio'] as String?,
+              role: extra?['role'] as String?,
+              isVerified: extra?['isVerified'] as bool?,
+              isOwnProfile: (extra?['isOwnProfile'] as bool?) ?? false,
+              heroTag: extra?['heroTag'] as String?,
             ),
           );
         },

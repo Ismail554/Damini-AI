@@ -18,11 +18,13 @@ import '../widgets/collaboration_requests_header.dart';
 class CollaborationRequestsView extends ConsumerStatefulWidget {
   final String? projectId;
   final String? projectTitle;
+  final String? heroTag;
 
   const CollaborationRequestsView({
     super.key,
     this.projectId,
     this.projectTitle,
+    this.heroTag = 'collaboration_requests_hero',
   });
 
   @override
@@ -65,7 +67,7 @@ class _CollaborationRequestsViewState
   Widget build(BuildContext context) {
     final state = ref.watch(collaborationRequestsProvider);
 
-    return CommonBackground(
+    final content = CommonBackground(
       showGrid: false,
       child: SafeArea(
         child: Column(
@@ -91,6 +93,58 @@ class _CollaborationRequestsViewState
             ),
           ],
         ),
+      ),
+    );
+
+    if (widget.heroTag == null) {
+      return content;
+    }
+
+    return Hero(
+      tag: widget.heroTag!,
+      flightShuttleBuilder: (
+        flightContext,
+        animation,
+        flightDirection,
+        fromHeroContext,
+        toHeroContext,
+      ) {
+        final isPush = flightDirection == HeroFlightDirection.push;
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOutCubicEmphasized,
+        );
+
+        return AnimatedBuilder(
+          animation: curved,
+          builder: (context, _) {
+            final t = curved.value;
+            final radius = isPush
+                ? (1.0 - t) * AppDimens.radiusMd
+                : t * AppDimens.radiusMd;
+
+            final size = MediaQuery.of(flightContext).size;
+
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(radius),
+              child: Material(
+                type: MaterialType.transparency,
+                child: OverflowBox(
+                  alignment: Alignment.topCenter,
+                  minWidth: size.width,
+                  maxWidth: size.width,
+                  minHeight: size.height,
+                  maxHeight: size.height,
+                  child: toHeroContext.widget,
+                ),
+              ),
+            );
+          },
+        );
+      },
+      child: Material(
+        type: MaterialType.transparency,
+        child: content,
       ),
     );
   }

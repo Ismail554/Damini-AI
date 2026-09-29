@@ -12,7 +12,10 @@ import 'package:Braintech/core/widgets/custom_snackbar.dart';
 import 'package:Braintech/shared/global_key.dart';
 import '../../project_details/controllers/sponsor_project_details_provider.dart';
 import '../../project_details/repositories/sponsor_project_details_repository.dart';
+import '../../../../core/services/api_error_handler.dart';
 import '../models/project_public_view_model.dart';
+import '../repositories/project_public_repository.dart';
+import '../../saved/controllers/sponsor_saved_provider.dart';
 import '../widgets/project_public_compact_app_bar.dart';
 import '../widgets/project_public_sheet_content.dart';
 import '../widgets/public_view_image_header.dart';
@@ -58,6 +61,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
     } else {
       _project = ProjectPublicViewModel.mockData();
     }
+    _isBookmarked = _project.isSaved;
 
     if (widget.projectId != null &&
         widget.projectId!.isNotEmpty &&
@@ -77,6 +81,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
       if (mounted) {
         setState(() {
           _project = details.toPublicViewModel();
+          _isBookmarked = _project.isSaved;
         });
       }
     } catch (_) {}
@@ -88,6 +93,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
     if (widget.project != null && widget.project != oldWidget.project) {
       setState(() {
         _project = widget.project!;
+        _isBookmarked = _project.isSaved;
       });
     }
   }
@@ -101,16 +107,56 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
   }
 
   bool _isBookmarked = false;
+  bool _isSavingBookmark = false;
 
-  void _toggleBookmark() {
+  Future<void> _toggleBookmark() async {
+    final projectId = _project.id;
+    if (projectId.isEmpty || _isSavingBookmark) return;
+
     HapticFeedback.lightImpact();
+    final prev = _isBookmarked;
     setState(() {
-      _isBookmarked = !_isBookmarked;
+      _isBookmarked = !prev;
+      _isSavingBookmark = true;
     });
-    if (_isBookmarked) {
-      CustomSnackBar.success(context, "Project added to your saved list!");
-    } else {
-      CustomSnackBar.info(context, "Project removed from your saved list.");
+
+    try {
+      final repo = ref.read(projectPublicRepositoryProvider);
+      final res = await repo.toggleSaveProject(projectId);
+      final isNowSaved = res ?? !prev;
+
+      // Notify SponsorSavedView and provider to update /api/v1/projects/saved/
+      ref.read(sponsorSavedProvider.notifier).onProjectBookmarkToggled(
+        projectId: projectId,
+        isSaved: isNowSaved,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isBookmarked = isNowSaved;
+        });
+        if (isNowSaved) {
+          CustomSnackBar.success(context, "Project added to your saved list!");
+        } else {
+          CustomSnackBar.info(context, "Project removed from your saved list.");
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isBookmarked = prev;
+        });
+        CustomSnackBar.error(
+          context,
+          e is AppException ? e.message : "Failed to update saved status: $e",
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSavingBookmark = false;
+        });
+      }
     }
   }
 
@@ -196,6 +242,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
                 fit: StackFit.expand,
                 children: [
                   PublicViewImageHeader(
+                    projectId: _project.id,
                     imageUrls: _project.imageUrls,
                     isBookmarked: _isBookmarked,
                     onBookmarkTap: _toggleBookmark,

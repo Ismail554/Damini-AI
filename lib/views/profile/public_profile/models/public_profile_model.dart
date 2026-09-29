@@ -9,19 +9,22 @@ class PublicProfileModel {
   final String location;
   final String website;
   final String bio;
+  final String role;
+  final bool isVerified;
 
   const PublicProfileModel({
-    this.name = 'John Doe',
-    this.title = 'CEO at Acme Corp',
-    this.company = 'Apex Ventures Ltd.',
-    this.avatarUrl =
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop',
-    this.country = 'United States',
-    this.phone = '000001111444455',
-    this.email = 'john@apexventures.com',
-    this.location = 'San Francisco, CA',
-    this.website = 'apexventures.com',
-    this.bio = 'Venture capitalist focused on tech innovation and sustainable energy.',
+    this.name = '',
+    this.title = '',
+    this.company = '',
+    this.avatarUrl = '',
+    this.country = '',
+    this.phone = '',
+    this.email = '',
+    this.location = '',
+    this.website = '',
+    this.bio = '',
+    this.role = '',
+    this.isVerified = true,
   });
 
   PublicProfileModel copyWith({
@@ -35,6 +38,8 @@ class PublicProfileModel {
     String? location,
     String? website,
     String? bio,
+    String? role,
+    bool? isVerified,
   }) {
     return PublicProfileModel(
       name: name ?? this.name,
@@ -47,6 +52,8 @@ class PublicProfileModel {
       location: location ?? this.location,
       website: website ?? this.website,
       bio: bio ?? this.bio,
+      role: role ?? this.role,
+      isVerified: isVerified ?? this.isVerified,
     );
   }
 }

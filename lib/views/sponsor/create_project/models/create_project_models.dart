@@ -9,8 +9,8 @@ class CreateProjectRequestModel {
   final double targetRoi;
   final String country;
   final String location;
-  final String industry;
-  final String categoryIds;
+  final String? industry;
+  final List<int>? categoryIds;
   final String fundingStage;
   final int timelineMonths;
   final String currentStatus;
@@ -34,8 +34,8 @@ class CreateProjectRequestModel {
     required this.targetRoi,
     required this.country,
     required this.location,
-    required this.industry,
-    required this.categoryIds,
+    this.industry,
+    this.categoryIds,
     required this.fundingStage,
     required this.timelineMonths,
     required this.currentStatus,
@@ -56,20 +56,18 @@ class CreateProjectRequestModel {
       'title': title.trim(),
       'short_description': shortDescription.trim(),
       'business_description': businessDescription.trim(),
-      'funding_goal': fundingGoal.toString(),
-      'minimum_investment': minimumInvestment.toString(),
-      'target_roi': targetRoi.toString(),
+      'funding_goal': fundingGoal.toStringAsFixed(2),
+      'minimum_investment': minimumInvestment.toStringAsFixed(2),
+      'target_roi': targetRoi.toStringAsFixed(2),
       'country': country.trim(),
       'location': location.trim(),
-      'industry': industry.trim(),
-      'category_ids': categoryIds.trim(),
       'funding_stage': fundingStage.trim(),
       'timeline_months': timelineMonths.toString(),
       'current_status': currentStatus.trim(),
       'next_milestones': nextMilestones.trim(),
       'use_of_funds': useOfFunds.trim(),
-      'skin_in_the_game': skinInTheGame.toString(),
-      'potential_monthly_revenue': potentialMonthlyRevenue.toString(),
+      'skin_in_the_game': skinInTheGame.toStringAsFixed(2),
+      'potential_monthly_revenue': potentialMonthlyRevenue.toStringAsFixed(2),
       'hold_period_months': holdPeriodMonths.toString(),
       'timeline_to_operations_months': timelineToOperationsMonths.toString(),
       'team_members_text': teamMembersText.trim(),
@@ -77,12 +75,39 @@ class CreateProjectRequestModel {
       'status': status.toUpperCase(),
     };
 
+    // Industry ID as integer (if provided)
+    if (industry != null && industry!.trim().isNotEmpty) {
+      final parsedId = int.tryParse(industry!.trim());
+      if (parsedId != null && parsedId > 0) {
+        map['industry'] = parsedId.toString();
+      }
+    }
+
+    // Category IDs: Only send if provided and non-empty.
+    // Spec: "e.g. category_ids[0]: 1, category_ids[1]: 2"
+    if (categoryIds != null && categoryIds!.isNotEmpty) {
+      for (var i = 0; i < categoryIds!.length; i++) {
+        map['category_ids[$i]'] = categoryIds![i].toString();
+      }
+    }
+
     final imagePath = coverImagePath?.trim();
     if (imagePath != null && imagePath.isNotEmpty) {
       final fileName = imagePath.split(RegExp(r'[\\/]')).last;
+      final ext = fileName.split('.').last.toLowerCase();
+      DioMediaType? mediaType;
+      if (ext == 'png') {
+        mediaType = DioMediaType('image', 'png');
+      } else if (ext == 'webp') {
+        mediaType = DioMediaType('image', 'webp');
+      } else if (ext == 'jpg' || ext == 'jpeg') {
+        mediaType = DioMediaType('image', 'jpeg');
+      }
+
       map['cover_image'] = await MultipartFile.fromFile(
         imagePath,
         filename: fileName,
+        contentType: mediaType,
       );
     }
 

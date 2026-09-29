@@ -32,7 +32,12 @@ class SponsorDashboard extends ConsumerWidget {
     final requests = dashboardState.requests;
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(sponsorDashboardProvider.notifier).refresh(),
+      onRefresh: () async {
+        await Future.wait([
+          ref.read(sponsorDashboardProvider.notifier).refresh(),
+          ref.read(projectDraftProvider.notifier).loadDrafts(),
+        ]);
+      },
       color: AppColors.primaryColor,
       backgroundColor: tc.cardBg,
       child: SingleChildScrollView(
@@ -202,7 +207,12 @@ class SponsorDashboard extends ConsumerWidget {
             ),
             SizedBox(height: AppDimens.paddingMd),
 
-            if (draftProvider.drafts.isEmpty)
+            if (draftProvider.isLoading && draftProvider.drafts.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: AppShimmer.card(height: 72.h),
+              )
+            else if (draftProvider.drafts.isEmpty)
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12.h),
                 child: Text(

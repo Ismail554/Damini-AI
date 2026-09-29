@@ -32,14 +32,18 @@ class ProjectDraftNotifier extends Notifier<ProjectDraftState> {
   @override
   ProjectDraftState build() {
     _repository = ProjectDraftRepository();
-    loadDrafts();
+    Future.microtask(() => loadDrafts());
     return const ProjectDraftState(isLoading: true);
   }
 
   Future<void> loadDrafts() async {
     state = state.copyWith(isLoading: true);
-    final list = await _repository.getDrafts();
-    state = state.copyWith(drafts: list, isLoading: false);
+    try {
+      final list = await _repository.getDrafts();
+      state = state.copyWith(drafts: list, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(drafts: [], isLoading: false);
+    }
   }
 
   Future<void> saveDraft(ProjectDraftModel draft) async {
@@ -50,14 +54,24 @@ class ProjectDraftNotifier extends Notifier<ProjectDraftState> {
     } else {
       list.insert(0, draft);
     }
-    state = state.copyWith(drafts: list);
-    await _repository.saveDrafts(list);
+    state = state.copyWith(drafts: list, isLoading: false);
+    try {
+      await _repository.saveDrafts(list);
+    } catch (_) {}
   }
 
   Future<void> deleteDraft(String id) async {
     final list = List<ProjectDraftModel>.from(state.drafts)
       ..removeWhere((d) => d.id == id);
-    state = state.copyWith(drafts: list);
-    await _repository.saveDrafts(list);
+    state = state.copyWith(drafts: list, isLoading: false);
+    try {
+      await _repository.saveDrafts(list);
+    } catch (_) {}
+  }
+
+  /// Remove draft after successful publish (if editing an existing draft)
+  Future<void> deleteDraftIfExists(String? draftId) async {
+    if (draftId == null || draftId.isEmpty) return;
+    await deleteDraft(draftId);
   }
 }

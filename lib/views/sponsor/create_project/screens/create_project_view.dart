@@ -137,9 +137,11 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     _targetRoiController = TextEditingController(text: d?.targetRoi ?? '18');
     final initialCountry = d?.country;
     _locationController = TextEditingController(
-      text: (initialCountry != null && initialCountry.isNotEmpty)
-          ? initialCountry
-          : 'Austin, TX',
+      text: (d?.location != null && d!.location.isNotEmpty)
+          ? d.location
+          : ((initialCountry != null && initialCountry.isNotEmpty)
+              ? initialCountry
+              : 'Austin, TX'),
     );
 
     _statusController = TextEditingController(text: d?.status ?? '');
@@ -168,6 +170,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     _selectedCountry = d?.country;
     _selectedFundingStage = d?.fundingStage ?? 'Seed';
     _selectedTimeline = d?.timeline ?? '36 months';
+    _coverImagePath = d?.coverImagePath;
 
     if (d != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -220,6 +223,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       targetRoi: _targetRoiController.text,
       industry: _selectedIndustry,
       country: _selectedCountry,
+      location: _locationController.text,
       fundingStage: _selectedFundingStage ?? 'Seed',
       timeline: _selectedTimeline ?? '36 months',
       status: _statusController.text,
@@ -233,13 +237,18 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       timelineOps: _timelineOpsController.text,
       teamMembers: _teamMembersController.text,
       ndaAgreement: _ndaAgreementController.text,
-      lastEdited: 'Last edited just now',
+      coverImagePath: _coverImagePath,
+      lastEditedMs: DateTime.now().millisecondsSinceEpoch,
     );
 
     await ref.read(projectDraftProvider.notifier).saveDraft(draft);
     if (!mounted) return;
     CustomSnackBar.success(context, "Draft saved to Sponsor Dashboard!");
-    context.go('/home');
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/home');
+    }
   }
 
   void _onPreview() {
@@ -257,6 +266,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       targetRoi: _targetRoiController.text,
       industry: _selectedIndustry,
       country: _selectedCountry,
+      location: _locationController.text,
       fundingStage: _selectedFundingStage ?? 'Seed',
       timeline: _selectedTimeline ?? '36 months',
       status: _statusController.text,
@@ -270,6 +280,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       timelineOps: _timelineOpsController.text,
       teamMembers: _teamMembersController.text,
       ndaAgreement: _ndaAgreementController.text,
+      coverImagePath: _coverImagePath,
       lastEdited: 'Preview Mode',
     );
 
@@ -300,13 +311,26 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
 
     final industriesList =
         ref.read(industriesProvider).whenOrNull(data: (d) => d) ?? [];
-    String industryId = '1';
-    for (final ind in industriesList) {
-      if (ind.name.toLowerCase() == (_selectedIndustry ?? '').toLowerCase()) {
-        industryId = ind.id.toString();
-        break;
+    String? industryId;
+    if (_selectedIndustry != null && _selectedIndustry!.trim().isNotEmpty) {
+      for (final ind in industriesList) {
+        if (ind.name.toLowerCase() == _selectedIndustry!.trim().toLowerCase()) {
+          industryId = ind.id.toString();
+          break;
+        }
       }
+      industryId ??= industriesList.isNotEmpty ? industriesList.first.id.toString() : null;
     }
+
+    final rawTeam = _teamMembersController.text.trim();
+    final cleanTeam = rawTeam
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .join(', ');
+    final teamMembersText = cleanTeam.isNotEmpty
+        ? cleanTeam
+        : "Core Founding & Executive Team";
 
     final request = CreateProjectRequestModel(
       title: title,
@@ -326,7 +350,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
           ? _locationController.text.trim()
           : (_selectedCountry ?? "Austin, TX"),
       industry: industryId,
-      categoryIds: industryId,
+      categoryIds: null,
       fundingStage: _selectedFundingStage ?? "Seed",
       timelineMonths: _parseIntMonths(_selectedTimeline ?? "36 months", 36),
       currentStatus: _statusController.text.trim().isNotEmpty
@@ -344,9 +368,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       holdPeriodMonths: _parseIntMonths(_holdPeriodController.text, 36),
       timelineToOperationsMonths:
           _parseIntMonths(_timelineOpsController.text, 6),
-      teamMembersText: _teamMembersController.text.trim().isNotEmpty
-          ? _teamMembersController.text.trim()
-          : "Core Founding & Executive Team",
+      teamMembersText: teamMembersText,
       confidentialityAgreementText:
           _ndaAgreementController.text.trim().isNotEmpty
               ? _ndaAgreementController.text.trim()
@@ -361,6 +383,8 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     if (!mounted) return;
 
     if (result.success) {
+      await ref.read(projectDraftProvider.notifier).deleteDraftIfExists(_draftId);
+      if (!mounted) return;
       CustomSnackBar.success(context, "Project published successfully!");
       context.pop();
     } else {

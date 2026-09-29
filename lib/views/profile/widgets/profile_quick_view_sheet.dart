@@ -145,8 +145,7 @@ class ProfileQuickViewSheet extends StatelessWidget {
                   'title': title,
                   'company': company,
                   'avatarUrl': avatarUrl,
-                  'country': 'United States',
-                  'phone': '+1 (512) 555-0199',
+                  'isOwnProfile': true,
                 },
               );
             },

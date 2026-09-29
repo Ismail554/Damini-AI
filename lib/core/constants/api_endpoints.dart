@@ -23,6 +23,7 @@ class ApiEndpoints {
   // User & Projects
   static const String currentUser = "/api/v1/users/me/";
   static const String sponsorProjects = "/api/v1/projects/sponsor/";
+  static const String savedProjects = "/api/v1/projects/saved/";
   static const String sponsorCollaborationRequests =
       "/api/v1/projects/sponsor/requests/";
   static String sponsorProjectRequests(String id) =>
@@ -35,6 +36,7 @@ class ApiEndpoints {
       "/api/v1/projects/sponsor/requests/$id/fund-received/";
   static const String projects = "/api/v1/projects/";
   static String projectDetails(String id) => "/api/v1/projects/$id/";
+  static String saveProject(String id) => "/api/v1/projects/$id/save/";
   static String confirmInvestors(String projectId) =>
       "/api/v1/projects/$projectId/confirm-investors/";
 

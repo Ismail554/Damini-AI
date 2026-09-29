@@ -10,6 +10,7 @@ class SponsorRequestCard extends StatelessWidget {
   final String subtitle;
   final String avatarUrl;
   final VoidCallback onReview;
+  final String heroTag;
 
   const SponsorRequestCard({
     super.key,
@@ -17,21 +18,26 @@ class SponsorRequestCard extends StatelessWidget {
     required this.subtitle,
     required this.avatarUrl,
     required this.onReview,
+    this.heroTag = 'collaboration_requests_hero',
   });
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
-    return Container(
-      margin: EdgeInsets.only(bottom: AppDimens.spaceMd),
-      padding: EdgeInsets.all(AppDimens.paddingMd),
-      decoration: BoxDecoration(
-        color: tc.cardBg,
-        borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-        border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
-      ),
-      child: Row(
+    return Hero(
+      tag: heroTag,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Container(
+          margin: EdgeInsets.only(bottom: AppDimens.spaceMd),
+          padding: EdgeInsets.all(AppDimens.paddingMd),
+          decoration: BoxDecoration(
+            color: tc.cardBg,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+            border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
+          ),
+          child: Row(
         children: [
           Expanded(
             child: GestureDetector(
@@ -114,6 +120,8 @@ class SponsorRequestCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }
