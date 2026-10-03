@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -96,7 +97,7 @@ class InfoSectionCard extends StatelessWidget {
                                   color: tc.textTertiary,
                                 ),
                               ),
-                              SizedBox(height: 6.h),
+                              AppSpacing.h6,
                               Text(
                                 displayValue,
                                 style: GoogleFonts.outfit(
@@ -126,7 +127,7 @@ class InfoSectionCard extends StatelessWidget {
                                   color: tc.textTertiary,
                                 ),
                               ),
-                              SizedBox(width: 16.w),
+                              AppSpacing.w16, 
                               Expanded(
                                 child: Text(
                                   displayValue,

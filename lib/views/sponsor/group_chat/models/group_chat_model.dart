@@ -31,26 +31,72 @@ class GroupChatMessage {
     this.voiceDuration,
   });
 
-  factory GroupChatMessage.fromJson(Map<String, dynamic> json) {
+  factory GroupChatMessage.fromJson(
+    Map<String, dynamic> json, {
+    String? currentUserId,
+  }) {
+    final senderIdStr =
+        json['sender_id']?.toString() ?? json['senderId']?.toString();
+    final isMeFlag = json['is_me'] == true ||
+        json['isMe'] == true ||
+        (currentUserId != null &&
+            senderIdStr != null &&
+            currentUserId == senderIdStr);
+
+    final rawType = (json['message_type'] ?? json['type'] ?? 'text')
+        .toString()
+        .toLowerCase();
+    ChatMessageType msgType = ChatMessageType.text;
+    if (rawType == 'image') msgType = ChatMessageType.image;
+    if (rawType == 'voice') msgType = ChatMessageType.voice;
+
+    final rawAvatar = (json['avatar_type'] ?? json['avatarType'] ?? 'sponsor')
+        .toString()
+        .toLowerCase();
+    ChatAvatarType avatarType = ChatAvatarType.sponsor;
+    if (rawAvatar == 'ai') avatarType = ChatAvatarType.ai;
+    if (rawAvatar == 'investor') avatarType = ChatAvatarType.investor;
+
+    String timeStr = json['time']?.toString() ?? '';
+    if (timeStr.isEmpty && json['created_at'] != null) {
+      final dt = DateTime.tryParse(json['created_at'].toString())?.toLocal();
+      if (dt != null) {
+        timeStr =
+            '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+      }
+    }
+
+    final sName = json['sender_name']?.toString() ??
+        json['senderName']?.toString() ??
+        'User';
+
+    String initials = json['avatar_initials']?.toString() ??
+        json['avatarInitials']?.toString() ??
+        '';
+    if (initials.isEmpty && sName.isNotEmpty) {
+      final parts = sName.trim().split(RegExp(r'\s+'));
+      if (parts.length >= 2) {
+        initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+      } else {
+        initials = sName.substring(0, sName.length >= 2 ? 2 : 1).toUpperCase();
+      }
+    }
+
     return GroupChatMessage(
-      id: json['id'] as String? ?? '',
-      senderName: json['senderName'] as String? ?? '',
-      senderRole: json['senderRole'] as String?,
-      avatarInitials: json['avatarInitials'] as String? ?? '',
-      avatarType: ChatAvatarType.values.firstWhere(
-        (e) => e.name == (json['avatarType'] as String? ?? 'user'),
-        orElse: () => ChatAvatarType.sponsor,
-      ),
-      isAi: json['isAi'] as bool? ?? false,
-      isMe: json['isMe'] as bool? ?? false,
-      text: json['text'] as String? ?? '',
-      time: json['time'] as String? ?? '',
-      type: ChatMessageType.values.firstWhere(
-        (e) => e.name == (json['type'] as String? ?? 'text'),
-        orElse: () => ChatMessageType.text,
-      ),
-      mediaUrl: json['mediaUrl'] as String?,
-      voiceDuration: json['voiceDuration'] as String?,
+      id: json['id']?.toString() ?? '',
+      senderName: sName,
+      senderRole:
+          json['sender_role']?.toString() ?? json['senderRole']?.toString(),
+      avatarInitials: initials,
+      avatarType: avatarType,
+      isAi: json['is_ai'] == true || json['isAi'] == true,
+      isMe: isMeFlag,
+      text: json['text']?.toString() ?? '',
+      time: timeStr.isNotEmpty ? timeStr : 'Just now',
+      type: msgType,
+      mediaUrl: json['media_url']?.toString() ?? json['mediaUrl']?.toString(),
+      voiceDuration: json['voice_duration']?.toString() ??
+          json['voiceDuration']?.toString(),
     );
   }
 }
@@ -67,4 +113,14 @@ class AiSuggestion {
     required this.icon,
     this.isCompleted = true,
   });
+
+  factory AiSuggestion.fromJson(Map<String, dynamic> json) {
+    return AiSuggestion(
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      icon: json['icon']?.toString() ?? '💡',
+      isCompleted:
+          json['is_completed'] == true || json['isCompleted'] == true,
+    );
+  }
 }

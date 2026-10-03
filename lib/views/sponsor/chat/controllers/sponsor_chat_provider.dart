@@ -6,11 +6,15 @@ class SponsorChatState {
   final List<ChatItemModel> allChats;
   final String searchQuery;
   final bool isLoading;
+  final bool isRefreshing;
+  final String? error;
 
   const SponsorChatState({
     this.allChats = const [],
     this.searchQuery = '',
     this.isLoading = false,
+    this.isRefreshing = false,
+    this.error,
   });
 
   List<ChatItemModel> get chats {
@@ -26,25 +30,63 @@ class SponsorChatState {
     List<ChatItemModel>? allChats,
     String? searchQuery,
     bool? isLoading,
+    bool? isRefreshing,
+    String? error,
   }) {
     return SponsorChatState(
       allChats: allChats ?? this.allChats,
       searchQuery: searchQuery ?? this.searchQuery,
       isLoading: isLoading ?? this.isLoading,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
+      error: error,
     );
   }
 }
 
 class SponsorChatNotifier extends Notifier<SponsorChatState> {
-  late final ChatRepository _repository = ChatRepository();
+  late final ChatRepository _repository;
 
   @override
   SponsorChatState build() {
-    final chats = _repository.fetchChats();
-    return SponsorChatState(
-      allChats: chats,
-      isLoading: false,
-    );
+    _repository = ref.watch(chatRepositoryProvider);
+    Future.microtask(() => loadConversations());
+    return const SponsorChatState(isLoading: true);
+  }
+
+  Future<void> loadConversations({bool isRefresh = false}) async {
+    if (isRefresh) {
+      state = state.copyWith(isRefreshing: true, error: null);
+    } else {
+      state = state.copyWith(isLoading: true, error: null);
+    }
+
+    try {
+      final conversations = await _repository.fetchConversations();
+      final items = conversations
+          .map((c) => ChatItemModel.fromConversation(c))
+          .toList();
+
+      state = state.copyWith(
+        isLoading: false,
+        isRefreshing: false,
+        allChats: items.isNotEmpty ? items : _repository.fetchChats(),
+        error: null,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isRefreshing: false,
+        allChats: state.allChats.isNotEmpty
+            ? state.allChats
+            : _repository.fetchChats(),
+        error:
+            state.allChats.isEmpty ? 'Failed to load conversations: $e' : null,
+      );
+    }
+  }
+
+  Future<void> refresh() async {
+    await loadConversations(isRefresh: true);
   }
 
   void updateSearchQuery(String query) {
@@ -73,6 +115,6 @@ class SponsorChatNotifier extends Notifier<SponsorChatState> {
 }
 
 final sponsorChatProvider =
-    NotifierProvider.autoDispose<SponsorChatNotifier, SponsorChatState>(
+    NotifierProvider<SponsorChatNotifier, SponsorChatState>(
   SponsorChatNotifier.new,
 );

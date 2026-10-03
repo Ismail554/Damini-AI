@@ -10,6 +10,7 @@ class DirectChatInputBar extends StatefulWidget {
   final VoidCallback onSend;
   final ValueChanged<String>? onSendImage;
   final ValueChanged<String>? onSendVoice;
+  final ValueChanged<bool>? onTyping;
 
   const DirectChatInputBar({
     super.key,
@@ -17,6 +18,7 @@ class DirectChatInputBar extends StatefulWidget {
     required this.onSend,
     this.onSendImage,
     this.onSendVoice,
+    this.onTyping,
   });
 
   @override
@@ -41,6 +43,7 @@ class _DirectChatInputBarState extends State<DirectChatInputBar> {
     final hasText = widget.controller.text.trim().isNotEmpty;
     if (hasText != _hasText) {
       setState(() => _hasText = hasText);
+      widget.onTyping?.call(hasText);
     }
   }
 

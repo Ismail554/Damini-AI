@@ -13,7 +13,7 @@ import '../widgets/group_chat_app_bar.dart';
 import '../widgets/group_chat_message_bubble.dart';
 import '../widgets/remove_participant_modal.dart';
 
-class GroupChatView extends ConsumerWidget {
+class GroupChatView extends ConsumerStatefulWidget {
   final String? projectTitle;
   final int? conversationId;
   final int? projectId;
@@ -26,14 +26,31 @@ class GroupChatView extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<GroupChatView> createState() => _GroupChatViewState();
+}
+
+class _GroupChatViewState extends ConsumerState<GroupChatView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(groupChatProvider.notifier).init(
+            conversationId: widget.conversationId?.toString(),
+            projectId: widget.projectId,
+            projectTitle: widget.projectTitle,
+          );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(groupChatProvider);
     final notifier = ref.read(groupChatProvider.notifier);
 
     return Scaffold(
       backgroundColor: const Color(0xFF061427),
       appBar: GroupChatAppBar(
-        title: projectTitle,
+        title: widget.projectTitle,
         activeMemberCount: state.participants.length,
         onMenuSelected: (action) =>
             _handleMenuAction(context, ref, action),
@@ -44,10 +61,10 @@ class GroupChatView extends ConsumerWidget {
             Expanded(
               child: state.isLoading
                   ? const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF006EDB),
-                              ),
-                            )
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF006EDB),
+                      ),
+                    )
                   : ListView.builder(
                       controller: notifier.scrollController,
                       padding: EdgeInsets.symmetric(
@@ -61,6 +78,21 @@ class GroupChatView extends ConsumerWidget {
                       },
                     ),
             ),
+            if (state.typingUser != null)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "${state.typingUser} is typing...",
+                    style: GoogleFonts.outfit(
+                      fontSize: 12.sp,
+                      color: const Color(0xFF006EDB),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ),
             GroupChatAiSuggestions(
               suggestions: state.suggestions,
               onSelect: notifier.onSuggestionTap,
@@ -70,6 +102,7 @@ class GroupChatView extends ConsumerWidget {
               onSend: notifier.sendMessage,
               onSendImage: notifier.sendImageMessage,
               onSendVoice: notifier.sendVoiceMessage,
+              onTyping: notifier.onTyping,
             ),
           ],
         ),

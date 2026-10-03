@@ -43,4 +43,21 @@ class ApiEndpoints {
   // Chat & Notifications
   static const String startConversation =
       "/api/v1/notifications/chat/conversations/start/";
+  static const String conversations =
+      "/api/v1/notifications/chat/conversations/";
+  static String conversationMessages(String conversationId) =>
+      "/api/v1/notifications/chat/conversations/$conversationId/messages/";
+  static const String chatUpload =
+      "/api/v1/notifications/chat/upload/";
+  static String markConversationRead(String conversationId) =>
+      "/api/v1/notifications/chat/conversations/$conversationId/read/";
+  static String removeParticipant(String conversationId, String userId) =>
+      "/api/v1/notifications/chat/conversations/$conversationId/participants/$userId/";
+
+  static String chatWebSocket(String conversationId, String token) {
+    final wsBase = baseUrl
+        .replaceFirst(RegExp(r'^http://'), 'ws://')
+        .replaceFirst(RegExp(r'^https://'), 'wss://');
+    return "$wsBase/ws/chat/$conversationId/?token=$token";
+  }
 }

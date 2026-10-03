@@ -58,11 +58,27 @@ class DirectChatView extends ConsumerWidget {
                   ],
                 ),
               ),
+              if (state.typingUser != null)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "${state.typingUser} is typing...",
+                      style: GoogleFonts.outfit(
+                        fontSize: 12.sp,
+                        color: const Color(0xFF2563EB),
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ),
               DirectChatInputBar(
                 controller: notifier.textController,
                 onSend: notifier.sendMessage,
                 onSendImage: notifier.sendImageMessage,
                 onSendVoice: notifier.sendVoiceMessage,
+                onTyping: notifier.onTyping,
               ),
             ],
           ),
