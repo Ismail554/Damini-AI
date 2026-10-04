@@ -24,11 +24,7 @@ class GroupChatState {
     this.projectTitle,
     this.messages = const [],
     this.suggestions = const [],
-    this.participants = const [
-      'Ahmad Al-Rashid',
-      'Marcus Webb',
-      'Priya Mehta',
-    ],
+    this.participants = const [],
     this.isLoading = false,
     this.isConnected = false,
     this.typingUser,
@@ -115,53 +111,52 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
       await _connectWebSocket(targetConvId);
       await _fetchMessages(targetConvId);
     } else {
-      await _loadFallback();
+      state = state.copyWith(
+        isLoading: false,
+        messages: const [],
+        suggestions: const [],
+      );
     }
   }
 
   Future<void> _fetchMessages(String convId) async {
     try {
       final fetchedMessages = await _chatRepo.fetchMessages(convId);
-      final fetchedSuggestions = await _fallbackRepo.fetchSuggestions();
 
-      if (fetchedMessages.isNotEmpty) {
-        state = state.copyWith(
-          messages: List.from(fetchedMessages),
-          suggestions: List.from(fetchedSuggestions),
-          isLoading: false,
-        );
-      } else {
-        final fallback = await _fallbackRepo.fetchInitialMessages();
-        state = state.copyWith(
-          messages: List.from(fallback),
-          suggestions: List.from(fetchedSuggestions),
-          isLoading: false,
-        );
+      // Collect active participants from message history
+      final participantSet = <String>{};
+      for (final m in fetchedMessages) {
+        if (!m.isMe &&
+            !m.isAi &&
+            m.senderName.trim().isNotEmpty &&
+            m.senderName.trim().toLowerCase() != 'user' &&
+            m.senderName.trim().toLowerCase() != 'you') {
+          participantSet.add(m.senderName.trim());
+        }
       }
+
+      state = state.copyWith(
+        messages: List.from(fetchedMessages),
+        participants: participantSet.isNotEmpty
+            ? participantSet.toList()
+            : state.participants,
+        suggestions: const [],
+        isLoading: false,
+      );
 
       _chatRepo.markConversationAsRead(convId);
     } catch (_) {
-      await _loadFallback();
+      state = state.copyWith(
+        isLoading: false,
+        messages: const [],
+        suggestions: const [],
+      );
     } finally {
       _scrollToBottom();
     }
   }
 
-  Future<void> _loadFallback() async {
-    try {
-      final fetchedMessages = await _fallbackRepo.fetchInitialMessages();
-      final fetchedSuggestions = await _fallbackRepo.fetchSuggestions();
-      state = state.copyWith(
-        messages: List.from(fetchedMessages),
-        suggestions: List.from(fetchedSuggestions),
-        isLoading: false,
-      );
-    } catch (_) {
-      state = state.copyWith(isLoading: false);
-    } finally {
-      _scrollToBottom();
-    }
-  }
+
 
   Future<void> _connectWebSocket(String convId) async {
     final ws = ref.read(chatWebSocketServiceProvider);
@@ -191,7 +186,21 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
         if (msgData != null) {
           final newMsg = GroupChatMessage.fromJson(msgData);
           if (!state.messages.any((m) => m.id == newMsg.id)) {
-            state = state.copyWith(messages: [...state.messages, newMsg]);
+            final updatedParticipants = List<String>.from(state.participants);
+            if (!newMsg.isMe &&
+                !newMsg.isAi &&
+                newMsg.senderName.trim().isNotEmpty &&
+                newMsg.senderName.trim().toLowerCase() != 'user' &&
+                newMsg.senderName.trim().toLowerCase() != 'you') {
+              if (!updatedParticipants.contains(newMsg.senderName.trim())) {
+                updatedParticipants.add(newMsg.senderName.trim());
+              }
+            }
+
+            state = state.copyWith(
+              messages: [...state.messages, newMsg],
+              participants: updatedParticipants,
+            );
             _scrollToBottom();
 
             if (!newMsg.isMe) {

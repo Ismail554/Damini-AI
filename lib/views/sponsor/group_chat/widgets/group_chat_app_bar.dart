@@ -6,12 +6,14 @@ import 'package:google_fonts/google_fonts.dart';
 class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final int activeMemberCount;
+  final List<String> participants;
   final Function(String action)? onMenuSelected;
 
   const GroupChatAppBar({
     super.key,
     this.title,
-    this.activeMemberCount = 3,
+    this.activeMemberCount = 0,
+    this.participants = const [],
     this.onMenuSelected,
   });
 
@@ -20,7 +22,9 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayTitle = title ?? 'Downtown Tech Hub || Group Chat with Ai';
+    final displayTitle = (title != null && title!.trim().isNotEmpty)
+        ? title!.trim()
+        : 'Project Group Chat';
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
@@ -40,57 +44,8 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
               constraints: const BoxConstraints(),
             ),
             SizedBox(width: 8.w),
-            SizedBox(
-              width: 54.w,
-              height: 32.h,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    child: _buildAvatarCircle(
-                      bg: const Color(0xFF9333EA),
-                      child: Text(
-                        '☡',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 14.w,
-                    child: _buildAvatarCircle(
-                      bg: const Color(0xFFC026D3),
-                      child: Text(
-                        'A',
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 28.w,
-                    child: _buildAvatarCircle(
-                      bg: const Color(0xFF006EDB),
-                      child: Text(
-                        'DC',
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 9.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 6.w),
+            _buildAvatarStack(),
+            SizedBox(width: 8.w),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -108,7 +63,9 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    '$activeMemberCount members active',
+                    activeMemberCount > 0
+                        ? '$activeMemberCount ${activeMemberCount == 1 ? "member" : "members"} active'
+                        : 'Group Discussion',
                     style: GoogleFonts.outfit(
                       color: const Color(0xFF6B8A9D),
                       fontSize: 11.sp,
@@ -180,6 +137,71 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildAvatarStack() {
+    if (participants.isEmpty) {
+      return Container(
+        width: 32.w,
+        height: 32.w,
+        decoration: BoxDecoration(
+          color: const Color(0xFF006EDB).withValues(alpha: 0.2),
+          shape: BoxShape.circle,
+          border: Border.all(color: const Color(0xFF006EDB), width: 1.5),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.groups_rounded,
+            color: const Color(0xFF00C6FF),
+            size: 18.sp,
+          ),
+        ),
+      );
+    }
+
+    final colors = [
+      const Color(0xFF9333EA),
+      const Color(0xFF006EDB),
+      const Color(0xFF10B981),
+      const Color(0xFFF59E0B),
+    ];
+
+    final displayItems = participants.take(3).toList();
+    final stackWidth = 26.w + (displayItems.length - 1) * 14.w;
+
+    return SizedBox(
+      width: stackWidth,
+      height: 32.h,
+      child: Stack(
+        children: [
+          for (int i = 0; i < displayItems.length; i++)
+            Positioned(
+              left: (i * 14).w,
+              child: _buildAvatarCircle(
+                bg: colors[i % colors.length],
+                child: Text(
+                  _getInitials(displayItems[i]),
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    } else if (name.isNotEmpty) {
+      return name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase();
+    }
+    return 'U';
   }
 
   Widget _buildAvatarCircle({required Color bg, required Widget child}) {

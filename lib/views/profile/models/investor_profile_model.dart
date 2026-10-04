@@ -10,8 +10,7 @@ class InvestorProfileModel {
   const InvestorProfileModel({
     this.name = "Member",
     this.title = "Angel Investor",
-    this.avatarUrl =
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
+    this.avatarUrl = "",
     this.investedAmount = "\$0.00",
     this.projectsCount = "0",
   });
@@ -53,8 +52,7 @@ class InvestorProfileModel {
         data['profile_image']?.toString() ??
         data['avatar']?.toString();
 
-    String photoUrl =
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop";
+    String photoUrl = '';
     if (rawPhoto != null && rawPhoto != 'null' && rawPhoto.isNotEmpty) {
       if (rawPhoto.startsWith('http://') || rawPhoto.startsWith('https://')) {
         photoUrl = rawPhoto;

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/constants/api_endpoints.dart';
 import '../../chat/models/chat_message_model.dart';
 import '../models/group_chat_model.dart';
 
@@ -191,16 +192,57 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble> {
   }
 
   Widget _buildImageWidget() {
-    final path = widget.message.mediaUrl ?? '';
-    if (path.startsWith('assets/')) {
+    final rawPath = widget.message.mediaUrl ?? '';
+    if (rawPath.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    if (rawPath.startsWith('assets/')) {
       return Image.asset(
-        path,
+        rawPath,
         width: 190.w,
         height: 130.h,
         fit: BoxFit.cover,
       );
     }
-    final file = File(path);
+
+    if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) {
+      return Image.network(
+        rawPath,
+        width: 190.w,
+        height: 130.h,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: 190.w,
+          height: 130.h,
+          color: const Color(0xFF0F1E2E),
+          child: const Center(
+            child: Icon(Icons.broken_image_rounded, color: Colors.white54),
+          ),
+        ),
+      );
+    }
+
+    if (rawPath.startsWith('/media/') || rawPath.startsWith('media/')) {
+      final cleanPath = rawPath.startsWith('/') ? rawPath : '/$rawPath';
+      final fullUrl = '${ApiEndpoints.baseUrl}$cleanPath';
+      return Image.network(
+        fullUrl,
+        width: 190.w,
+        height: 130.h,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          width: 190.w,
+          height: 130.h,
+          color: const Color(0xFF0F1E2E),
+          child: const Center(
+            child: Icon(Icons.broken_image_rounded, color: Colors.white54),
+          ),
+        ),
+      );
+    }
+
+    final file = File(rawPath);
     if (file.existsSync()) {
       return Image.file(
         file,
@@ -209,11 +251,14 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble> {
         fit: BoxFit.cover,
       );
     }
-    return Image.asset(
-      'assets/images/onboarding1.png',
+
+    return Container(
       width: 190.w,
       height: 130.h,
-      fit: BoxFit.cover,
+      color: const Color(0xFF0F1E2E),
+      child: const Center(
+        child: Icon(Icons.image_not_supported_rounded, color: Colors.white54),
+      ),
     );
   }
 

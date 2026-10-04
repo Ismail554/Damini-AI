@@ -63,6 +63,7 @@ class InvestorProfileView extends ConsumerWidget {
             avatarUrl: profile.avatarUrl,
             investedAmount: profile.investedAmount,
             projectsCount: profile.projectsCount,
+            role: currentRole,
           ),
           SizedBox(height: 18.h),
 

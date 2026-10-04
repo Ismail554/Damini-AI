@@ -14,6 +14,7 @@ import '../widgets/investor_banner_carousel.dart';
 import '../widgets/investor_category_chip.dart';
 import '../widgets/trending_opportunity_card.dart';
 import '../../../profile/widgets/profile_quick_view_sheet.dart';
+import 'package:Braintech/core/widgets/app_avatar.dart';
 
 class InvestorDashboard extends ConsumerStatefulWidget {
   const InvestorDashboard({super.key});
@@ -140,15 +141,10 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
           children: [
             GestureDetector(
               onTap: () => ProfileQuickViewSheet.show(context),
-              child: CircleAvatar(
+              child: AppAvatar(
+                imageUrl: state.profilePhoto,
+                name: state.greetingName,
                 radius: AppDimens.avatarSm,
-                backgroundColor: tc.buttonSecondary,
-                backgroundImage: (state.profilePhoto != null &&
-                        state.profilePhoto!.isNotEmpty)
-                    ? NetworkImage(state.profilePhoto!)
-                    : const NetworkImage(
-                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
-                      ),
               ),
             ),
             SizedBox(width: AppDimens.spaceMd),

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_theme_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
+import '../../auth/session/controllers/session_provider.dart';
+import '../personal_info/controllers/personal_info_provider.dart';
 
-class ProfileQuickViewSheet extends StatelessWidget {
-  final String name;
-  final String title;
-  final String company;
-  final String avatarUrl;
+class ProfileQuickViewSheet extends ConsumerWidget {
+  final String? name;
+  final String? title;
+  final String? company;
+  final String? avatarUrl;
+  final String? role;
+  final String? verificationStatus;
 
   const ProfileQuickViewSheet({
     super.key,
-    this.name = "Shawn Blake",
-    this.title = "Managing Director at Austin Tech Capital",
-    this.company = "Austin Tech Capital",
-    this.avatarUrl =
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250&auto=format&fit=crop",
+    this.name,
+    this.title,
+    this.company,
+    this.avatarUrl,
+    this.role,
+    this.verificationStatus,
   });
 
   static Future<void> show(BuildContext context) {
@@ -29,8 +36,51 @@ class ProfileQuickViewSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tc = AppThemeColors.of(context);
+    final personalInfo = ref.watch(personalInfoProvider).info;
+    final authRole = ref.watch(authProvider).userRole;
+
+    final effectiveName = name ??
+        (personalInfo.fullName.isNotEmpty && personalInfo.fullName != 'Member'
+            ? personalInfo.fullName
+            : (authRole == 'investor' ? 'Investor' : 'Sponsor'));
+
+    final effectiveTitle = title ??
+        (personalInfo.position.isNotEmpty
+            ? personalInfo.position
+            : (personalInfo.companyName.isNotEmpty
+                ? personalInfo.companyName
+                : (authRole == 'investor'
+                    ? 'Angel Investor'
+                    : 'Sponsor Partner')));
+
+    final effectiveCompany = company ?? personalInfo.companyName;
+    final effectiveAvatarUrl = avatarUrl ?? personalInfo.profilePhotoUrl;
+
+    final roleStr =
+        role ?? (personalInfo.role.isNotEmpty ? personalInfo.role : authRole);
+    final isInvestor = (roleStr ?? '').toLowerCase() == 'investor';
+    final roleLabel = isInvestor ? 'Investor' : 'Sponsor';
+
+    final status = (verificationStatus ??
+            personalInfo.verificationStatus ??
+            'PENDING')
+        .toUpperCase();
+    final isApproved = status == 'APPROVED';
+    final statusLabel = isApproved
+        ? 'Verified'
+        : (status == 'REJECTED' ? 'Rejected' : 'Pending');
+    final statusBg = isApproved
+        ? const Color(0xFF064E3B)
+        : (status == 'REJECTED'
+            ? const Color(0xFF450A0A)
+            : const Color(0xFF451A03));
+    final statusTextColor = isApproved
+        ? const Color(0xFF10B981)
+        : (status == 'REJECTED'
+            ? const Color(0xFFEF4444)
+            : const Color(0xFFF59E0B));
 
     return Container(
       padding: EdgeInsets.all(20.r),
@@ -62,21 +112,24 @@ class ProfileQuickViewSheet extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  CircleAvatar(
+                  AppAvatar(
+                    imageUrl: effectiveAvatarUrl,
+                    name: effectiveName,
                     radius: 30.r,
-                    backgroundImage: NetworkImage(avatarUrl),
                   ),
                   Positioned(
                     right: 0,
                     bottom: 0,
                     child: Container(
                       padding: EdgeInsets.all(3.r),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF10B981),
+                      decoration: BoxDecoration(
+                        color: statusTextColor,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        Icons.shield_outlined,
+                        isApproved
+                            ? Icons.verified_rounded
+                            : Icons.shield_outlined,
                         color: Colors.white,
                         size: 11.r,
                       ),
@@ -90,7 +143,7 @@ class ProfileQuickViewSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      effectiveName,
                       style: GoogleFonts.outfit(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
@@ -99,7 +152,7 @@ class ProfileQuickViewSheet extends StatelessWidget {
                     ),
                     SizedBox(height: 2.h),
                     Text(
-                      title,
+                      effectiveTitle,
                       style: GoogleFonts.outfit(
                         fontSize: 13.sp,
                         color: tc.textSecondary,
@@ -110,10 +163,18 @@ class ProfileQuickViewSheet extends StatelessWidget {
                     SizedBox(height: 6.h),
                     Row(
                       children: [
-                        _buildBadge("Sponsor", const Color(0xFF1D4ED8)),
+                        _buildBadge(
+                          roleLabel,
+                          isInvestor
+                              ? const Color(0xFF059669)
+                              : const Color(0xFF1D4ED8),
+                        ),
                         SizedBox(width: 6.w),
-                        _buildBadge("Verified", const Color(0xFF064E3B),
-                            textColor: const Color(0xFF10B981)),
+                        _buildBadge(
+                          statusLabel,
+                          statusBg,
+                          textColor: statusTextColor,
+                        ),
                       ],
                     ),
                   ],
@@ -141,10 +202,10 @@ class ProfileQuickViewSheet extends StatelessWidget {
               context.push(
                 '/public-profile',
                 extra: {
-                  'name': name,
-                  'title': title,
-                  'company': company,
-                  'avatarUrl': avatarUrl,
+                  'name': effectiveName,
+                  'title': effectiveTitle,
+                  'company': effectiveCompany,
+                  'avatarUrl': effectiveAvatarUrl ?? '',
                   'isOwnProfile': true,
                 },
               );

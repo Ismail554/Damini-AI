@@ -1,35 +1,9 @@
-import 'package:flutter/material.dart';
 import '../widgets/group_member_card.dart';
 
 class InvestorSelectionHelper {
   InvestorSelectionHelper._();
 
-  static const List<GroupMemberCardItem> mockInvestors = [
-    GroupMemberCardItem(
-      id: 'inv_dc',
-      name: 'David Chen',
-      role: 'Investor',
-      offeredBudget: '\$200k',
-      initials: 'DC',
-      avatarBg: Color(0xFF006EDB),
-    ),
-    GroupMemberCardItem(
-      id: 'inv_vp',
-      name: 'Venture Partners LLC',
-      role: 'VC Investor',
-      offeredBudget: '\$400k',
-      initials: 'VP',
-      avatarBg: Color(0xFF7C3AED),
-    ),
-    GroupMemberCardItem(
-      id: 'inv_sj',
-      name: 'Sarah Jenkins',
-      role: 'Angel Investor',
-      offeredBudget: '\$150k',
-      initials: 'SJ',
-      avatarBg: Color(0xFFEC4899),
-    ),
-  ];
+  static const List<GroupMemberCardItem> mockInvestors = [];
 
   static String calculateTotalBudget(List<GroupMemberCardItem> selected) {
     double total = 0;

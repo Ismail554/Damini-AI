@@ -10,6 +10,7 @@ import 'package:Braintech/core/widgets/logout_dialog.dart';
 import '../../../profile/widgets/account_type_switcher_card.dart';
 import '../../../profile/widgets/profile_hero_card.dart';
 import '../../../profile/widgets/profile_menu_card.dart';
+import '../../../profile/personal_info/controllers/personal_info_provider.dart';
 import '../controllers/sponsor_profile_provider.dart';
 
 class SponsorProfileView extends ConsumerWidget {
@@ -22,6 +23,7 @@ class SponsorProfileView extends ConsumerWidget {
     final currentRole = auth.userRole ?? 'sponsor';
     final profileState = ref.watch(sponsorProfileProvider);
     final profile = profileState.profile;
+    final personal = ref.watch(personalInfoProvider).info;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -56,12 +58,24 @@ class SponsorProfileView extends ConsumerWidget {
           SizedBox(height: AppDimens.spaceLg),
 
           ProfileHeroCard(
-            name: profile?.name ,
-            title: profile?.title ?? "Managing Director at Austin Tech Capital",
-            avatarUrl: profile?.avatarUrl ??
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
-            investedAmount: profile?.investedAmount ?? "\$1.2M",
-            projectsCount: profile?.projectsCount ?? "2",
+            name: (profile?.name != null &&
+                    profile!.name.isNotEmpty &&
+                    profile.name != 'Member')
+                ? profile.name
+                : (personal.fullName.isNotEmpty ? personal.fullName : 'Member'),
+            title: (profile?.title != null && profile!.title.isNotEmpty)
+                ? profile.title
+                : (personal.position.isNotEmpty
+                    ? personal.position
+                    : 'Sponsor Partner'),
+            avatarUrl:
+                (profile?.avatarUrl != null && profile!.avatarUrl.isNotEmpty)
+                    ? profile.avatarUrl
+                    : personal.profilePhotoUrl,
+            investedAmount: profile?.investedAmount ?? "\$0.00",
+            projectsCount: profile?.projectsCount ?? "0",
+            role: currentRole,
+            verificationStatus: personal.verificationStatus,
           ),
           SizedBox(height: AppDimens.spaceLg),
 

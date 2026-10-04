@@ -15,6 +15,8 @@ class GroupChatAiSuggestions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (suggestions.isEmpty) return const SizedBox.shrink();
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8.h),
       color: const Color(0xFF061427),

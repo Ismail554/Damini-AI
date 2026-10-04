@@ -8,22 +8,28 @@ import '../models/investor_selection_helper.dart';
 import 'group_member_card.dart';
 
 class ConfirmInvestorModal extends StatefulWidget {
+  final List<GroupMemberCardItem>? availableInvestors;
   final Function(List<InvestorContributionModel> contributions) onConfirm;
 
   const ConfirmInvestorModal({
     super.key,
+    this.availableInvestors,
     required this.onConfirm,
   });
 
   static Future<void> show(
     BuildContext context, {
+    List<GroupMemberCardItem>? availableInvestors,
     required Function(List<InvestorContributionModel> contributions) onConfirm,
   }) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ConfirmInvestorModal(onConfirm: onConfirm),
+      builder: (_) => ConfirmInvestorModal(
+        availableInvestors: availableInvestors,
+        onConfirm: onConfirm,
+      ),
     );
   }
 
@@ -32,11 +38,15 @@ class ConfirmInvestorModal extends StatefulWidget {
 }
 
 class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
-  final Set<String> _selectedIds = {'inv_dc'};
+  final Set<String> _selectedIds = {};
 
   @override
   void initState() {
     super.initState();
+    final list = widget.availableInvestors ?? [];
+    if (list.isNotEmpty) {
+      _selectedIds.add(list.first.id);
+    }
     _loadCachedSelection();
   }
 
@@ -44,10 +54,16 @@ class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
     final prefs = await SharedPreferences.getInstance();
     final cachedIds = prefs.getStringList('cached_selected_investor_ids');
     if (cachedIds != null && cachedIds.isNotEmpty) {
-      setState(() {
-        _selectedIds.clear();
-        _selectedIds.addAll(cachedIds);
-      });
+      final validIds = (widget.availableInvestors ?? [])
+          .map((i) => i.id)
+          .toSet();
+      final intersection = cachedIds.where(validIds.contains).toSet();
+      if (intersection.isNotEmpty) {
+        setState(() {
+          _selectedIds.clear();
+          _selectedIds.addAll(intersection);
+        });
+      }
     }
   }
 
@@ -74,7 +90,7 @@ class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
 
   @override
   Widget build(BuildContext context) {
-    final investors = InvestorSelectionHelper.mockInvestors;
+    final investors = widget.availableInvestors ?? [];
     final selected =
         investors.where((inv) => _selectedIds.contains(inv.id)).toList();
     final totalBudget = InvestorSelectionHelper.calculateTotalBudget(selected);
@@ -112,22 +128,23 @@ class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF006EDB).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: const Color(0xFF006EDB)),
-                ),
-                child: Text(
-                  '${_selectedIds.length} Selected',
-                  style: GoogleFonts.outfit(
-                    color: const Color(0xFF00C6FF),
-                    fontSize: 11.5.sp,
-                    fontWeight: FontWeight.w600,
+              if (investors.isNotEmpty)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF006EDB).withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: const Color(0xFF006EDB)),
+                  ),
+                  child: Text(
+                    '${_selectedIds.length} Selected',
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFF00C6FF),
+                      fontSize: 11.5.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           SizedBox(height: 4.h),
@@ -139,50 +156,85 @@ class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
             ),
           ),
           SizedBox(height: 14.h),
-          ...investors.map((inv) {
-            return GroupMemberCard(
-              member: inv,
-              isSelected: _selectedIds.contains(inv.id),
-              onTap: () => _toggleInvestor(inv.id),
-            );
-          }),
-          SizedBox(height: 10.h),
-          // Total Budget Summary Bar
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-            decoration: BoxDecoration(
-              color: const Color(0xFF071424),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Confirmed Budget:',
-                  style: GoogleFonts.outfit(
-                    color: const Color(0xFF6B8A9D),
-                    fontSize: 13.sp,
-                  ),
+          if (investors.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.h),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.people_outline_rounded,
+                      color: const Color(0xFF6B8A9D),
+                      size: 40.sp,
+                    ),
+                    SizedBox(height: 10.h),
+                    Text(
+                      'No Approved Investors Yet',
+                      style: GoogleFonts.outfit(
+                        color: Colors.white,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'Approved project collaboration requests will appear here.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.outfit(
+                        color: const Color(0xFF6B8A9D),
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  totalBudget,
-                  style: GoogleFonts.outfit(
-                    color: const Color(0xFF10B981),
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
+              ),
+            )
+          else ...[
+            ...investors.map((inv) {
+              return GroupMemberCard(
+                member: inv,
+                isSelected: _selectedIds.contains(inv.id),
+                onTap: () => _toggleInvestor(inv.id),
+              );
+            }),
+            SizedBox(height: 10.h),
+            // Total Budget Summary Bar
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+              decoration: BoxDecoration(
+                color: const Color(0xFF071424),
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total Confirmed Budget:',
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFF6B8A9D),
+                      fontSize: 13.sp,
+                    ),
                   ),
-                ),
-              ],
+                  Text(
+                    totalBudget,
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFF10B981),
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 16.h),
-          CustomButton(
-            text:
-                'Confirm ${selected.length} Investor${selected.length > 1 ? 's' : ''} ($totalBudget)',
-            variant: CustomButtonVariant.gradient,
-            onPressed: () => _handleConfirm(selected),
-          ),
+            SizedBox(height: 16.h),
+            CustomButton(
+              text:
+                  'Confirm ${selected.length} Investor${selected.length > 1 ? 's' : ''} ($totalBudget)',
+              variant: CustomButtonVariant.gradient,
+              onPressed: selected.isEmpty ? () {} : () => _handleConfirm(selected),
+            ),
+          ],
         ],
       ),
     );

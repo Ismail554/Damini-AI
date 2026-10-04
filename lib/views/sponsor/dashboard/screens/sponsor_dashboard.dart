@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
+import 'package:Braintech/core/widgets/app_avatar.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
 import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import '../../create_project/controllers/project_draft_provider.dart';
@@ -323,15 +324,10 @@ class SponsorDashboard extends ConsumerWidget {
             SizedBox(width: AppDimens.spaceMd),
             GestureDetector(
               onTap: () => ProfileQuickViewSheet.show(context),
-              child: CircleAvatar(
+              child: AppAvatar(
+                imageUrl: state.profilePhoto,
+                name: state.displayName,
                 radius: AppDimens.avatarSm,
-                backgroundColor: tc.buttonSecondary,
-                backgroundImage: (state.profilePhoto != null &&
-                        state.profilePhoto!.isNotEmpty)
-                    ? NetworkImage(state.profilePhoto!)
-                    : const NetworkImage(
-                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
-                      ),
               ),
             ),
           ],

@@ -9,79 +9,12 @@ abstract class GroupChatRepository {
 class GroupChatRepositoryImpl implements GroupChatRepository {
   @override
   Future<List<GroupChatMessage>> fetchInitialMessages() async {
-    await Future.delayed(const Duration(milliseconds: 150));
-    return const [
-      GroupChatMessage(
-        id: '1',
-        senderName: 'Damani AI',
-        avatarInitials: 'AI',
-        avatarType: ChatAvatarType.ai,
-        isAi: true,
-        isMe: false,
-        text:
-            'Welcome! This is a group chat with Arif (Sponsor), David (Investor), and me — VentureAI. I am here to keep the conversation on track and suggest next steps.',
-        time: '10:05',
-      ),
-      GroupChatMessage(
-        id: '2',
-        senderName: 'David Chen',
-        senderRole: 'Investor',
-        avatarInitials: 'DC',
-        avatarType: ChatAvatarType.investor,
-        isAi: false,
-        isMe: false,
-        text:
-            'Hello Arif! Very interested to hear about your EdTech project. How many active users do you currently have?',
-        time: '10:06',
-      ),
-      GroupChatMessage(
-        id: '3',
-        senderName: 'You',
-        senderRole: 'Sponsor',
-        avatarInitials: 'A',
-        avatarType: ChatAvatarType.sponsor,
-        isAi: false,
-        isMe: true,
-        text:
-            'We have 2,400 beta users so far, growing at 34% month over month.',
-        time: '10:07',
-      ),
-      GroupChatMessage(
-        id: '4',
-        senderName: 'Damani AI',
-        avatarInitials: 'AI',
-        avatarType: ChatAvatarType.ai,
-        isAi: true,
-        isMe: false,
-        text:
-            '💡 Tip: Share your retention rate and monthly active users (MAU) with David — these are the most important metrics for investors at the seed stage.',
-        time: '10:07',
-      ),
-    ];
+    return const [];
   }
 
   @override
   Future<List<AiSuggestion>> fetchSuggestions() async {
-    return const [
-      AiSuggestion(
-        id: 's1',
-        title: 'Prepare pitch deck',
-        icon: '\$',
-        isCompleted: true,
-      ),
-      AiSuggestion(
-        id: 's2',
-        title: 'Define MVP roadmap',
-        icon: '⚡',
-        isCompleted: true,
-      ),
-      AiSuggestion(
-        id: 's3',
-        title: 'Set financial targets',
-        icon: '📈',
-        isCompleted: false,
-      ),
-    ];
+    return const [];
   }
 
   @override
@@ -93,7 +26,7 @@ class GroupChatRepositoryImpl implements GroupChatRepository {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderName: 'You',
       senderRole: 'Sponsor',
-      avatarInitials: 'A',
+      avatarInitials: 'YO',
       avatarType: ChatAvatarType.sponsor,
       isAi: false,
       isMe: true,

@@ -1,30 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
+import '../../../core/widgets/app_avatar.dart';
 
 class ProfileHeroCard extends StatelessWidget {
-  final String ? name;
-  final String title;
-  final String avatarUrl;
+  final String? name;
+  final String? title;
+  final String? avatarUrl;
   final String investedAmount;
   final String projectsCount;
+  final String? role;
+  final String? verificationStatus;
 
   const ProfileHeroCard({
     super.key,
     required this.name,
-    required this.title,
-    required this.avatarUrl,
+    this.title,
+    this.avatarUrl,
     required this.investedAmount,
     required this.projectsCount,
+    this.role,
+    this.verificationStatus,
   });
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
+    final status = (verificationStatus ?? 'PENDING').toUpperCase();
+    final isApproved = status == 'APPROVED';
+    final isRejected = status == 'REJECTED';
+
+    final effectiveRole = (role != null && role!.isNotEmpty)
+        ? '${role![0].toUpperCase()}${role!.substring(1).toLowerCase()}'
+        : 'Member';
+
+    Color verificationBg = tc.greenPillBg;
+    Color verificationTextColor = tc.greenPillText;
+    String verificationLabel = "Verified";
+    IconData verificationIcon = Icons.verified_outlined;
+
+    if (isApproved) {
+      verificationBg = tc.greenPillBg;
+      verificationTextColor = tc.greenPillText;
+      verificationLabel = "Verified";
+      verificationIcon = Icons.verified_outlined;
+    } else if (isRejected) {
+      verificationBg = AppColors.error.withValues(alpha: 0.15);
+      verificationTextColor = AppColors.error;
+      verificationLabel = "Rejected";
+      verificationIcon = Icons.cancel_outlined;
+    } else {
+      verificationBg = const Color(0xFFF59E0B).withValues(alpha: 0.15);
+      verificationTextColor = const Color(0xFFF59E0B);
+      verificationLabel = "Pending";
+      verificationIcon = Icons.hourglass_top_rounded;
+    }
 
     return Container(
       width: double.infinity,
@@ -43,35 +77,28 @@ class ProfileHeroCard extends StatelessWidget {
               children: [
                 Stack(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        // border: Border.all(
-                        //   color: tc.textPrimary,
-                        //   width: AppDimens.borderMedium,
-                        // ),
-                      ),
-                      child: CircleAvatar(
-                        radius: 40.r,
-                        backgroundImage: NetworkImage(avatarUrl),
-                      ),
+                    AppAvatar(
+                      imageUrl: avatarUrl,
+                      name: name ?? "Member",
+                      radius: 40.r,
                     ),
-                    Positioned(
-                      right: 2.w,
-                      bottom: 2.h,
-                      child: Container(
-                        padding: EdgeInsets.all(3.r),
-                        decoration: const BoxDecoration(
-                          color: AppColors.successGreen,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.check_rounded,
-                          color: Colors.white,
-                          size: 12.r,
+                    if (isApproved)
+                      Positioned(
+                        right: 2.w,
+                        bottom: 2.h,
+                        child: Container(
+                          padding: EdgeInsets.all(3.r),
+                          decoration: const BoxDecoration(
+                            color: AppColors.successGreen,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 12.r,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 SizedBox(height: AppDimens.spaceMd),
@@ -85,7 +112,9 @@ class ProfileHeroCard extends StatelessWidget {
                 ),
                 SizedBox(height: AppDimens.spaceXxs),
                 Text(
-                  title,
+                  (title != null && title!.trim().isNotEmpty)
+                      ? title!.trim()
+                      : "Member",
                   style: GoogleFonts.outfit(
                     fontSize: 13.sp,
                     color: tc.textTertiary,
@@ -107,7 +136,7 @@ class ProfileHeroCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
                 child: Text(
-                  "Sponsor",
+                  effectiveRole,
                   style: GoogleFonts.outfit(
                     fontSize: 11.sp,
                     color: tc.pillText,
@@ -124,22 +153,22 @@ class ProfileHeroCard extends StatelessWidget {
                     vertical: 4.h,
                   ),
                   decoration: BoxDecoration(
-                    color: tc.greenPillBg,
+                    color: verificationBg,
                     borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                   ),
                   child: Row(
                     children: [
                       Icon(
-                        Icons.verified_outlined,
-                        color: tc.greenPillText,
+                        verificationIcon,
+                        color: verificationTextColor,
                         size: 12.r,
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        "Verified",
+                        verificationLabel,
                         style: GoogleFonts.outfit(
                           fontSize: 11.sp,
-                          color: tc.greenPillText,
+                          color: verificationTextColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

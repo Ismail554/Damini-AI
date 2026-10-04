@@ -27,7 +27,7 @@ class SponsorDashboardState {
     if (userProfile != null && userProfile!.fullName.isNotEmpty) {
       return userProfile!.fullName;
     }
-    return 'Shawn Blake';
+    return 'Member';
   }
 
   /// Profile photo URL if available

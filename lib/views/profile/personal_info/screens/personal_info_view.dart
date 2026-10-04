@@ -5,8 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_theme_colors.dart';
+import '../../../../core/widgets/app_avatar.dart';
 import '../../../../core/widgets/common_background.dart';
 import '../controllers/personal_info_provider.dart';
+import '../models/personal_info_model.dart';
 import '../widgets/info_section_card.dart';
 
 class PersonalInformationView extends ConsumerWidget {
@@ -103,33 +105,16 @@ class PersonalInformationView extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfilePhotoHeader(dynamic info, AppThemeColors tc) {
-    final initials = (info.fullName as String).isNotEmpty
-        ? (info.fullName as String)
-              .split(' ')
-              .where((w) => w.isNotEmpty)
-              .map((e) => e[0])
-              .take(2)
-              .join()
-        : 'U';
-
-    final hasPhoto =
-        info.profilePhotoUrl != null &&
-        (info.profilePhotoUrl as String).isNotEmpty;
-
+  Widget _buildProfilePhotoHeader(PersonalInfoModel info, AppThemeColors tc) {
     final subtitleParts = [
-      if ((info.position as String).trim().isNotEmpty)
-        (info.position as String).trim(),
-      if ((info.companyName as String).trim().isNotEmpty)
-        (info.companyName as String).trim(),
+      if (info.position.trim().isNotEmpty) info.position.trim(),
+      if (info.companyName.trim().isNotEmpty) info.companyName.trim(),
     ];
     final subtitle = subtitleParts.isNotEmpty
         ? subtitleParts.join(' • ')
-        : ((info.role as String).isNotEmpty
-              ? (info.role as String)
-              : ((info.email as String).isNotEmpty
-                    ? (info.email as String)
-                    : 'Member'));
+        : (info.role.isNotEmpty
+            ? info.role
+            : (info.email.isNotEmpty ? info.email : 'Member'));
 
     return Container(
       width: double.infinity,
@@ -151,22 +136,10 @@ class PersonalInformationView extends ConsumerWidget {
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0xFF006EDB), width: 2.w),
             ),
-            child: CircleAvatar(
+            child: AppAvatar(
+              imageUrl: info.profilePhotoUrl,
+              name: info.fullName,
               radius: 44.r,
-              backgroundColor: tc.buttonSecondary,
-              backgroundImage: hasPhoto
-                  ? NetworkImage(info.profilePhotoUrl!)
-                  : null,
-              child: !hasPhoto
-                  ? Text(
-                      initials.toUpperCase(),
-                      style: GoogleFonts.outfit(
-                        fontSize: 24.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF006EDB),
-                      ),
-                    )
-                  : null,
             ),
           ),
           AppSpacing.h12,

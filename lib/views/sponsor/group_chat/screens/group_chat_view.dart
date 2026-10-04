@@ -11,6 +11,7 @@ import '../widgets/confirm_investor_modal.dart';
 import '../widgets/group_chat_ai_suggestions.dart';
 import '../widgets/group_chat_app_bar.dart';
 import '../widgets/group_chat_message_bubble.dart';
+import '../widgets/group_member_card.dart';
 import '../widgets/remove_participant_modal.dart';
 
 class GroupChatView extends ConsumerStatefulWidget {
@@ -52,6 +53,7 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
       appBar: GroupChatAppBar(
         title: widget.projectTitle,
         activeMemberCount: state.participants.length,
+        participants: state.participants,
         onMenuSelected: (action) =>
             _handleMenuAction(context, ref, action),
       ),
@@ -65,18 +67,60 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
                         color: Color(0xFF006EDB),
                       ),
                     )
-                  : ListView.builder(
-                      controller: notifier.scrollController,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                      itemCount: state.messages.length,
-                      itemBuilder: (context, index) {
-                        final message = state.messages[index];
-                        return GroupChatMessageBubble(message: message);
-                      },
-                    ),
+                  : state.messages.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 64.w,
+                                height: 64.w,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF006EDB).withValues(alpha: 0.12),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.chat_bubble_outline_rounded,
+                                  color: const Color(0xFF006EDB),
+                                  size: 30.sp,
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              Text(
+                                "No messages yet",
+                                style: GoogleFonts.outfit(
+                                  color: Colors.white,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 40.w),
+                                child: Text(
+                                  "Start the conversation with your investors and project team.",
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.outfit(
+                                    color: const Color(0xFF6B8A9D),
+                                    fontSize: 12.5.sp,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          controller: notifier.scrollController,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 12.h,
+                          ),
+                          itemCount: state.messages.length,
+                          itemBuilder: (context, index) {
+                            final message = state.messages[index];
+                            return GroupChatMessageBubble(message: message);
+                          },
+                        ),
             ),
             if (state.typingUser != null)
               Padding(
@@ -93,10 +137,11 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
                   ),
                 ),
               ),
-            GroupChatAiSuggestions(
-              suggestions: state.suggestions,
-              onSelect: notifier.onSuggestionTap,
-            ),
+            if (state.suggestions.isNotEmpty)
+              GroupChatAiSuggestions(
+                suggestions: state.suggestions,
+                onSelect: notifier.onSuggestionTap,
+              ),
             DirectChatInputBar(
               controller: notifier.messageController,
               onSend: notifier.sendMessage,
@@ -199,8 +244,51 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
     BuildContext context,
     WidgetRef ref,
   ) {
+    final projectState = ref.read(sponsorProjectProvider);
+    final chatState = ref.read(groupChatProvider);
+
+    final availableInvestors = <GroupMemberCardItem>[];
+    final colors = [
+      const Color(0xFF006EDB),
+      const Color(0xFF7C3AED),
+      const Color(0xFF10B981),
+      const Color(0xFFEC4899),
+    ];
+
+    int colorIdx = 0;
+    for (final req in projectState.approvedList) {
+      if (req.investorName.isNotEmpty) {
+        availableInvestors.add(
+          GroupMemberCardItem(
+            id: req.id,
+            name: req.investorName,
+            role: req.investorType.isNotEmpty ? req.investorType : 'Investor',
+            offeredBudget: req.proposedBudget.isNotEmpty ? req.proposedBudget : '\$0',
+            initials: _getInitials(req.investorName),
+            avatarBg: colors[(colorIdx++) % colors.length],
+          ),
+        );
+      }
+    }
+
+    for (final p in chatState.participants) {
+      if (!availableInvestors.any((inv) => inv.name.toLowerCase() == p.toLowerCase())) {
+        availableInvestors.add(
+          GroupMemberCardItem(
+            id: 'participant_${p.hashCode}',
+            name: p,
+            role: 'Participant',
+            offeredBudget: '\$0',
+            initials: _getInitials(p),
+            avatarBg: colors[(colorIdx++) % colors.length],
+          ),
+        );
+      }
+    }
+
     ConfirmInvestorModal.show(
       context,
+      availableInvestors: availableInvestors,
       onConfirm: (contributions) {
         if (contributions.isEmpty) return;
         final sponsorNotifier = ref.read(sponsorProjectProvider.notifier);
@@ -221,5 +309,15 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
         );
       },
     );
+  }
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    } else if (name.isNotEmpty) {
+      return name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase();
+    }
+    return 'U';
   }
 }

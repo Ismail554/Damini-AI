@@ -33,19 +33,17 @@ class SponsorProfileRepository {
         return SponsorProfileData.fromJson(Map<String, dynamic>.from(data));
       }
       return const SponsorProfileData(
-        name: "Shawn Blake",
-        title: "Managing Director at Austin Tech Capital",
-        avatarUrl:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
+        name: "Member",
+        title: "Sponsor Partner",
+        avatarUrl: "",
         investedAmount: "\$0.00",
         projectsCount: "0",
       );
     } catch (_) {
       return const SponsorProfileData(
-        name: "Shawn Blake",
-        title: "Managing Director at Austin Tech Capital",
-        avatarUrl:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop",
+        name: "Member",
+        title: "Sponsor Partner",
+        avatarUrl: "",
         investedAmount: "\$0.00",
         projectsCount: "0",
       );

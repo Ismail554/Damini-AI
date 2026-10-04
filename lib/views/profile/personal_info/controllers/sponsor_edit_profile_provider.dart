@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../sponsor/dashboard/controllers/sponsor_dashboard_provider.dart';
 import '../../../sponsor/profile/controllers/sponsor_profile_provider.dart';
 import '../models/sponsor_edit_profile_model.dart';
 import '../repositories/sponsor_edit_profile_repository.dart';
@@ -113,6 +114,10 @@ class SponsorEditProfileNotifier extends Notifier<SponsorEditProfileState> {
 
       try {
         await ref.read(sponsorProfileProvider.notifier).refresh();
+      } catch (_) {}
+
+      try {
+        await ref.read(sponsorDashboardProvider.notifier).refresh();
       } catch (_) {}
 
       // Re-fetch to get latest server values

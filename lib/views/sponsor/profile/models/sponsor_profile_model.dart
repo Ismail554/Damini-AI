@@ -44,7 +44,7 @@ class SponsorProfileData {
     } else if (last.isNotEmpty) {
       fullName = capitalize(last);
     } else {
-      fullName = 'Shawn Blake';
+      fullName = 'Member';
     }
 
     final rawPhoto = profile['profile_photo']?.toString() ??
@@ -52,8 +52,7 @@ class SponsorProfileData {
         data['profile_image']?.toString() ??
         data['avatar']?.toString();
 
-    String photoUrl =
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250&auto=format&fit=crop";
+    String photoUrl = '';
     if (rawPhoto != null && rawPhoto != 'null' && rawPhoto.isNotEmpty) {
       if (rawPhoto.startsWith('http://') || rawPhoto.startsWith('https://')) {
         photoUrl = rawPhoto;

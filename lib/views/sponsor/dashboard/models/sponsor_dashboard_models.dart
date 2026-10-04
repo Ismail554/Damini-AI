@@ -43,7 +43,7 @@ class SponsorUserProfile {
     if (capFirst.isNotEmpty && capLast.isNotEmpty) return '$capFirst $capLast';
     if (capFirst.isNotEmpty) return capFirst;
     if (capLast.isNotEmpty) return capLast;
-    return 'Shawn Blake';
+    return 'Member';
   }
 
   factory SponsorUserProfile.fromJson(Map<String, dynamic> json) {
