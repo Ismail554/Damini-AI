@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:Braintech/core/constants/api_endpoints.dart';
 import 'package:Braintech/core/services/api_error_handler.dart';
 import 'package:Braintech/core/services/api_service.dart';
+import 'package:Braintech/core/services/notification_service.dart';
 import 'package:Braintech/core/services/storage_service.dart';
 import 'package:Braintech/shared/global_key.dart';
 import 'package:Braintech/views/auth/login/models/login_request_model.dart';
@@ -82,6 +84,11 @@ class LoginRepositoryImpl implements LoginRepository {
       } else {
         await StorageService.clearRole();
       }
+
+      // Validate and register FCM device token with backend
+      unawaited(
+        NotificationService.validateAndRegisterDeviceToken(force: true),
+      );
 
       return LoginResponseModel(
         success: true,

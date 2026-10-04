@@ -1,5 +1,7 @@
+import 'dart:async';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/api_service.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/services/storage_service.dart';
 import '../models/otp_model.dart';
 
@@ -49,6 +51,9 @@ class OtpRepositoryImpl implements OtpRepository {
         }
         await StorageService.saveIsApiConnected(true);
         await StorageService.saveHasSeenOnboarding();
+        unawaited(
+          NotificationService.validateAndRegisterDeviceToken(force: true),
+        );
       }
 
       return OtpVerificationResponseModel(

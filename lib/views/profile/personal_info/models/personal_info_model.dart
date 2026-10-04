@@ -12,6 +12,10 @@ class PersonalInfoModel {
   final String bio;
   final String role;
   final String? profilePhotoUrl;
+  final String? sponsorType;
+  final String? verificationStatus;
+  final String? registrationNumber;
+  final String? businessAddress;
 
   const PersonalInfoModel({
     required this.fullName,
@@ -25,7 +29,13 @@ class PersonalInfoModel {
     required this.bio,
     this.role = '',
     this.profilePhotoUrl,
+    this.sponsorType,
+    this.verificationStatus,
+    this.registrationNumber,
+    this.businessAddress,
   });
+
+  bool get isCompany => sponsorType?.toUpperCase() == 'COMPANY';
 
   factory PersonalInfoModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] is Map
@@ -78,6 +88,10 @@ class PersonalInfoModel {
     }
 
     final role = data['role']?.toString() ?? '';
+    final rawSponsorType = profile['sponsor_type']?.toString() ??
+        data['sponsor_type']?.toString();
+    final rawVerificationStatus = profile['verification_status']?.toString() ??
+        data['verification_status']?.toString();
 
     return PersonalInfoModel(
       fullName: name,
@@ -85,12 +99,18 @@ class PersonalInfoModel {
       phone: profile['phone']?.toString() ?? '',
       country: profile['country']?.toString() ?? '',
       location: profile['location']?.toString() ?? '',
-      companyName: profile['legal_company_name']?.toString() ?? '',
+      companyName: profile['legal_company_name']?.toString() ??
+          profile['company_name']?.toString() ??
+          '',
       position: profile['position_title']?.toString() ?? '',
       website: profile['company_website']?.toString() ?? '',
       bio: profile['bio']?.toString() ?? '',
       role: role,
       profilePhotoUrl: photoUrl,
+      sponsorType: rawSponsorType?.toUpperCase(),
+      verificationStatus: rawVerificationStatus?.toUpperCase(),
+      registrationNumber: profile['registration_number']?.toString(),
+      businessAddress: profile['business_address']?.toString(),
     );
   }
 
@@ -106,6 +126,10 @@ class PersonalInfoModel {
     String? bio,
     String? role,
     String? profilePhotoUrl,
+    String? sponsorType,
+    String? verificationStatus,
+    String? registrationNumber,
+    String? businessAddress,
   }) {
     return PersonalInfoModel(
       fullName: fullName ?? this.fullName,
@@ -119,6 +143,10 @@ class PersonalInfoModel {
       bio: bio ?? this.bio,
       role: role ?? this.role,
       profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
+      sponsorType: sponsorType ?? this.sponsorType,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
+      registrationNumber: registrationNumber ?? this.registrationNumber,
+      businessAddress: businessAddress ?? this.businessAddress,
     );
   }
 }

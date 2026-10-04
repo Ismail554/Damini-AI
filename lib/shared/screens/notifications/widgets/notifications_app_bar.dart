@@ -8,8 +8,15 @@ import '../../../../core/utils/app_colors.dart';
 class NotificationsAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final VoidCallback onMarkAllRead;
+  final VoidCallback? onClearAll;
+  final bool hasNotifications;
 
-  const NotificationsAppBar({super.key, required this.onMarkAllRead});
+  const NotificationsAppBar({
+    super.key,
+    required this.onMarkAllRead,
+    this.onClearAll,
+    this.hasNotifications = true,
+  });
 
   @override
   Size get preferredSize => Size.fromHeight(56.h);
@@ -47,17 +54,45 @@ class NotificationsAppBar extends StatelessWidget
                 ),
               ],
             ),
-            GestureDetector(
-              onTap: onMarkAllRead,
-              child: Text(
-                'Mark all read',
-                style: GoogleFonts.outfit(
-                  color: AppColors.accentOrange,
-                  fontSize: 13.5.sp,
-                  fontWeight: FontWeight.w600,
-                ),
+            if (hasNotifications)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: onMarkAllRead,
+                    child: Text(
+                      'Mark all read',
+                      style: GoogleFonts.outfit(
+                        color: AppColors.accentOrange,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  if (onClearAll != null) ...[
+                    SizedBox(width: 12.w),
+                    GestureDetector(
+                      onTap: onClearAll,
+                      child: Container(
+                        padding: EdgeInsets.all(6.r),
+                        decoration: BoxDecoration(
+                          color: tc.logoutBg,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.error.withValues(alpha: 0.3),
+                            width: 0.8.w,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.delete_outline_rounded,
+                          color: AppColors.error,
+                          size: 17.r,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ),
           ],
         ),
       ),

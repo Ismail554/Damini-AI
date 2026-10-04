@@ -69,12 +69,29 @@ class PersonalInformationView extends ConsumerWidget {
                   InfoSectionCard(
                     title: "Professional Information",
                     rows: [
-                      InfoRowData("Company Name", info.companyName),
-                      InfoRowData("Info", info.position),
-                      InfoRowData("Website", info.website),
+                      InfoRowData("Position / Title", info.position),
                       InfoRowData("Bio", info.bio),
+                      if (!info.isCompany && info.website.isNotEmpty)
+                        InfoRowData("Website", info.website),
                     ],
                   ),
+                  if (info.isCompany ||
+                      info.companyName.isNotEmpty ||
+                      (info.registrationNumber != null &&
+                          info.registrationNumber!.isNotEmpty)) ...[
+                    AppSpacing.h16,
+                    InfoSectionCard(
+                      title: "Company Details",
+                      rows: [
+                        InfoRowData("Company Name", info.companyName),
+                        InfoRowData(
+                            "Registration No.", info.registrationNumber ?? ''),
+                        InfoRowData(
+                            "Business Address", info.businessAddress ?? ''),
+                        InfoRowData("Company Website", info.website),
+                      ],
+                    ),
+                  ],
                   AppSpacing.h24,
                   _buildEditButton(context),
                 ],
@@ -166,6 +183,30 @@ class PersonalInformationView extends ConsumerWidget {
             subtitle,
             style: GoogleFonts.outfit(fontSize: 13.sp, color: tc.textSecondary),
           ),
+          if (info.sponsorType != null &&
+              (info.sponsorType as String).isNotEmpty) ...[
+            AppSpacing.h10,
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: (info.isCompany
+                        ? const Color(0xFF006EDB)
+                        : const Color(0xFF10B981))
+                    .withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Text(
+                info.isCompany ? "COMPANY SPONSOR" : "INDIVIDUAL SPONSOR",
+                style: GoogleFonts.outfit(
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w600,
+                  color: info.isCompany
+                      ? const Color(0xFF006EDB)
+                      : const Color(0xFF10B981),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

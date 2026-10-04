@@ -27,6 +27,7 @@ class MyApp extends ConsumerWidget {
         splitScreenMode: true,
         builder: (context, child) {
           return MaterialApp.router(
+            scaffoldMessengerKey: AppRouter.scaffoldMessengerKey,
             debugShowCheckedModeBanner: false,
             title: 'Damini AI',
             theme: AppTheme.lightTheme,

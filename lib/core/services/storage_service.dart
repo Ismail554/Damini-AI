@@ -132,6 +132,74 @@ class StorageService {
     } catch (_) {}
   }
 
+  static Future<void> saveDeviceToken(String token) async {
+    try {
+      final trimmed = token.trim();
+      if (trimmed.isNotEmpty) {
+        await _storage.write(key: GlobalKeys.deviceToken, value: trimmed);
+      }
+    } catch (_) {}
+  }
+
+  static Future<String?> getDeviceToken() async {
+    try {
+      final val = await _storage.read(key: GlobalKeys.deviceToken);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> saveDeviceName(String name) async {
+    try {
+      final trimmed = name.trim();
+      if (trimmed.isNotEmpty) {
+        await _storage.write(key: GlobalKeys.deviceName, value: trimmed);
+      }
+    } catch (_) {}
+  }
+
+  static Future<String?> getDeviceName() async {
+    try {
+      final val = await _storage.read(key: GlobalKeys.deviceName);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Token last confirmed by backend (POST device-token succeeded).
+  static Future<void> saveRegisteredDeviceToken(String token) async {
+    try {
+      final trimmed = token.trim();
+      if (trimmed.isNotEmpty) {
+        await _storage.write(
+          key: GlobalKeys.registeredDeviceToken,
+          value: trimmed,
+        );
+      }
+    } catch (_) {}
+  }
+
+  static Future<String?> getRegisteredDeviceToken() async {
+    try {
+      final val = await _storage.read(key: GlobalKeys.registeredDeviceToken);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> clearPushData() async {
+    try {
+      await _storage.delete(key: GlobalKeys.deviceToken);
+      await _storage.delete(key: GlobalKeys.registeredDeviceToken);
+    } catch (_) {}
+  }
+
   static Future<void> clearAll() async {
     try {
       await _storage.delete(key: GlobalKeys.access);
@@ -139,6 +207,7 @@ class StorageService {
       await _storage.delete(key: GlobalKeys.uuid);
       await _storage.delete(key: GlobalKeys.userRole);
       await _storage.delete(key: GlobalKeys.isRoleSelected);
+      await _storage.delete(key: GlobalKeys.registeredDeviceToken);
     } catch (_) {}
   }
 }

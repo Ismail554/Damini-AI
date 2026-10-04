@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Braintech/views/auth/session/controllers/session_provider.dart';
 import 'package:Braintech/core/utils/asset_manager.dart';
+import '../../core/services/notification_service.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/widgets/common_background.dart';
 import '../../shared/global_key.dart';
@@ -65,6 +66,11 @@ class _SplashViewState extends ConsumerState<SplashView>
 
         if (mounted) {
           context.go(nextRoute);
+          if (nextRoute == '/home') {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => NotificationService.consumePendingRoute(),
+            );
+          }
         }
       }
     });

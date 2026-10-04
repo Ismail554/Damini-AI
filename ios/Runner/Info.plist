@@ -78,5 +78,12 @@
 		<string>Damani AI requires access to your camera so you can take and upload photos directly within the app.</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Damani AI requires access to your microphone when recording video attachments for projects.</string>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>fetch</string>
+			<string>remote-notification</string>
+		</array>
+		<key>FirebaseAppDelegateProxyEnabled</key>
+		<true/>
 	</dict>
 </plist>

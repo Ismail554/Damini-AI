@@ -33,6 +33,51 @@ class NotificationModel {
     );
   }
 
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    String timeStr =
+        json['time_ago']?.toString() ?? json['time']?.toString() ?? '';
+    if (timeStr.isEmpty && json['created_at'] != null) {
+      final dt = DateTime.tryParse(json['created_at'].toString())?.toLocal();
+      if (dt != null) {
+        final diff = DateTime.now().difference(dt);
+        if (diff.inMinutes < 60) {
+          timeStr = '${diff.inMinutes}m ago';
+        } else if (diff.inHours < 24) {
+          timeStr = '${diff.inHours}h ago';
+        } else if (diff.inDays < 7) {
+          timeStr = '${diff.inDays}d ago';
+        } else {
+          timeStr = '${dt.month}/${dt.day}';
+        }
+      }
+    }
+
+    return NotificationModel(
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      description: json['description']?.toString() ??
+          json['message']?.toString() ??
+          json['body']?.toString() ??
+          '',
+      timeAgo: timeStr.isNotEmpty ? timeStr : 'Just now',
+      isUnread: json['is_unread'] == true ||
+          json['is_read'] == false ||
+          json['unread'] == true,
+      route: json['route']?.toString() ?? json['target_url']?.toString(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'time_ago': timeAgo,
+      'is_unread': isUnread,
+      'route': route,
+    };
+  }
+
   static List<NotificationModel> mockNotifications() {
     return const [
       NotificationModel(

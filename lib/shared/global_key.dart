@@ -8,6 +8,11 @@ class GlobalKeys {
   static const String isApiConnected = 'is_api_connected';
   static const String hasSeenOnboardingKey = 'has_seen_onboarding';
 
+  // Push Notification Keys
+  static const String deviceToken = 'device_token';
+  static const String deviceName = 'device_name';
+  static const String registeredDeviceToken = 'registered_device_token';
+
   // Role Constants
   static const String investorRole = 'investor';
   static const String sponsorRole = 'sponsor';

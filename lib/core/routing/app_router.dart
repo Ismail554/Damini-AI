@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../views/splash/splash_view.dart';
 import '../../views/onboarding/onboarding_view.dart';
@@ -40,7 +41,13 @@ import '../../views/investor/request_collaboration/screens/request_collaboration
 import 'custom_page_transition.dart';
 
 class AppRouter {
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   static final GoRouter router = GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: '/',
     routes: [
       GoRoute(

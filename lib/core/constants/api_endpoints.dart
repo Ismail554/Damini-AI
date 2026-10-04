@@ -20,6 +20,10 @@ class ApiEndpoints {
   static const String verificationStatus =
       "/api/v1/profiles/verification-status/";
 
+  // Profile GET/PATCH
+  static String profileByRole(String role) =>
+      "/api/v1/profiles/${role.toLowerCase()}/";
+
   // User & Projects
   static const String currentUser = "/api/v1/users/me/";
   static const String sponsorProjects = "/api/v1/projects/sponsor/";
@@ -60,4 +64,10 @@ class ApiEndpoints {
         .replaceFirst(RegExp(r'^https://'), 'wss://');
     return "$wsBase/ws/chat/$conversationId/?token=$token";
   }
+  static const String getNotifications = "/api/v1/notifications/";
+  static String markRead(String id) => "/api/v1/notifications/$id/read/";
+  static const String markAllRead = "/api/v1/notifications/mark-all-read/";
+  static const String deviceToken = "/api/v1/notifications/device-token/";
+  static String deleteNotification(String id) => "/api/v1/notifications/$id/";
+  static const String clearAllNotifications = "/api/v1/notifications/clear-all/";
 }
