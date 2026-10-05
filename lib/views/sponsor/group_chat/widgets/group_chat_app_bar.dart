@@ -8,6 +8,7 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int activeMemberCount;
   final List<String> participants;
   final Function(String action)? onMenuSelected;
+  final bool isOwner;
 
   const GroupChatAppBar({
     super.key,
@@ -15,6 +16,7 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.activeMemberCount = 0,
     this.participants = const [],
     this.onMenuSelected,
+    this.isOwner = true,
   });
 
   @override
@@ -91,26 +93,28 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                 size: 20.sp,
               ),
               itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'confirm_investor',
-                  child: Row(
-                    children: [
-                      Icon(Icons.verified_user_outlined, color: const Color(0xFF006EDB), size: 18.r),
-                      SizedBox(width: 10.w),
-                      Text("Confirm Investors", style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
-                    ],
+                if (isOwner) ...[
+                  PopupMenuItem(
+                    value: 'confirm_investor',
+                    child: Row(
+                      children: [
+                        Icon(Icons.verified_user_outlined, color: const Color(0xFF006EDB), size: 18.r),
+                        SizedBox(width: 10.w),
+                        Text("Confirm Investors", style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
+                      ],
+                    ),
                   ),
-                ),
-                PopupMenuItem(
-                  value: 'remove_participant',
-                  child: Row(
-                    children: [
-                      Icon(Icons.person_remove_outlined, color: Colors.orangeAccent, size: 18.r),
-                      SizedBox(width: 10.w),
-                      Text("Remove Participant (Owner)", style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
-                    ],
+                  PopupMenuItem(
+                    value: 'remove_participant',
+                    child: Row(
+                      children: [
+                        Icon(Icons.person_remove_outlined, color: Colors.orangeAccent, size: 18.r),
+                        SizedBox(width: 10.w),
+                        Text("Remove Participant (Owner)", style: GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp)),
+                      ],
+                    ),
                   ),
-                ),
+                ],
                 PopupMenuItem(
                   value: 'report',
                   child: Row(
@@ -121,16 +125,17 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ],
                   ),
                 ),
-                PopupMenuItem(
-                  value: 'leave',
-                  child: Row(
-                    children: [
-                      Icon(Icons.exit_to_app_rounded, color: Colors.redAccent, size: 18.r),
-                      SizedBox(width: 10.w),
-                      Text("Leave Group", style: GoogleFonts.outfit(color: Colors.redAccent, fontSize: 13.sp, fontWeight: FontWeight.bold)),
-                    ],
+                if (!isOwner)
+                  PopupMenuItem(
+                    value: 'leave',
+                    child: Row(
+                      children: [
+                        Icon(Icons.exit_to_app_rounded, color: Colors.redAccent, size: 18.r),
+                        SizedBox(width: 10.w),
+                        Text("Leave Group", style: GoogleFonts.outfit(color: Colors.redAccent, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ],

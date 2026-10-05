@@ -6,6 +6,7 @@ class SponsorProfileData {
   final String avatarUrl;
   final String investedAmount;
   final String projectsCount;
+  final String? verificationStatus;
 
   const SponsorProfileData({
     required this.name,
@@ -13,6 +14,7 @@ class SponsorProfileData {
     required this.avatarUrl,
     required this.investedAmount,
     required this.projectsCount,
+    this.verificationStatus,
   });
 
   factory SponsorProfileData.fromJson(Map<String, dynamic> json) {
@@ -65,7 +67,10 @@ class SponsorProfileData {
       }
     }
 
-    final position = profile['position_title']?.toString() ?? '';
+    final position = profile['position_title']?.toString() ??
+        data['position_title']?.toString() ??
+        profile['position']?.toString() ??
+        '';
     final company = profile['legal_company_name']?.toString() ?? '';
     final title = (position.isNotEmpty && company.isNotEmpty)
         ? '$position at $company'
@@ -80,12 +85,16 @@ class SponsorProfileData {
     final investedAmount = rawFunded != 0 ? '\$$rawFunded' : '\$0.00';
     final projectsCount = (stats['projects'] ?? 0).toString();
 
+    final rawVerificationStatus = profile['verification_status']?.toString() ??
+        data['verification_status']?.toString();
+
     return SponsorProfileData(
       name: fullName,
       title: title,
       avatarUrl: photoUrl,
       investedAmount: investedAmount,
       projectsCount: projectsCount,
+      verificationStatus: rawVerificationStatus?.toUpperCase(),
     );
   }
 }

@@ -12,6 +12,7 @@ import '../widgets/group_chat_ai_suggestions.dart';
 import '../widgets/group_chat_app_bar.dart';
 import '../widgets/group_chat_message_bubble.dart';
 import '../widgets/group_member_card.dart';
+import '../../../auth/session/controllers/session_provider.dart';
 import '../widgets/remove_participant_modal.dart';
 
 class GroupChatView extends ConsumerStatefulWidget {
@@ -47,6 +48,8 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
   Widget build(BuildContext context) {
     final state = ref.watch(groupChatProvider);
     final notifier = ref.read(groupChatProvider.notifier);
+    final userRole = ref.watch(authProvider).userRole?.toLowerCase() ?? 'sponsor';
+    final isOwner = userRole == 'sponsor';
 
     return Scaffold(
       backgroundColor: const Color(0xFF061427),
@@ -54,6 +57,7 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
         title: widget.projectTitle,
         activeMemberCount: state.participants.length,
         participants: state.participants,
+        isOwner: isOwner,
         onMenuSelected: (action) =>
             _handleMenuAction(context, ref, action),
       ),

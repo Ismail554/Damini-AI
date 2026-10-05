@@ -63,14 +63,35 @@ class InvestorProfileView extends ConsumerWidget {
 
           // Profile Hero Card
           ProfileHeroCard(
-            name: profile.name,
-            title: profile.title,
-            avatarUrl: profile.avatarUrl,
+            name: profile.name != 'Member'
+                ? profile.name
+                : (personalInfo.fullName.isNotEmpty
+                    ? personalInfo.fullName
+                    : 'Member'),
+            title: profile.title.isNotEmpty && profile.title != 'Member'
+                ? profile.title
+                : (personalInfo.position.isNotEmpty
+                    ? personalInfo.position
+                    : 'Angel Investor'),
+            avatarUrl: profile.avatarUrl.isNotEmpty
+                ? profile.avatarUrl
+                : personalInfo.profilePhotoUrl,
             investedAmount: profile.investedAmount,
             projectsCount: profile.projectsCount,
             role: currentRole,
-            verificationStatus: personalInfo.verificationStatus,
+            verificationStatus:
+                personalInfo.verificationStatus ?? profile.verificationStatus,
             isCompany: personalInfo.isCompany,
+            location: personalInfo.location.isNotEmpty
+                ? (personalInfo.country.isNotEmpty
+                    ? '${personalInfo.location}, ${personalInfo.country}'
+                    : personalInfo.location)
+                : personalInfo.country,
+            companyName: personalInfo.companyName,
+            bio: personalInfo.bio,
+            email: personalInfo.email,
+            stat1Label: "INVESTED",
+            stat2Label: "PROJECTS",
           ),
           SizedBox(height: 18.h),
 

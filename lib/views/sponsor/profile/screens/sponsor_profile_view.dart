@@ -70,7 +70,9 @@ class SponsorProfileView extends ConsumerWidget {
                 ? profile.title
                 : (personal.position.isNotEmpty
                     ? personal.position
-                    : 'Sponsor Partner'),
+                    : (personal.companyName.isNotEmpty
+                        ? personal.companyName
+                        : 'Sponsor Partner')),
             avatarUrl:
                 (profile?.avatarUrl != null && profile!.avatarUrl.isNotEmpty)
                     ? profile.avatarUrl
@@ -78,8 +80,19 @@ class SponsorProfileView extends ConsumerWidget {
             investedAmount: profile?.investedAmount ?? "\$0.00",
             projectsCount: profile?.projectsCount ?? "0",
             role: currentRole,
-            verificationStatus: personal.verificationStatus,
+            verificationStatus:
+                personal.verificationStatus ?? profile?.verificationStatus,
             isCompany: personal.isCompany,
+            location: personal.location.isNotEmpty
+                ? (personal.country.isNotEmpty
+                    ? '${personal.location}, ${personal.country}'
+                    : personal.location)
+                : personal.country,
+            companyName: personal.companyName,
+            bio: personal.bio,
+            email: personal.email,
+            stat1Label: "TOTAL RAISED",
+            stat2Label: "PROJECTS",
           ),
           SizedBox(height: AppDimens.spaceLg),
 

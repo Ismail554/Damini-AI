@@ -23,6 +23,8 @@ import '../widgets/project_dropdown_field.dart';
 import '../widgets/project_form_field.dart';
 import '../widgets/upload_box.dart';
 import '../../../../core/widgets/country_picker_field.dart';
+import '../../../profile/personal_info/controllers/personal_info_provider.dart';
+import '../../dashboard/controllers/sponsor_dashboard_provider.dart';
 
 class CreateProjectView extends ConsumerStatefulWidget {
   final ProjectDraftModel? initialDraft;
@@ -299,6 +301,18 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
   }
 
   void _onPublish() async {
+    final personal = ref.read(personalInfoProvider).info;
+    final dashboardProfile = ref.read(sponsorDashboardProvider).userProfile;
+    final rawStatus = (personal.verificationStatus ?? dashboardProfile?.verificationStatus ?? 'PENDING').trim().toUpperCase();
+
+    if (rawStatus != 'APPROVED') {
+      final msg = rawStatus == 'REJECTED'
+          ? "Your verification documents were rejected. Please update your documents to publish projects."
+          : "Your verification is currently pending. A Sponsor cannot publish projects until status hits APPROVED.";
+      CustomSnackBar.error(context, msg);
+      return;
+    }
+
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       CustomSnackBar.error(context, "Please enter a project title");

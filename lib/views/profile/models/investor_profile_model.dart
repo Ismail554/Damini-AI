@@ -6,6 +6,7 @@ class InvestorProfileModel {
   final String avatarUrl;
   final String investedAmount;
   final String projectsCount;
+  final String? verificationStatus;
 
   const InvestorProfileModel({
     this.name = "Member",
@@ -13,6 +14,7 @@ class InvestorProfileModel {
     this.avatarUrl = "",
     this.investedAmount = "\$0.00",
     this.projectsCount = "0",
+    this.verificationStatus,
   });
 
   factory InvestorProfileModel.fromJson(Map<String, dynamic> json) {
@@ -65,7 +67,10 @@ class InvestorProfileModel {
       }
     }
 
-    final position = profile['position_title']?.toString() ?? '';
+    final position = profile['position_title']?.toString() ??
+        data['position_title']?.toString() ??
+        profile['position']?.toString() ??
+        '';
     final company = profile['legal_company_name']?.toString() ?? '';
     final title = (position.isNotEmpty && company.isNotEmpty)
         ? '$position at $company'
@@ -80,12 +85,16 @@ class InvestorProfileModel {
     final investedAmount = rawFunded != 0 ? '\$$rawFunded' : '\$0.00';
     final projectsCount = (stats['projects'] ?? stats['requests'] ?? 0).toString();
 
+    final rawVerificationStatus = profile['verification_status']?.toString() ??
+        data['verification_status']?.toString();
+
     return InvestorProfileModel(
       name: fullName,
       title: title,
       avatarUrl: photoUrl,
       investedAmount: investedAmount,
       projectsCount: projectsCount,
+      verificationStatus: rawVerificationStatus?.toUpperCase(),
     );
   }
 
@@ -95,6 +104,7 @@ class InvestorProfileModel {
     String? avatarUrl,
     String? investedAmount,
     String? projectsCount,
+    String? verificationStatus,
   }) {
     return InvestorProfileModel(
       name: name ?? this.name,
@@ -102,6 +112,7 @@ class InvestorProfileModel {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       investedAmount: investedAmount ?? this.investedAmount,
       projectsCount: projectsCount ?? this.projectsCount,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
     );
   }
 }

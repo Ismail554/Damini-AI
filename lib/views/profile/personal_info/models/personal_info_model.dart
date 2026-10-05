@@ -36,6 +36,7 @@ class PersonalInfoModel {
   });
 
   bool get isCompany => sponsorType?.toUpperCase() == 'COMPANY';
+  String get title => position;
 
   factory PersonalInfoModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] is Map
@@ -106,7 +107,11 @@ class PersonalInfoModel {
       companyName: profile['legal_company_name']?.toString() ??
           profile['company_name']?.toString() ??
           '',
-      position: profile['position_title']?.toString() ?? '',
+      position: profile['position_title']?.toString() ??
+          data['position_title']?.toString() ??
+          profile['position']?.toString() ??
+          data['position']?.toString() ??
+          '',
       website: profile['company_website']?.toString() ?? '',
       bio: profile['bio']?.toString() ?? '',
       role: role,
@@ -126,6 +131,7 @@ class PersonalInfoModel {
     String? location,
     String? companyName,
     String? position,
+    String? title,
     String? website,
     String? bio,
     String? role,
@@ -142,7 +148,7 @@ class PersonalInfoModel {
       country: country ?? this.country,
       location: location ?? this.location,
       companyName: companyName ?? this.companyName,
-      position: position ?? this.position,
+      position: title ?? position ?? this.position,
       website: website ?? this.website,
       bio: bio ?? this.bio,
       role: role ?? this.role,

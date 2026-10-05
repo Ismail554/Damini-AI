@@ -91,7 +91,10 @@ class SponsorEditProfileModel {
       phone: profile['phone']?.toString(),
       country: profile['country']?.toString(),
       location: profile['location']?.toString(),
-      positionTitle: profile['position_title']?.toString(),
+      positionTitle: profile['position_title']?.toString() ??
+          data['position_title']?.toString() ??
+          profile['position']?.toString() ??
+          data['position']?.toString(),
       bio: profile['bio']?.toString(),
       profilePhotoUrl: photoUrl,
       sponsorType: rawSponsorType.toUpperCase(),
