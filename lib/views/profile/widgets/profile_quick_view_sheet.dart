@@ -221,16 +221,17 @@ class ProfileQuickViewSheet extends ConsumerWidget {
               context.push('/personal-info');
             },
           ),
-          _buildActionTile(
-            context,
-            tc,
-            icon: Icons.verified_user_outlined,
-            title: "Company Verification",
-            onTap: () {
-              context.pop();
-              context.push('/company-verification');
-            },
-          ),
+          if (personalInfo.isCompany)
+            _buildActionTile(
+              context,
+              tc,
+              icon: Icons.verified_user_outlined,
+              title: "Company Verification",
+              onTap: () {
+                context.pop();
+                context.push('/company-verification');
+              },
+            ),
           _buildActionTile(
             context,
             tc,

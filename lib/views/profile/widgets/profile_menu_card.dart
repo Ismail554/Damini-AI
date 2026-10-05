@@ -7,14 +7,27 @@ import 'package:Braintech/core/theme/theme_provider.dart';
 import '../../../core/utils/app_colors.dart';
 import '../../../core/utils/app_dimens.dart';
 import '../../../core/utils/app_theme_colors.dart';
+import '../personal_info/controllers/personal_info_provider.dart';
+import '../personal_info/controllers/sponsor_edit_profile_provider.dart';
 
 class ProfileMenuCard extends ConsumerWidget {
-  const ProfileMenuCard({super.key});
+  final bool? isCompany;
+
+  const ProfileMenuCard({
+    super.key,
+    this.isCompany,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tc = AppThemeColors.of(context);
     final themeMode = ref.watch(themeProvider);
+    final personalInfo = ref.watch(personalInfoProvider).info;
+    final editProfile = ref.watch(sponsorEditProfileProvider).profile;
+    final effectiveIsCompany = isCompany ??
+        (editProfile != null
+            ? editProfile.isCompany
+            : personalInfo.isCompany);
 
     return Container(
       width: double.infinity,
@@ -31,13 +44,18 @@ class ProfileMenuCard extends ConsumerWidget {
             icon: Icons.person_outline_rounded,
             onTap: () => context.push('/personal-info'),
           ),
-          Divider(color: tc.borderSubtle, height: 1),
-          _buildMenuItem(
-            tc: tc,
-            title: "Company Verification",
-            icon: Icons.verified_user_outlined,
-            onTap: () => context.push('/company-verification'),
-          ),
+          if (effectiveIsCompany) ...[
+            Divider(color: tc.borderSubtle, height: 1),
+            _buildMenuItem(
+              tc: tc,
+              title: "Company Verification",
+              subtitle: personalInfo.verificationStatus != null
+                  ? "Status: ${personalInfo.verificationStatus}"
+                  : null,
+              icon: Icons.verified_user_outlined,
+              onTap: () => context.push('/company-verification'),
+            ),
+          ],
           Divider(color: tc.borderSubtle, height: 1),
           _buildMenuItem(
             tc: tc,

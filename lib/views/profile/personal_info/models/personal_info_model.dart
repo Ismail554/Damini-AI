@@ -89,7 +89,11 @@ class PersonalInfoModel {
 
     final role = data['role']?.toString() ?? '';
     final rawSponsorType = profile['sponsor_type']?.toString() ??
-        data['sponsor_type']?.toString();
+        data['sponsor_type']?.toString() ??
+        profile['investor_type']?.toString() ??
+        data['investor_type']?.toString() ??
+        profile['account_type']?.toString() ??
+        data['account_type']?.toString();
     final rawVerificationStatus = profile['verification_status']?.toString() ??
         data['verification_status']?.toString();
 

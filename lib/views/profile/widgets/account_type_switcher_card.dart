@@ -8,11 +8,13 @@ import '../../../core/utils/app_theme_colors.dart';
 class AccountTypeSwitcherCard extends StatelessWidget {
   final String activeRole;
   final ValueChanged<String> onSwitchRole;
+  final bool isLoading;
 
   const AccountTypeSwitcherCard({
     super.key,
     required this.activeRole,
     required this.onSwitchRole,
+    this.isLoading = false,
   });
 
   @override
@@ -84,6 +86,7 @@ class AccountTypeSwitcherCard extends StatelessWidget {
             subtitle: "Publish projects & raise capital",
             icon: Icons.business_center_outlined,
             isActive: !isInvestor,
+            isOptionLoading: isLoading && isInvestor,
             onTap: () => onSwitchRole('sponsor'),
           ),
           SizedBox(height: AppDimens.spaceMd),
@@ -95,6 +98,7 @@ class AccountTypeSwitcherCard extends StatelessWidget {
             subtitle: "Discover & fund opportunities",
             icon: Icons.trending_up_rounded,
             isActive: isInvestor,
+            isOptionLoading: isLoading && !isInvestor,
             onTap: () => onSwitchRole('investor'),
           ),
         ],
@@ -109,9 +113,10 @@ class AccountTypeSwitcherCard extends StatelessWidget {
     required IconData icon,
     required bool isActive,
     required VoidCallback onTap,
+    bool isOptionLoading = false,
   }) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: (isLoading || isActive) ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.all(AppDimens.paddingMd),
@@ -182,6 +187,16 @@ class AccountTypeSwitcherCard extends StatelessWidget {
                     ),
                   ),
                 ],
+              )
+            else if (isOptionLoading)
+              SizedBox(
+                width: 14.r,
+                height: 14.r,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(tc.textSecondary),
+                ),
               )
             else
               Text(

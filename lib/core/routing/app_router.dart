@@ -140,6 +140,22 @@ class AppRouter {
         },
       ),
       GoRoute(
+        path: '/investor-onboarding',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const RoleOnboardingView(role: 'investor'),
+        ),
+      ),
+      GoRoute(
+        path: '/sponsor-onboarding',
+        pageBuilder: (context, state) => buildNativePage(
+          context: context,
+          state: state,
+          child: const RoleOnboardingView(role: 'sponsor'),
+        ),
+      ),
+      GoRoute(
         path: '/home',
         pageBuilder: (context, state) => buildNativePage(
           context: context,

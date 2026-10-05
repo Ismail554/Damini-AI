@@ -104,21 +104,44 @@ class SponsorEditProfileModel {
     );
   }
 
-  Map<String, dynamic> toPatchPayload() {
+  Map<String, dynamic> toPatchPayload({String? role}) {
     final map = <String, dynamic>{};
-    if (phone != null) map['phone'] = phone;
-    if (country != null) map['country'] = country;
-    if (location != null) map['location'] = location;
-    if (positionTitle != null) map['position_title'] = positionTitle;
-    if (bio != null) map['bio'] = bio;
+    if (phone != null && phone!.trim().isNotEmpty) {
+      map['phone'] = phone!.trim();
+    }
+    if (country != null && country!.trim().isNotEmpty) {
+      map['country'] = country!.trim();
+    }
+    if (location != null && location!.trim().isNotEmpty) {
+      map['location'] = location!.trim();
+    }
+    if (positionTitle != null && positionTitle!.trim().isNotEmpty) {
+      map['position_title'] = positionTitle!.trim();
+    }
+    if (bio != null && bio!.trim().isNotEmpty) {
+      map['bio'] = bio!.trim();
+    }
 
-    if (isCompany) {
-      if (legalCompanyName != null) map['legal_company_name'] = legalCompanyName;
-      if (registrationNumber != null) {
-        map['registration_number'] = registrationNumber;
+    if (role == 'investor') {
+      if (legalCompanyName != null && legalCompanyName!.trim().isNotEmpty) {
+        map['company_name'] = legalCompanyName!.trim();
       }
-      if (businessAddress != null) map['business_address'] = businessAddress;
-      if (companyWebsite != null) map['company_website'] = companyWebsite;
+    } else {
+      if (isCompany) {
+        if (legalCompanyName != null && legalCompanyName!.trim().isNotEmpty) {
+          map['legal_company_name'] = legalCompanyName!.trim();
+        }
+        if (registrationNumber != null &&
+            registrationNumber!.trim().isNotEmpty) {
+          map['registration_number'] = registrationNumber!.trim();
+        }
+        if (businessAddress != null && businessAddress!.trim().isNotEmpty) {
+          map['business_address'] = businessAddress!.trim();
+        }
+        if (companyWebsite != null && companyWebsite!.trim().isNotEmpty) {
+          map['company_website'] = companyWebsite!.trim();
+        }
+      }
     }
 
     return map;

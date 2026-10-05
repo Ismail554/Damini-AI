@@ -22,6 +22,7 @@ import '../widgets/project_details_section.dart';
 import '../widgets/project_dropdown_field.dart';
 import '../widgets/project_form_field.dart';
 import '../widgets/upload_box.dart';
+import '../../../../core/widgets/country_picker_field.dart';
 
 class CreateProjectView extends ConsumerStatefulWidget {
   final ProjectDraftModel? initialDraft;
@@ -604,18 +605,11 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
         ),
         SizedBox(width: AppDimens.spaceSm),
         Expanded(
-          child: ProjectDropdownField(
+          child: CountryPickerField(
             label: "Country",
             hint: "Select....",
-            value: _selectedCountry,
-            items: const [
-              "United States",
-              "United Kingdom",
-              "Germany",
-              "Canada",
-              "Australia",
-            ],
-            onChanged: (val) => setState(() => _selectedCountry = val),
+            initialValue: _selectedCountry,
+            onChanged: (val) => setState(() => _selectedCountry = val.name),
           ),
         ),
       ],

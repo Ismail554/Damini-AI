@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/utils/app_colors.dart';
+import '../../views/auth/session/controllers/session_provider.dart';
+import '../../views/home/controllers/home_provider.dart';
 import '../../views/role_selection/provider/onboarding_provider.dart';
 
 class VerificationPendingScreen extends ConsumerStatefulWidget {
@@ -102,7 +104,16 @@ class _VerificationPendingScreenState extends ConsumerState<VerificationPendingS
             width: double.infinity,
             height: 54.h,
             child: ElevatedButton(
-              onPressed: () => context.go('/home'),
+              onPressed: () async {
+                await ref.read(authProvider.notifier).setRole(widget.role);
+                try {
+                  await ref.read(authProvider.notifier).switchRole(widget.role);
+                } catch (_) {}
+                ref.read(homeProvider.notifier).setTabIndex(0);
+                if (context.mounted) {
+                  context.go('/home');
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF006EDB),
                 foregroundColor: Colors.white,

@@ -15,6 +15,7 @@ class ProfileHeroCard extends StatelessWidget {
   final String projectsCount;
   final String? role;
   final String? verificationStatus;
+  final bool isCompany;
 
   const ProfileHeroCard({
     super.key,
@@ -25,6 +26,7 @@ class ProfileHeroCard extends StatelessWidget {
     required this.projectsCount,
     this.role,
     this.verificationStatus,
+    this.isCompany = false,
   });
 
   @override
@@ -95,7 +97,7 @@ class ProfileHeroCard extends StatelessWidget {
                           child: Icon(
                             Icons.check_rounded,
                             color: Colors.white,
-                            size: 12.r,
+                            size: 12.sp,
                           ),
                         ),
                       ),
@@ -146,7 +148,13 @@ class ProfileHeroCard extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               GestureDetector(
-                onTap: () => context.push('/company-verification'),
+                onTap: () {
+                  if (isCompany) {
+                    context.push('/company-verification');
+                  } else {
+                    context.push('/personal-info');
+                  }
+                },
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 10.w,

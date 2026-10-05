@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../sponsor/dashboard/controllers/sponsor_dashboard_provider.dart';
 import '../../../sponsor/profile/controllers/sponsor_profile_provider.dart';
+import '../../controllers/investor_profile_provider.dart';
 import '../models/sponsor_edit_profile_model.dart';
 import '../repositories/sponsor_edit_profile_repository.dart';
 import 'personal_info_provider.dart';
@@ -110,6 +111,10 @@ class SponsorEditProfileNotifier extends Notifier<SponsorEditProfileState> {
       // 3. Refresh related profile providers
       try {
         await ref.read(personalInfoProvider.notifier).refresh();
+      } catch (_) {}
+
+      try {
+        await ref.read(investorProfileProvider.notifier).refreshProfile();
       } catch (_) {}
 
       try {

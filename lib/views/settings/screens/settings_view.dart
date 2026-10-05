@@ -9,6 +9,7 @@ import 'package:Braintech/core/theme/theme_provider.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/logout_dialog.dart';
+import '../../profile/personal_info/controllers/personal_info_provider.dart';
 import '../controllers/settings_provider.dart';
 import '../widgets/delete_account_dialog.dart';
 import '../widgets/settings_item_tile.dart';
@@ -194,6 +195,7 @@ class SettingsView extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final verificationStatus = provider.verificationStatus.toUpperCase();
+    final personalInfo = ref.watch(personalInfoProvider).info;
     final isApproved = verificationStatus == 'APPROVED';
     final isPending = verificationStatus == 'PENDING';
     final statusColor = isApproved
@@ -220,39 +222,41 @@ class SettingsView extends ConsumerWidget {
             subtitle: provider.email.isNotEmpty ? provider.email : null,
             onTap: () => context.push('/personal-info'),
           ),
-          _divider(tc),
-          SettingsItemTile(
-            icon: Icons.verified_user_outlined,
-            title: "Company Verification",
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6.r),
-                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
-                  ),
-                  child: Text(
-                    verificationStatus,
-                    style: GoogleFonts.outfit(
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.bold,
-                      color: statusColor,
+          if (personalInfo.isCompany) ...[
+            _divider(tc),
+            SettingsItemTile(
+              icon: Icons.verified_user_outlined,
+              title: "Company Verification",
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6.r),
+                      border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                    ),
+                    child: Text(
+                      verificationStatus,
+                      style: GoogleFonts.outfit(
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.bold,
+                        color: statusColor,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 8.w),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: tc.textTertiary,
-                  size: 22.r,
-                ),
-              ],
+                  SizedBox(width: 8.w),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: tc.textTertiary,
+                    size: 22.r,
+                  ),
+                ],
+              ),
+              onTap: () => context.push('/company-verification'),
             ),
-            onTap: () => context.push('/company-verification'),
-          ),
+          ],
           _divider(tc),
           SettingsItemTile(
             icon: Icons.assignment_outlined,

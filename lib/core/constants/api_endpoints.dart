@@ -12,6 +12,7 @@ class ApiEndpoints {
 
   // Onboarding & Profiles
   static const String setRole = "/api/v1/profiles/set-role/";
+  static const String switchRole = "/api/v1/users/switch-role/";
   static String onboarding(String role) =>
       "/api/v1/profiles/${role.toLowerCase()}/onboarding/";
   static const String verificationDocuments =

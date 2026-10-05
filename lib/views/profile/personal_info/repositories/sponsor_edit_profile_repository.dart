@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/api_service.dart';
+import '../../../../core/services/storage_service.dart';
 import '../models/sponsor_edit_profile_model.dart';
 
 final sponsorEditProfileRepositoryProvider =
@@ -27,12 +28,19 @@ class SponsorEditProfileRepositoryImpl implements SponsorEditProfileRepository {
 
   @override
   Future<SponsorEditProfileModel> getProfile() async {
-    final response = await _apiService.get(
-      ApiEndpoints.profileByRole('sponsor'),
-      requireAuth: true,
-    );
+    final role = (await StorageService.getRole())?.toLowerCase() ?? 'sponsor';
+    dynamic profileData;
 
-    dynamic profileData = response.data;
+    if (role == 'sponsor') {
+      try {
+        final response = await _apiService.get(
+          ApiEndpoints.profileByRole('sponsor'),
+          requireAuth: true,
+        );
+        profileData = response.data;
+      } catch (_) {}
+    }
+
     if (profileData is String) {
       try {
         profileData = jsonDecode(profileData);
@@ -44,37 +52,32 @@ class SponsorEditProfileRepositoryImpl implements SponsorEditProfileRepository {
       mergedMap.addAll(Map<String, dynamic>.from(profileData));
     }
 
-    // Check if name/email are present in the response
-    final hasUserFields = mergedMap['first_name'] != null ||
-        mergedMap['email'] != null ||
-        (mergedMap['data'] is Map &&
-            (mergedMap['data']['first_name'] != null ||
-                mergedMap['data']['email'] != null));
-
-    if (!hasUserFields) {
-      try {
-        final userResponse = await _apiService.get(
-          ApiEndpoints.currentUser,
-          requireAuth: true,
-        );
-        dynamic userData = userResponse.data;
-        if (userData is String) {
-          try {
-            userData = jsonDecode(userData);
-          } catch (_) {}
-        }
-        if (userData is Map) {
-          final uMap = Map<String, dynamic>.from(userData);
-          final uData = uMap['data'] is Map
-              ? Map<String, dynamic>.from(uMap['data'] as Map)
-              : uMap;
-          mergedMap['first_name'] ??= uData['first_name'];
-          mergedMap['last_name'] ??= uData['last_name'];
-          mergedMap['email'] ??= uData['email'];
-        }
-      } catch (_) {
-        // Continue with whatever was returned by profileByRole
+    // Check if name/email/profile are present in the response
+    try {
+      final userResponse = await _apiService.get(
+        ApiEndpoints.currentUser,
+        requireAuth: true,
+      );
+      dynamic userData = userResponse.data;
+      if (userData is String) {
+        try {
+          userData = jsonDecode(userData);
+        } catch (_) {}
       }
+      if (userData is Map) {
+        final uMap = Map<String, dynamic>.from(userData);
+        final uData = uMap['data'] is Map
+            ? Map<String, dynamic>.from(uMap['data'] as Map)
+            : uMap;
+        mergedMap['first_name'] ??= uData['first_name'];
+        mergedMap['last_name'] ??= uData['last_name'];
+        mergedMap['email'] ??= uData['email'];
+        if (mergedMap['profile'] == null && uData['profile'] is Map) {
+          mergedMap['profile'] = uData['profile'];
+        }
+      }
+    } catch (_) {
+      // Continue with whatever was returned by profileByRole
     }
 
     return SponsorEditProfileModel.fromJson(mergedMap);
@@ -85,7 +88,8 @@ class SponsorEditProfileRepositoryImpl implements SponsorEditProfileRepository {
     SponsorEditProfileModel profile, {
     File? photoFile,
   }) async {
-    final payload = profile.toPatchPayload();
+    final role = (await StorageService.getRole())?.toLowerCase() ?? 'sponsor';
+    final payload = profile.toPatchPayload(role: role);
     dynamic data;
 
     if (photoFile != null) {
@@ -100,8 +104,15 @@ class SponsorEditProfileRepositoryImpl implements SponsorEditProfileRepository {
       data = payload;
     }
 
+    // Role-specific profile endpoint:
+    // Investor: PATCH /api/v1/profiles/investor/onboarding/
+    // Sponsor:  PATCH /api/v1/profiles/sponsor/
+    final targetEndpoint = role == 'investor'
+        ? ApiEndpoints.onboarding('investor')
+        : ApiEndpoints.profileByRole('sponsor');
+
     final response = await _apiService.patch(
-      ApiEndpoints.profileByRole('sponsor'),
+      targetEndpoint,
       data: data,
       requireAuth: true,
     );

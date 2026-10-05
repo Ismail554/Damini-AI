@@ -10,9 +10,11 @@ import '../../../../core/widgets/common_background.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
 import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/widgets/country_picker_field.dart';
 import '../controllers/sponsor_edit_profile_provider.dart';
 import '../models/sponsor_edit_profile_model.dart';
 import '../widgets/profile_photo_uploader.dart';
+import '../../../auth/session/controllers/session_provider.dart';
 
 class EditProfileView extends ConsumerStatefulWidget {
   const EditProfileView({super.key});
@@ -192,6 +194,9 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
     final profile = state.profile ?? const SponsorEditProfileModel();
     final isCompany = profile.isCompany;
 
+    final userRole = ref.watch(authProvider).userRole?.toLowerCase() ?? 'sponsor';
+    final isInvestor = userRole == 'investor';
+
     return CommonBackground(
       showGrid: false,
       child: Scaffold(
@@ -203,7 +208,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAccountBadge(profile, tc),
+                _buildAccountBadge(profile, tc, isInvestor),
                 Center(
                   child: ProfilePhotoUploader(
                     imageFile: _profileImage,
@@ -235,23 +240,14 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.next,
                 ),
-                CustomTextField(
-                  label: "Country",
-                  hint: "Select country",
-                  controller: _countryController,
-                  isDropdown: true,
-                  dropdownItems: const [
-                    "United States",
-                    "United Kingdom",
-                    "Canada",
-                    "Australia",
-                    "Germany",
-                    "United Arab Emirates",
-                    "Singapore",
-                    "Bangladesh",
-                    "India",
-                  ],
-                  onChanged: (_) => setState(() {}),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 16.h),
+                  child: CountryPickerField(
+                    label: "Country",
+                    hint: "Select country",
+                    controller: _countryController,
+                    onChanged: (_) => setState(() {}),
+                  ),
                 ),
                 CustomTextField(
                   label: "Location / City",
@@ -358,7 +354,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
   }
 
   Widget _buildAccountBadge(
-      SponsorEditProfileModel profile, AppThemeColors tc) {
+      SponsorEditProfileModel profile, AppThemeColors tc, bool isInvestor) {
     final isCompany = profile.isCompany;
     final status = profile.verificationStatus;
     Color statusColor;
@@ -372,6 +368,17 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
       default:
         statusColor = const Color(0xFFF59E0B);
     }
+
+    final title = isInvestor
+        ? (isCompany ? "Company Investor" : "Individual Investor")
+        : (isCompany ? "Company Account" : "Individual Account");
+    final subtitle = isInvestor
+        ? (isCompany
+            ? "Investing as a registered business entity"
+            : "Investing as an individual investor")
+        : (isCompany
+            ? "Sponsoring as a registered business entity"
+            : "Sponsoring as an individual member");
 
     return Container(
       margin: EdgeInsets.only(bottom: 20.h),
@@ -408,7 +415,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isCompany ? "Company Account" : "Individual Account",
+                  title,
                   style: GoogleFonts.outfit(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w600,
@@ -417,9 +424,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  isCompany
-                      ? "Sponsoring as a registered business entity"
-                      : "Sponsoring as an individual member",
+                  subtitle,
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
                     color: tc.textSecondary,

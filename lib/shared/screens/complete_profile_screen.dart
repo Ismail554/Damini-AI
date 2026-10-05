@@ -4,12 +4,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/utils/app_colors.dart';
+import '../../core/widgets/country_picker_field.dart';
 import '../../views/auth/widgets/labeled_text_field.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   final String role;
   final bool isCompany;
   final bool isLoading;
+  final String? initialPhone;
+  final String? initialCountry;
+  final String? initialLocation;
+  final String? initialPosition;
+  final String? initialCompanyName;
+  final String? initialRegNumber;
+  final String? initialAddress;
+  final String? initialWebsite;
+  final String? initialPhotoUrl;
   final void Function(Map<String, dynamic> fields, String? photoPath) onSaved;
   final VoidCallback? onBack;
 
@@ -18,6 +28,15 @@ class CompleteProfileScreen extends StatefulWidget {
     required this.role,
     this.isCompany = false,
     this.isLoading = false,
+    this.initialPhone,
+    this.initialCountry,
+    this.initialLocation,
+    this.initialPosition,
+    this.initialCompanyName,
+    this.initialRegNumber,
+    this.initialAddress,
+    this.initialWebsite,
+    this.initialPhotoUrl,
     required this.onSaved,
     this.onBack,
   });
@@ -39,6 +58,68 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   String? _photoPath;
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _populateInitialData();
+  }
+
+  void _populateInitialData() {
+    if (widget.initialPhone != null && widget.initialPhone!.isNotEmpty) {
+      _phoneCtrl.text = widget.initialPhone!;
+    }
+    if (widget.initialCountry != null && widget.initialCountry!.isNotEmpty) {
+      _countryCtrl.text = widget.initialCountry!;
+    }
+    if (widget.initialLocation != null && widget.initialLocation!.isNotEmpty) {
+      _locationCtrl.text = widget.initialLocation!;
+    }
+    if (widget.initialPosition != null && widget.initialPosition!.isNotEmpty) {
+      _positionCtrl.text = widget.initialPosition!;
+    }
+    if (widget.initialCompanyName != null && widget.initialCompanyName!.isNotEmpty) {
+      _companyNameCtrl.text = widget.initialCompanyName!;
+    }
+    if (widget.initialRegNumber != null && widget.initialRegNumber!.isNotEmpty) {
+      _regNumberCtrl.text = widget.initialRegNumber!;
+    }
+    if (widget.initialAddress != null && widget.initialAddress!.isNotEmpty) {
+      _addressCtrl.text = widget.initialAddress!;
+    }
+    if (widget.initialWebsite != null && widget.initialWebsite!.isNotEmpty) {
+      _websiteCtrl.text = widget.initialWebsite!;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CompleteProfileScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_phoneCtrl.text.isEmpty && widget.initialPhone?.isNotEmpty == true) {
+      _phoneCtrl.text = widget.initialPhone!;
+    }
+    if (_countryCtrl.text.isEmpty && widget.initialCountry?.isNotEmpty == true) {
+      _countryCtrl.text = widget.initialCountry!;
+    }
+    if (_locationCtrl.text.isEmpty && widget.initialLocation?.isNotEmpty == true) {
+      _locationCtrl.text = widget.initialLocation!;
+    }
+    if (_positionCtrl.text.isEmpty && widget.initialPosition?.isNotEmpty == true) {
+      _positionCtrl.text = widget.initialPosition!;
+    }
+    if (_companyNameCtrl.text.isEmpty && widget.initialCompanyName?.isNotEmpty == true) {
+      _companyNameCtrl.text = widget.initialCompanyName!;
+    }
+    if (_regNumberCtrl.text.isEmpty && widget.initialRegNumber?.isNotEmpty == true) {
+      _regNumberCtrl.text = widget.initialRegNumber!;
+    }
+    if (_addressCtrl.text.isEmpty && widget.initialAddress?.isNotEmpty == true) {
+      _addressCtrl.text = widget.initialAddress!;
+    }
+    if (_websiteCtrl.text.isEmpty && widget.initialWebsite?.isNotEmpty == true) {
+      _websiteCtrl.text = widget.initialWebsite!;
+    }
+  }
 
   @override
   void dispose() {
@@ -202,12 +283,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: LabeledTextField(
+                        child: CountryPickerField(
                           label: "Country",
-                          hint: "USA",
+                          hint: "Select country",
                           controller: _countryCtrl,
-                          prefixIcon: const Icon(Icons.public_rounded, color: AppColors.grey, size: 20),
-                          textInputAction: TextInputAction.next,
                           validator: (v) => (v == null || v.trim().isEmpty) ? "Enter country" : null,
                         ),
                       ),
@@ -284,6 +363,19 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Widget _buildPhotoPicker() {
+    final hasRemotePhoto = widget.initialPhotoUrl != null &&
+        widget.initialPhotoUrl!.isNotEmpty &&
+        widget.initialPhotoUrl != 'null';
+
+    ImageProvider? imageProvider;
+    if (_photoPath != null) {
+      imageProvider = FileImage(File(_photoPath!));
+    } else if (hasRemotePhoto) {
+      imageProvider = NetworkImage(widget.initialPhotoUrl!);
+    }
+
+    final hasPhoto = imageProvider != null;
+
     return GestureDetector(
       onTap: _pickImage,
       child: Column(
@@ -300,12 +392,19 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     color: AppColors.primaryColor.withValues(alpha: 0.45),
                     width: 2.w,
                   ),
-                  image: _photoPath != null
-                      ? DecorationImage(image: FileImage(File(_photoPath!)), fit: BoxFit.cover)
+                  image: hasPhoto
+                      ? DecorationImage(
+                          image: imageProvider,
+                          fit: BoxFit.cover,
+                        )
                       : null,
                 ),
-                child: _photoPath == null
-                    ? Icon(Icons.person_outline_rounded, color: AppColors.grey, size: 46.r)
+                child: !hasPhoto
+                    ? Icon(
+                        Icons.person_outline_rounded,
+                        color: AppColors.grey,
+                        size: 46.r,
+                      )
                     : null,
               ),
               Positioned(
@@ -317,14 +416,18 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     color: AppColors.primaryColor,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16.r),
+                  child: Icon(
+                    Icons.camera_alt_rounded,
+                    color: Colors.white,
+                    size: 16.r,
+                  ),
                 ),
               ),
             ],
           ),
           SizedBox(height: 10.h),
           Text(
-            _photoPath != null ? "Change Profile Photo" : "Upload Profile Photo",
+            hasPhoto ? "Change Profile Photo" : "Upload Profile Photo",
             style: GoogleFonts.outfit(
               fontSize: 13.sp,
               color: Colors.white.withValues(alpha: 0.7),

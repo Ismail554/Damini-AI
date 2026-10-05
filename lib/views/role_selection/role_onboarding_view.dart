@@ -8,6 +8,9 @@ import '../../shared/screens/company_verification_screen.dart';
 import '../../shared/screens/complete_profile_screen.dart';
 import '../../shared/screens/interests_screen.dart';
 import '../../shared/screens/verification_pending_screen.dart';
+import '../profile/personal_info/controllers/personal_info_provider.dart';
+import '../profile/controllers/investor_profile_provider.dart';
+import '../sponsor/profile/controllers/sponsor_profile_provider.dart';
 import 'provider/onboarding_provider.dart';
 
 class RoleOnboardingView extends ConsumerStatefulWidget {
@@ -28,6 +31,11 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
     super.initState();
     Future.microtask(() {
       ref.read(onboardingProvider.notifier).initRole(widget.role);
+      ref.read(personalInfoProvider.notifier).refresh();
+      final p = ref.read(personalInfoProvider).info;
+      if (p.isCompany || p.sponsorType?.toUpperCase() == 'COMPANY') {
+        setState(() => _selectedAccountType = 'COMPANY');
+      }
     });
   }
 
@@ -142,6 +150,16 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
     final onboardingState = ref.watch(onboardingProvider);
     final isCompany = _selectedAccountType.toUpperCase() == 'COMPANY';
 
+    final personalInfo = ref.watch(personalInfoProvider).info;
+    final investorAvatar = ref.watch(investorProfileProvider).profile.avatarUrl;
+    final sponsorAvatar = ref.watch(sponsorProfileProvider).profile?.avatarUrl;
+    final avatar = (personalInfo.profilePhotoUrl != null &&
+            personalInfo.profilePhotoUrl!.isNotEmpty)
+        ? personalInfo.profilePhotoUrl
+        : (investorAvatar.isNotEmpty
+            ? investorAvatar
+            : (sponsorAvatar?.isNotEmpty == true ? sponsorAvatar : null));
+
     return CommonBackground(
       showGrid: false,
       child: SafeArea(
@@ -152,6 +170,10 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
             ChooseTypeScreen(
               role: widget.role,
               isLoading: onboardingState.isLoading,
+              initialType: (personalInfo.isCompany ||
+                      personalInfo.sponsorType?.toUpperCase() == 'COMPANY')
+                  ? 'COMPANY'
+                  : 'INDIVIDUAL',
               onNext: _onTypeSelected,
               onBack: _prevPage,
             ),
@@ -159,6 +181,15 @@ class _RoleOnboardingViewState extends ConsumerState<RoleOnboardingView> {
               role: widget.role,
               isCompany: isCompany,
               isLoading: onboardingState.isLoading,
+              initialPhone: personalInfo.phone,
+              initialCountry: personalInfo.country,
+              initialLocation: personalInfo.location,
+              initialPosition: personalInfo.position,
+              initialCompanyName: personalInfo.companyName,
+              initialRegNumber: personalInfo.registrationNumber,
+              initialAddress: personalInfo.businessAddress,
+              initialWebsite: personalInfo.website,
+              initialPhotoUrl: avatar,
               onSaved: _onProfileSaved,
               onBack: _prevPage,
             ),

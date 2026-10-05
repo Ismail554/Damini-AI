@@ -7,6 +7,9 @@ import 'package:Braintech/views/auth/session/controllers/session_provider.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/logout_dialog.dart';
+import 'package:Braintech/core/widgets/custom_snackbar.dart';
+import 'package:Braintech/core/widgets/switch_role_dialog.dart';
+import '../../../home/controllers/home_provider.dart';
 import '../../../profile/widgets/account_type_switcher_card.dart';
 import '../../../profile/widgets/profile_hero_card.dart';
 import '../../../profile/widgets/profile_menu_card.dart';
@@ -76,18 +79,52 @@ class SponsorProfileView extends ConsumerWidget {
             projectsCount: profile?.projectsCount ?? "0",
             role: currentRole,
             verificationStatus: personal.verificationStatus,
+            isCompany: personal.isCompany,
           ),
           SizedBox(height: AppDimens.spaceLg),
 
           AccountTypeSwitcherCard(
             activeRole: currentRole,
+            isLoading: auth.isLoading,
             onSwitchRole: (newRole) async {
-              await ref.read(authProvider.notifier).setRole(newRole);
+              if (newRole == currentRole) return;
+              final confirm = await SwitchRoleDialog.show(context, newRole);
+              if (confirm != true || !context.mounted) return;
+              final result =
+                  await ref.read(authProvider.notifier).switchRole(newRole);
+              if (!context.mounted) return;
+              if (result.success) {
+                if (result.isOnboarded) {
+                  ref.read(homeProvider.notifier).setTabIndex(0);
+                  CustomSnackBar.success(
+                    context,
+                    'Switched to ${newRole == 'sponsor' ? 'Sponsor' : 'Investor'} mode',
+                  );
+                } else {
+                  CustomSnackBar.info(
+                    context,
+                    'Please complete ${newRole == 'sponsor' ? 'Sponsor' : 'Investor'} onboarding.',
+                  );
+                  context.push('/role-onboarding', extra: {'role': newRole});
+                }
+              } else if (result.isProfileMissing) {
+                CustomSnackBar.info(
+                  context,
+                  result.message ??
+                      'Please complete ${newRole == 'sponsor' ? 'Sponsor' : 'Investor'} onboarding.',
+                );
+                context.push('/role-onboarding', extra: {'role': newRole});
+              } else {
+                CustomSnackBar.error(
+                  context,
+                  result.message ?? 'Failed to switch role',
+                );
+              }
             },
           ),
           SizedBox(height: AppDimens.spaceLg),
 
-          const ProfileMenuCard(),
+          ProfileMenuCard(isCompany: personal.isCompany),
           SizedBox(height: AppDimens.spaceXl),
 
           GestureDetector(

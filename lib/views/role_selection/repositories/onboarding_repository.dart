@@ -43,12 +43,25 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   }) async {
     final typeKey = role.toLowerCase() == 'sponsor' ? 'sponsor_type' : 'investor_type';
     final payload = {typeKey: accountType.toUpperCase()};
-    final response = await apiService.patch(
-      ApiEndpoints.onboarding(role),
-      data: payload,
-      requireAuth: true,
-    );
-    return response.statusCode == 200 || response.statusCode == 201;
+    try {
+      final response = await apiService.patch(
+        ApiEndpoints.onboarding(role),
+        data: payload,
+        requireAuth: true,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (_) {
+      try {
+        final fallback = await apiService.patch(
+          ApiEndpoints.profileByRole(role),
+          data: payload,
+          requireAuth: true,
+        );
+        return fallback.statusCode == 200 || fallback.statusCode == 201;
+      } catch (e) {
+        rethrow;
+      }
+    }
   }
 
   @override
@@ -57,25 +70,46 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     required Map<String, dynamic> fields,
     String? photoPath,
   }) async {
+    final cleanFields = <String, dynamic>{};
+    for (final entry in fields.entries) {
+      final v = entry.value;
+      if (v == null) continue;
+      if (v is String && v.trim().isEmpty) continue;
+      cleanFields[entry.key] = v is String ? v.trim() : v;
+    }
+
     dynamic data;
     if (photoPath != null && photoPath.isNotEmpty) {
       final fileName = photoPath.split(RegExp(r'[\\/]')).last;
-      final map = Map<String, dynamic>.from(fields);
+      final map = Map<String, dynamic>.from(cleanFields);
       map['profile_photo'] = await MultipartFile.fromFile(
         photoPath,
         filename: fileName,
       );
       data = FormData.fromMap(map);
     } else {
-      data = fields;
+      data = cleanFields;
     }
 
-    final response = await apiService.patch(
-      ApiEndpoints.onboarding(role),
-      data: data,
-      requireAuth: true,
-    );
-    return response.statusCode == 200 || response.statusCode == 201;
+    try {
+      final response = await apiService.patch(
+        ApiEndpoints.onboarding(role),
+        data: data,
+        requireAuth: true,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (_) {
+      try {
+        final fallback = await apiService.patch(
+          ApiEndpoints.profileByRole(role),
+          data: data,
+          requireAuth: true,
+        );
+        return fallback.statusCode == 200 || fallback.statusCode == 201;
+      } catch (e) {
+        rethrow;
+      }
+    }
   }
 
   @override
@@ -110,12 +144,25 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
     required String role,
     required List<int> industryIds,
   }) async {
-    final response = await apiService.patch(
-      ApiEndpoints.onboarding(role),
-      data: {'industries': industryIds},
-      requireAuth: true,
-    );
-    return response.statusCode == 200 || response.statusCode == 201;
+    try {
+      final response = await apiService.patch(
+        ApiEndpoints.onboarding(role),
+        data: {'industries': industryIds},
+        requireAuth: true,
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (_) {
+      try {
+        final fallback = await apiService.patch(
+          ApiEndpoints.profileByRole(role),
+          data: {'industries': industryIds},
+          requireAuth: true,
+        );
+        return fallback.statusCode == 200 || fallback.statusCode == 201;
+      } catch (e) {
+        rethrow;
+      }
+    }
   }
 
   @override

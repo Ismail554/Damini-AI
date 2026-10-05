@@ -7,6 +7,7 @@ class ChooseTypeScreen extends StatefulWidget {
   final ValueChanged<String>? onNext;
   final VoidCallback onBack;
   final bool isLoading;
+  final String? initialType;
 
   const ChooseTypeScreen({
     super.key,
@@ -14,6 +15,7 @@ class ChooseTypeScreen extends StatefulWidget {
     this.onNext,
     required this.onBack,
     this.isLoading = false,
+    this.initialType,
   });
 
   @override
@@ -21,7 +23,25 @@ class ChooseTypeScreen extends StatefulWidget {
 }
 
 class _ChooseTypeScreenState extends State<ChooseTypeScreen> {
-  String _selectedType = 'INDIVIDUAL';
+  late String _selectedType;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedType = (widget.initialType != null && widget.initialType!.isNotEmpty)
+        ? widget.initialType!.toUpperCase()
+        : 'INDIVIDUAL';
+  }
+
+  @override
+  void didUpdateWidget(covariant ChooseTypeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialType != null &&
+        widget.initialType != oldWidget.initialType &&
+        widget.initialType!.isNotEmpty) {
+      setState(() => _selectedType = widget.initialType!.toUpperCase());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
