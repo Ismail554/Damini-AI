@@ -13,6 +13,7 @@ class ChatItemModel {
   final String? avatarUrl;
   final bool isGroupChat;
   final int? projectId;
+  final String? otherUserId;
 
   const ChatItemModel({
     required this.id,
@@ -26,6 +27,7 @@ class ChatItemModel {
     this.avatarUrl,
     this.isGroupChat = false,
     this.projectId,
+    this.otherUserId,
   });
 
   factory ChatItemModel.fromConversation(ConversationModel conv) {
@@ -96,6 +98,7 @@ class ChatItemModel {
     String? avatarUrl,
     bool? isGroupChat,
     int? projectId,
+    String? otherUserId,
   }) {
     return ChatItemModel(
       id: id ?? this.id,
@@ -109,6 +112,7 @@ class ChatItemModel {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isGroupChat: isGroupChat ?? this.isGroupChat,
       projectId: projectId ?? this.projectId,
+      otherUserId: otherUserId ?? this.otherUserId,
     );
   }
 

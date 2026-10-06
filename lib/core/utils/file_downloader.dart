@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import '../constants/api_endpoints.dart';
 import '../services/dio_service.dart';
 import '../widgets/custom_snackbar.dart';
 
@@ -18,12 +19,20 @@ class FileDownloader {
     String? extension,
     void Function(double progress)? onProgress,
   }) async {
-    final cleanUrl = url.trim();
+    var cleanUrl = url.trim();
     if (cleanUrl.isEmpty) {
       if (context.mounted) {
         CustomSnackBar.error(context, "No download URL available.");
       }
       return null;
+    }
+
+    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+      final base = ApiEndpoints.baseUrl.endsWith('/')
+          ? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)
+          : ApiEndpoints.baseUrl;
+      final path = cleanUrl.startsWith('/') ? cleanUrl : '/$cleanUrl';
+      cleanUrl = '$base$path';
     }
 
     try {
@@ -103,8 +112,14 @@ class FileDownloader {
           context,
           "Saved $fileName to device",
           actionLabel: "Open",
-          onAction: () {
-            OpenFilex.open(savePath);
+          onAction: () async {
+            final res = await OpenFilex.open(savePath);
+            if (res.type == ResultType.noAppToOpen && context.mounted) {
+              CustomSnackBar.warning(
+                context,
+                "No app available to open this file.",
+              );
+            }
           },
         );
       }

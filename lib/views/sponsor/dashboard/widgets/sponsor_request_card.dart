@@ -6,6 +6,7 @@ import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
 
 class SponsorRequestCard extends StatelessWidget {
+  final String? userId;
   final String name;
   final String subtitle;
   final String avatarUrl;
@@ -14,6 +15,7 @@ class SponsorRequestCard extends StatelessWidget {
 
   const SponsorRequestCard({
     super.key,
+    this.userId,
     required this.name,
     required this.subtitle,
     required this.avatarUrl,
@@ -44,6 +46,7 @@ class SponsorRequestCard extends StatelessWidget {
               onTap: () => context.push(
                 '/public-profile',
                 extra: {
+                  'userId': userId,
                   'name': name,
                   'title': subtitle,
                   'avatarUrl': avatarUrl,

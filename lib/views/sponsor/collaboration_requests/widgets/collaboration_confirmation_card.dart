@@ -64,6 +64,7 @@ class CollaborationConfirmationCard extends StatelessWidget {
             onTap: () => context.push(
               '/public-profile',
               extra: {
+                'userId': item.investorId?.toString(),
                 'name': item.investorName,
                 'title': item.investorType,
                 'avatarUrl': item.avatarUrl,

@@ -7,8 +7,8 @@ import '../../../../core/utils/app_theme_colors.dart';
 class DeleteAccountDialog extends StatefulWidget {
   const DeleteAccountDialog({super.key});
 
-  static Future<bool?> show(BuildContext context) {
-    return showDialog<bool>(
+  static Future<String?> show(BuildContext context) {
+    return showDialog<String>(
       context: context,
       barrierDismissible: true,
       builder: (context) => const DeleteAccountDialog(),
@@ -186,7 +186,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: isEnabled
-                        ? () => Navigator.of(context).pop(true)
+                        ? () => Navigator.of(context).pop(_passwordController.text.trim())
                         : null,
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(double.infinity, 44.h),

@@ -11,6 +11,7 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
 abstract class SettingsRepository {
   Future<UserSettingsModel> getUserSettings();
   Future<bool> updateNotificationPreference(bool enabled);
+  Future<bool> deleteAccount(String password);
 }
 
 class SettingsRepositoryImpl implements SettingsRepository {
@@ -55,6 +56,24 @@ class SettingsRepositoryImpl implements SettingsRepository {
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (_) {
       return false;
+    }
+  }
+
+  @override
+  Future<bool> deleteAccount(String password) async {
+    try {
+      final response = await _apiService.post(
+        ApiEndpoints.deleteAccount,
+        data: {'password': password},
+        requireAuth: true,
+      );
+      return response.statusCode == 200 ||
+          response.statusCode == 204 ||
+          (response.data is Map &&
+              (response.data['status'] == 'success' ||
+                  response.data['success'] == true));
+    } catch (e) {
+      rethrow;
     }
   }
 }

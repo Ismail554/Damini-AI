@@ -19,6 +19,9 @@ class SponsorSavedProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
+    final hasValidAvatar = item.avatarUrl.isNotEmpty &&
+        (item.avatarUrl.startsWith('http://') ||
+            item.avatarUrl.startsWith('https://'));
 
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
@@ -37,20 +40,39 @@ class SponsorSavedProfileCard extends StatelessWidget {
           children: [
             Expanded(
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => context.push(
                   '/public-profile',
                   extra: {
+                    'userId': item.userId,
                     'name': item.name,
                     'title': item.title,
                     'company': item.company,
                     'avatarUrl': item.avatarUrl,
+                    'location': item.location,
+                    'role': item.role,
+                    'isSaved': true,
                   },
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 28.r,
-                      backgroundImage: NetworkImage(item.avatarUrl),
+                      backgroundColor: tc.cardInner,
+                      backgroundImage:
+                          hasValidAvatar ? NetworkImage(item.avatarUrl) : null,
+                      child: !hasValidAvatar
+                          ? Text(
+                              item.name.trim().isNotEmpty
+                                  ? item.name.trim()[0].toUpperCase()
+                                  : 'U',
+                              style: GoogleFonts.outfit(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                                color: tc.textPrimary,
+                              ),
+                            )
+                          : null,
                     ),
                     AppSpacing.w14,
                     Expanded(
@@ -67,7 +89,9 @@ class SponsorSavedProfileCard extends StatelessWidget {
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            "${item.title} • ${item.company}",
+                            item.company.isNotEmpty
+                                ? "${item.title} • ${item.company}"
+                                : item.title,
                             style: GoogleFonts.outfit(
                               fontSize: 13.sp,
                               color: tc.textSecondary,
@@ -84,11 +108,15 @@ class SponsorSavedProfileCard extends StatelessWidget {
                                 size: 13.r,
                               ),
                               SizedBox(width: 4.w),
-                              Text(
-                                item.location,
-                                style: GoogleFonts.outfit(
-                                  fontSize: 12.sp,
-                                  color: tc.textTertiary,
+                              Expanded(
+                                child: Text(
+                                  item.location,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 12.sp,
+                                    color: tc.textTertiary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -101,59 +129,8 @@ class SponsorSavedProfileCard extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: () {
-                if (onBookmarkTap != null) {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      backgroundColor: tc.cardBg,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                      title: Text(
-                        "Remove Profile?",
-                        style: GoogleFonts.outfit(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: tc.textPrimary,
-                        ),
-                      ),
-                      content: Text(
-                        "Are you sure you want to remove this profile from your saved items?",
-                        style: GoogleFonts.outfit(
-                          fontSize: 14.sp,
-                          color: tc.textSecondary,
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(),
-                          child: Text(
-                            "Cancel",
-                            style: GoogleFonts.outfit(
-                              color: tc.textSecondary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(ctx).pop();
-                            onBookmarkTap!();
-                          },
-                          child: Text(
-                            "Remove",
-                            style: GoogleFonts.outfit(
-                              color: const Color(0xFFE53935),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              },
+              behavior: HitTestBehavior.opaque,
+              onTap: onBookmarkTap,
               child: Container(
                 width: 36.w,
                 height: 36.h,

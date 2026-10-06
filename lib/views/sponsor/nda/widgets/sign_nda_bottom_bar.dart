@@ -8,12 +8,14 @@ class SignNdaBottomBar extends StatelessWidget {
   final bool canSubmit;
   final bool isSubmitting;
   final VoidCallback onSubmit;
+  final VoidCallback? onDisabledTap;
 
   const SignNdaBottomBar({
     super.key,
     required this.canSubmit,
     required this.isSubmitting,
     required this.onSubmit,
+    this.onDisabledTap,
   });
 
   @override
@@ -44,6 +46,8 @@ class SignNdaBottomBar extends StatelessWidget {
             onPressed: () {
               if (canSubmit) {
                 onSubmit();
+              } else if (!isSubmitting) {
+                onDisabledTap?.call();
               }
             },
           ),

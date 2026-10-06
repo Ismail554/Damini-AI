@@ -277,6 +277,7 @@ class SponsorActiveProjectData {
 
 class SponsorCollaborationRequestPreview {
   final String id;
+  final String? userId;
   final String name;
   final String subtitle;
   final String avatarUrl;
@@ -284,6 +285,7 @@ class SponsorCollaborationRequestPreview {
 
   const SponsorCollaborationRequestPreview({
     required this.id,
+    this.userId,
     required this.name,
     required this.subtitle,
     required this.avatarUrl,
@@ -296,6 +298,9 @@ class SponsorCollaborationRequestPreview {
     final investor = json['investor'] is Map
         ? Map<String, dynamic>.from(json['investor'] as Map)
         : const <String, dynamic>{};
+    final userId = investor['id']?.toString() ??
+        investor['user_id']?.toString() ??
+        json['investor_id']?.toString();
     final name = investor['name']?.toString() ?? 'Investor';
 
     final project = json['project'] is Map
@@ -325,6 +330,7 @@ class SponsorCollaborationRequestPreview {
 
     return SponsorCollaborationRequestPreview(
       id: id,
+      userId: userId,
       name: name,
       subtitle: subtitle,
       avatarUrl: avatarUrl,

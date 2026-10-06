@@ -120,7 +120,103 @@ class SponsorSavedRepository {
     }
   }
 
-  Future<List<SponsorSavedProfileModel>> fetchSavedProfiles() async {
-    return SponsorSavedProfileModel.mockList();
+  /// Fetch saved profiles from GET /api/v1/users/saved/
+  /// Supports optional `search` and `ordering` query parameters.
+  Future<SavedProfilesResponse> fetchSavedProfiles({
+    String? search,
+    String? ordering,
+  }) async {
+    try {
+      final Map<String, dynamic> queryParams = {};
+      if (search != null && search.trim().isNotEmpty) {
+        queryParams['search'] = search.trim();
+      }
+      if (ordering != null && ordering.trim().isNotEmpty) {
+        queryParams['ordering'] = ordering.trim();
+      }
+
+      final response = await _apiService.get(
+        ApiEndpoints.savedProfiles,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      if (data is Map<String, dynamic>) {
+        if (data['results'] is List) {
+          return SavedProfilesResponse.fromJson(data);
+        } else if (data['data'] is Map<String, dynamic> &&
+            (data['data'] as Map)['results'] is List) {
+          return SavedProfilesResponse.fromJson(
+            Map<String, dynamic>.from(data['data']),
+          );
+        } else if (data['data'] is List) {
+          final list = (data['data'] as List)
+              .whereType<Map>()
+              .map(
+                (e) => SponsorSavedProfileModel.fromJson(
+                  Map<String, dynamic>.from(e),
+                ),
+              )
+              .toList();
+          return SavedProfilesResponse(count: list.length, results: list);
+        }
+      } else if (data is List) {
+        final list = data
+            .whereType<Map>()
+            .map(
+              (e) => SponsorSavedProfileModel.fromJson(
+                Map<String, dynamic>.from(e),
+              ),
+            )
+            .toList();
+        return SavedProfilesResponse(count: list.length, results: list);
+      }
+
+      return const SavedProfilesResponse(count: 0, results: []);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Toggle save/bookmark for user profile: POST /api/v1/users/{userId}/save/
+  Future<bool?> toggleSaveProfile(String userId) async {
+    try {
+      final response = await _apiService.post(
+        ApiEndpoints.saveProfile(userId),
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      if (data is Map<String, dynamic>) {
+        if (data.containsKey('is_saved')) {
+          final isSaved = data['is_saved'];
+          if (isSaved is bool) return isSaved;
+          if (isSaved != null) {
+            return isSaved.toString().toLowerCase() == 'true';
+          }
+        }
+        if (data.containsKey('saved')) {
+          final saved = data['saved'];
+          if (saved is bool) return saved;
+        }
+      }
+
+      return null;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

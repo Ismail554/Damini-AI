@@ -12,8 +12,11 @@ import '../../../sponsor/chat/models/chat_item_model.dart';
 import '../../personal_info/widgets/info_section_card.dart';
 import '../controllers/public_profile_provider.dart';
 import '../widgets/public_profile_hero_card.dart';
+import '../widgets/public_profile_save_button.dart';
 
 class PublicProfileView extends ConsumerWidget {
+  final String? userId;
+  final bool? isSaved;
   final String? name;
   final String? title;
   final String? company;
@@ -31,6 +34,8 @@ class PublicProfileView extends ConsumerWidget {
 
   const PublicProfileView({
     super.key,
+    this.userId,
+    this.isSaved,
     this.name,
     this.title,
     this.company,
@@ -148,6 +153,13 @@ class PublicProfileView extends ConsumerWidget {
               color: tc.textPrimary,
             ),
           ),
+          actions: [
+            if (!isOwnProfile && userId != null && userId!.trim().isNotEmpty)
+              PublicProfileSaveButton(
+                userId: userId!.trim(),
+                initialIsSaved: isSaved,
+              ),
+          ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(

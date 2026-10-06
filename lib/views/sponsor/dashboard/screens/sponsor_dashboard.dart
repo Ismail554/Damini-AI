@@ -175,6 +175,7 @@ class SponsorDashboard extends ConsumerWidget {
               const AppShimmer.card(height: 76)
             else if (requests.isNotEmpty)
               SponsorRequestCard(
+                userId: requests.first.userId,
                 name: requests.first.name,
                 subtitle: requests.first.subtitle,
                 avatarUrl: requests.first.avatarUrl,

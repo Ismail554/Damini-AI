@@ -352,7 +352,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
           ),
 
           // Request Collaboration Button (Investor Role)
-          if (isInvestor)
+          if (isInvestor && !_project.stage.toLowerCase().contains('terminated'))
             Positioned(
               left: 0,
               right: 0,

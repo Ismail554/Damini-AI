@@ -305,6 +305,10 @@ class AppRouter {
             context: context,
             state: state,
             child: PublicProfileView(
+              userId: extra?['userId']?.toString() ??
+                  extra?['user_id']?.toString() ??
+                  extra?['id']?.toString(),
+              isSaved: extra?['isSaved'] as bool?,
               name: extra?['name'] as String?,
               title: extra?['title'] as String?,
               company: extra?['company'] as String?,

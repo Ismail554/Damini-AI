@@ -486,19 +486,29 @@ class SponsorSavedView extends ConsumerWidget {
       );
     } else {
       // Saved Profiles tab
-      var profiles = state.profiles;
-      if (state.searchQuery.isNotEmpty) {
-        final q = state.searchQuery.toLowerCase();
-        profiles = profiles
-            .where(
-              (p) =>
-                  p.name.toLowerCase().contains(q) ||
-                  p.title.toLowerCase().contains(q) ||
-                  p.company.toLowerCase().contains(q),
-            )
-            .toList();
+      if (state.isLoadingProfiles && state.profiles.isEmpty) {
+        return Column(
+          children: List.generate(
+            3,
+            (_) => Padding(
+              padding: EdgeInsets.only(bottom: 16.h),
+              child: const AppShimmer(
+                shape: ShimmerShape.card,
+                height: 90,
+              ),
+            ),
+          ),
+        );
       }
 
+      if (state.profilesError != null && state.profiles.isEmpty) {
+        return AppErrorView(
+          message: state.profilesError!,
+          onRetry: () => ref.read(sponsorSavedProvider.notifier).loadSavedProfiles(),
+        );
+      }
+
+      final profiles = state.profiles;
       if (profiles.isEmpty) {
         return AppEmptyView(
           message: state.searchQuery.isNotEmpty
@@ -510,14 +520,85 @@ class SponsorSavedView extends ConsumerWidget {
 
       return Column(
         children: profiles.map((item) {
+          final targetId = item.userId.isNotEmpty ? item.userId : item.id;
           return SponsorSavedProfileCard(
             item: item,
-            onBookmarkTap: () =>
-                ref.read(sponsorSavedProvider.notifier).removeProfile(item.id),
+            onBookmarkTap: () => _confirmRemoveProfile(context, ref, tc, targetId),
           );
         }).toList(),
       );
     }
+  }
+
+  void _confirmRemoveProfile(
+    BuildContext context,
+    WidgetRef ref,
+    AppThemeColors tc,
+    String id,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: tc.cardBg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Text(
+          "Remove Profile?",
+          style: GoogleFonts.outfit(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: tc.textPrimary,
+          ),
+        ),
+        content: Text(
+          "Are you sure you want to remove this profile from your saved items?",
+          style: GoogleFonts.outfit(
+            fontSize: 14.sp,
+            color: tc.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              "Cancel",
+              style: GoogleFonts.outfit(
+                color: tc.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              try {
+                await ref.read(sponsorSavedProvider.notifier).removeProfile(id);
+                if (context.mounted) {
+                  CustomSnackBar.info(context, "Profile removed from saved items.");
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  CustomSnackBar.error(
+                    context,
+                    e is AppException
+                        ? e.message
+                        : "Failed to remove profile. Please try again.",
+                  );
+                }
+              }
+            },
+            child: Text(
+              "Remove",
+              style: GoogleFonts.outfit(
+                color: const Color(0xFFE53935),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _confirmRemoveProject(

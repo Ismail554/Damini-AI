@@ -18,6 +18,12 @@ class SponsorSavedState {
   final int totalProjectsCount;
   final List<SponsorSavedProjectModel> rawProjects;
   final List<SponsorSavedProjectModel> projects;
+
+  final bool isLoadingProfiles;
+  final bool isRefreshingProfiles;
+  final String? profilesError;
+  final int totalProfilesCount;
+  final List<SponsorSavedProfileModel> rawProfiles;
   final List<SponsorSavedProfileModel> profiles;
 
   const SponsorSavedState({
@@ -31,6 +37,11 @@ class SponsorSavedState {
     this.totalProjectsCount = 0,
     this.rawProjects = const [],
     required this.projects,
+    this.isLoadingProfiles = false,
+    this.isRefreshingProfiles = false,
+    this.profilesError,
+    this.totalProfilesCount = 0,
+    this.rawProfiles = const [],
     required this.profiles,
   });
 
@@ -44,17 +55,9 @@ class SponsorSavedState {
       return totalProjectsCount > 0 ? totalProjectsCount : projects.length;
     } else {
       if (searchQuery.isNotEmpty) {
-        final q = searchQuery.toLowerCase();
-        return profiles
-            .where(
-              (p) =>
-                  p.name.toLowerCase().contains(q) ||
-                  p.title.toLowerCase().contains(q) ||
-                  p.company.toLowerCase().contains(q),
-            )
-            .length;
+        return profiles.length;
       }
-      return profiles.length;
+      return totalProfilesCount > 0 ? totalProfilesCount : profiles.length;
     }
   }
 
@@ -70,6 +73,12 @@ class SponsorSavedState {
     int? totalProjectsCount,
     List<SponsorSavedProjectModel>? rawProjects,
     List<SponsorSavedProjectModel>? projects,
+    bool? isLoadingProfiles,
+    bool? isRefreshingProfiles,
+    String? profilesError,
+    bool clearProfilesError = false,
+    int? totalProfilesCount,
+    List<SponsorSavedProfileModel>? rawProfiles,
     List<SponsorSavedProfileModel>? profiles,
   }) {
     return SponsorSavedState(
@@ -84,6 +93,12 @@ class SponsorSavedState {
       totalProjectsCount: totalProjectsCount ?? this.totalProjectsCount,
       rawProjects: rawProjects ?? this.rawProjects,
       projects: projects ?? this.projects,
+      isLoadingProfiles: isLoadingProfiles ?? this.isLoadingProfiles,
+      isRefreshingProfiles: isRefreshingProfiles ?? this.isRefreshingProfiles,
+      profilesError:
+          clearProfilesError ? null : (profilesError ?? this.profilesError),
+      totalProfilesCount: totalProfilesCount ?? this.totalProfilesCount,
+      rawProfiles: rawProfiles ?? this.rawProfiles,
       profiles: profiles ?? this.profiles,
     );
   }
@@ -101,14 +116,19 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
       _debounceTimer?.cancel();
     });
 
-    // Initial fetch of saved projects
-    Future.microtask(() => loadSavedProjects());
+    // Initial fetch of saved projects and saved profiles
+    Future.microtask(() {
+      loadSavedProjects();
+      loadSavedProfiles();
+    });
 
-    return SponsorSavedState(
+    return const SponsorSavedState(
       isLoadingProjects: true,
-      rawProjects: const [],
-      projects: const [],
-      profiles: SponsorSavedProfileModel.mockList(),
+      rawProjects: [],
+      projects: [],
+      isLoadingProfiles: true,
+      rawProfiles: [],
+      profiles: [],
     );
   }
 
@@ -117,8 +137,14 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
       currentTab: tab,
       selectedSort: "Newest",
       selectedFilter: "All",
+      searchQuery: "",
     );
     _applyFilterAndSort();
+    if (tab == SavedTab.profiles && state.rawProfiles.isEmpty) {
+      loadSavedProfiles();
+    } else if (tab == SavedTab.projects && state.rawProjects.isEmpty) {
+      loadSavedProjects();
+    }
   }
 
   void setFilter(String filter) {
@@ -136,6 +162,8 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
     _applyFilterAndSort();
     if (state.currentTab == SavedTab.projects) {
       loadSavedProjects(ordering: _getBackendOrdering(sort));
+    } else {
+      loadSavedProfiles(ordering: _getProfileBackendOrdering(sort));
     }
   }
 
@@ -144,7 +172,11 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
     state = state.copyWith(searchQuery: query);
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 450), () {
-      loadSavedProjects(search: query);
+      if (state.currentTab == SavedTab.projects) {
+        loadSavedProjects(search: query);
+      } else {
+        loadSavedProfiles(search: query);
+      }
     });
   }
 
@@ -152,7 +184,11 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
   void clearSearch() {
     _debounceTimer?.cancel();
     state = state.copyWith(searchQuery: '');
-    loadSavedProjects(search: '');
+    if (state.currentTab == SavedTab.projects) {
+      loadSavedProjects(search: '');
+    } else {
+      loadSavedProfiles(search: '');
+    }
   }
 
   /// Load saved projects from backend API
@@ -205,8 +241,59 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
     }
   }
 
+  /// Load saved profiles from backend API
+  Future<void> loadSavedProfiles({
+    String? search,
+    String? ordering,
+    bool isRefresh = false,
+  }) async {
+    final query = search ?? state.searchQuery;
+    final order = ordering ?? _getProfileBackendOrdering(state.selectedSort);
+
+    if (isRefresh) {
+      state = state.copyWith(
+        isRefreshingProfiles: true,
+        clearProfilesError: true,
+      );
+    } else if (state.rawProfiles.isEmpty) {
+      state = state.copyWith(
+        isLoadingProfiles: true,
+        clearProfilesError: true,
+      );
+    }
+
+    try {
+      final response = await _repository.fetchSavedProfiles(
+        search: query,
+        ordering: order,
+      );
+      state = state.copyWith(
+        isLoadingProfiles: false,
+        isRefreshingProfiles: false,
+        rawProfiles: response.results,
+        totalProfilesCount: response.count,
+        clearProfilesError: true,
+      );
+      _applyFilterAndSort();
+    } catch (e) {
+      final errorMessage = e is AppException
+          ? e.message
+          : 'Unable to load saved profiles. Please try again.';
+
+      state = state.copyWith(
+        isLoadingProfiles: false,
+        isRefreshingProfiles: false,
+        profilesError: state.rawProfiles.isEmpty ? errorMessage : null,
+      );
+    }
+  }
+
   Future<void> refresh() async {
-    await loadSavedProjects(isRefresh: true);
+    if (state.currentTab == SavedTab.projects) {
+      await loadSavedProjects(isRefresh: true);
+    } else {
+      await loadSavedProfiles(isRefresh: true);
+    }
   }
 
   /// Notification hook called when any project bookmark changes across the app
@@ -214,7 +301,6 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
     required String projectId,
     required bool isSaved,
   }) async {
-    // If it was removed, optimistically filter it out immediately
     if (!isSaved) {
       final updatedRaw =
           state.rawProjects.where((p) => p.id != projectId).toList();
@@ -226,8 +312,27 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
       );
       _applyFilterAndSort();
     }
-    // Re-sync with backend GET /api/v1/projects/saved/
     await refresh();
+  }
+
+  /// Notification hook called when any user profile bookmark changes across the app
+  Future<void> onProfileBookmarkToggled({
+    required String userId,
+    required bool isSaved,
+  }) async {
+    if (!isSaved) {
+      final updatedRaw =
+          state.rawProfiles.where((p) => p.userId != userId && p.id != userId).toList();
+      state = state.copyWith(
+        rawProfiles: updatedRaw,
+        totalProfilesCount: state.totalProfilesCount > 0
+            ? state.totalProfilesCount - 1
+            : updatedRaw.length,
+      );
+      _applyFilterAndSort();
+    }
+    // Re-sync with backend in background
+    await loadSavedProfiles(isRefresh: true);
   }
 
   Future<void> removeProject(String id) async {
@@ -257,10 +362,33 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
     }
   }
 
-  void removeProfile(String id) {
+  Future<void> removeProfile(String idOrUserId) async {
+    final prevRaw = state.rawProfiles;
+    final prevProfiles = state.profiles;
+    final prevCount = state.totalProfilesCount;
+
+    // Optimistically remove from state
+    final updatedRaw = prevRaw
+        .where((p) => p.id != idOrUserId && p.userId != idOrUserId)
+        .toList();
     state = state.copyWith(
-      profiles: state.profiles.where((p) => p.id != id).toList(),
+      rawProfiles: updatedRaw,
+      totalProfilesCount:
+          prevCount > 0 ? prevCount - 1 : updatedRaw.length,
     );
+    _applyFilterAndSort();
+
+    try {
+      await _repository.toggleSaveProfile(idOrUserId);
+    } catch (e) {
+      // Revert state on failure
+      state = state.copyWith(
+        rawProfiles: prevRaw,
+        profiles: prevProfiles,
+        totalProfilesCount: prevCount,
+      );
+      rethrow;
+    }
   }
 
   void _applyFilterAndSort() {
@@ -324,16 +452,39 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
       }
       state = state.copyWith(projects: filtered);
     } else {
-      final sortedProfiles =
-          List<SponsorSavedProfileModel>.from(state.profiles);
+      var filteredProfiles = List<SponsorSavedProfileModel>.from(state.rawProfiles);
+
+      // Local search filtering if backend search isn't already applied
+      if (state.searchQuery.trim().isNotEmpty) {
+        final q = state.searchQuery.toLowerCase();
+        filteredProfiles = filteredProfiles.where((p) {
+          return p.name.toLowerCase().contains(q) ||
+              p.title.toLowerCase().contains(q) ||
+              p.company.toLowerCase().contains(q) ||
+              p.location.toLowerCase().contains(q);
+        }).toList();
+      }
+
+      final sortedProfiles = List<SponsorSavedProfileModel>.from(filteredProfiles);
       if (state.selectedSort == 'Name: A to Z') {
-        sortedProfiles.sort((a, b) => a.name.compareTo(b.name));
+        sortedProfiles.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       } else if (state.selectedSort == 'Name: Z to A') {
-        sortedProfiles.sort((a, b) => b.name.compareTo(a.name));
+        sortedProfiles.sort((a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
       } else if (state.selectedSort == 'Oldest') {
-        sortedProfiles.sort((a, b) => b.id.compareTo(a.id));
+        sortedProfiles.sort((a, b) {
+          if (a.createdAt != null && b.createdAt != null) {
+            return a.createdAt!.compareTo(b.createdAt!);
+          }
+          return a.id.compareTo(b.id);
+        });
       } else {
-        sortedProfiles.sort((a, b) => a.id.compareTo(b.id)); // Newest
+        // Newest
+        sortedProfiles.sort((a, b) {
+          if (a.createdAt != null && b.createdAt != null) {
+            return b.createdAt!.compareTo(a.createdAt!);
+          }
+          return b.id.compareTo(a.id);
+        });
       }
       state = state.copyWith(profiles: sortedProfiles);
     }
@@ -349,6 +500,20 @@ class SponsorSavedNotifier extends Notifier<SponsorSavedState> {
         return '-funding_goal';
       case 'Target Raise: Low to High':
         return 'funding_goal';
+      case 'Newest':
+      default:
+        return '-created_at';
+    }
+  }
+
+  String? _getProfileBackendOrdering(String sort) {
+    switch (sort) {
+      case 'Oldest':
+        return 'created_at';
+      case 'Name: A to Z':
+        return 'name';
+      case 'Name: Z to A':
+        return '-name';
       case 'Newest':
       default:
         return '-created_at';

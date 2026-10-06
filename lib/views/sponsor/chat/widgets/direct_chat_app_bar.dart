@@ -30,6 +30,7 @@ class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         onTap: () => context.push(
           '/public-profile',
           extra: {
+            'userId': chatItem.otherUserId,
             'name': chatItem.name,
             'avatarUrl': chatItem.avatarUrl,
           },

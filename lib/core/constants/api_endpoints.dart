@@ -27,8 +27,13 @@ class ApiEndpoints {
 
   // User & Projects
   static const String currentUser = "/api/v1/users/me/";
+  static const String deleteAccount = "/api/v1/users/delete-account/";
+  static const String sponsorNda = "/api/v1/profiles/sponsor/nda/";
   static const String sponsorProjects = "/api/v1/projects/sponsor/";
   static const String savedProjects = "/api/v1/projects/saved/";
+  static const String savedProfiles = "/api/v1/profiles/saved/";
+  static String saveProfile(String userId) => "/api/v1/profiles/$userId/save/";
+  static String userPublicProfile(String userId) => "/api/v1/profiles/$userId/";
   static const String sponsorCollaborationRequests =
       "/api/v1/projects/sponsor/requests/";
   static String sponsorProjectRequests(String id) =>

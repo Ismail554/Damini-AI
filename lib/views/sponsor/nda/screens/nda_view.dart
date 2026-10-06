@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,21 +10,22 @@ import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/custom_button.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
 import '../../../../core/utils/file_downloader.dart';
+import '../controllers/nda_provider.dart';
 import '../widgets/nda_agreement_card.dart';
 import '../widgets/nda_document_attachment_card.dart';
 import '../widgets/nda_header.dart';
 import '../widgets/nda_signature_section.dart';
 
-class NdaView extends StatefulWidget {
+class NdaView extends ConsumerStatefulWidget {
   final String disclosingParty;
 
   const NdaView({super.key, this.disclosingParty = "Acme Corp"});
 
   @override
-  State<NdaView> createState() => _NdaViewState();
+  ConsumerState<NdaView> createState() => _NdaViewState();
 }
 
-class _NdaViewState extends State<NdaView> {
+class _NdaViewState extends ConsumerState<NdaView> {
   final _signatureController = TextEditingController();
   bool _isAgreed = false;
   String? _signatureFileName;
@@ -155,6 +157,19 @@ class _NdaViewState extends State<NdaView> {
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
+    final ndaState = ref.watch(ndaProvider);
+    final agreement = ndaState.agreement;
+
+    final effectiveDisclosingParty = (agreement?.disclosingParty.isNotEmpty == true &&
+            agreement!.disclosingParty != "Acme Corp")
+        ? agreement.disclosingParty
+        : widget.disclosingParty;
+
+    final docTitle = agreement?.documentTitle ?? "Pitch_Deck_Financials.pdf";
+    final docSize = agreement?.fileSize ?? "4.1 MB";
+    final docUrl = (agreement?.documentUrl != null && agreement!.documentUrl!.isNotEmpty)
+        ? agreement.documentUrl!
+        : "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
     return CommonBackground(
       child: Scaffold(
@@ -186,17 +201,19 @@ class _NdaViewState extends State<NdaView> {
                 ),
                 child: Column(
                   children: [
-                    NdaHeader(disclosingParty: widget.disclosingParty),
+                    NdaHeader(disclosingParty: effectiveDisclosingParty),
                     SizedBox(height: AppDimens.spaceXl),
                     const NdaAgreementCard(),
                     SizedBox(height: AppDimens.spaceLg),
                     NdaDocumentAttachmentCard(
+                      fileName: docTitle,
+                      fileSize: "$docSize · Confidential",
                       onDownload: () {
                         FileDownloader.downloadFile(
                           context,
-                          url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+                          url: docUrl,
                           suggestedName:
-                              "NDA_Overview_${widget.disclosingParty.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}.pdf",
+                              "NDA_${effectiveDisclosingParty.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}.pdf",
                           extension: "pdf",
                         );
                       },
@@ -237,7 +254,12 @@ class _NdaViewState extends State<NdaView> {
                   variant: CustomButtonVariant.gradient,
                   width: double.infinity,
                   height: 42.h,
-                  onPressed: () => context.push('/edit-nda'),
+                  onPressed: () async {
+                    final updated = await context.push<bool>('/edit-nda');
+                    if (updated == true && mounted) {
+                      ref.read(ndaProvider.notifier).refresh();
+                    }
+                  },
                 ),
               ),
             ),

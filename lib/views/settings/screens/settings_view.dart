@@ -396,11 +396,27 @@ class SettingsView extends ConsumerWidget {
   Widget _buildDeleteAccountButton(BuildContext context, AppThemeColors tc, WidgetRef ref) {
     return GestureDetector(
       onTap: () async {
-        final confirmed = await DeleteAccountDialog.show(context);
-        if (confirmed == true && context.mounted) {
-          await ref.read(authProvider.notifier).logout();
-          if (context.mounted) {
-            context.go('/login');
+        final password = await DeleteAccountDialog.show(context);
+        if (password != null && password.isNotEmpty && context.mounted) {
+          try {
+            await ref.read(settingsProvider.notifier).deleteAccount(password);
+            if (context.mounted) {
+              await ref.read(authProvider.notifier).logout();
+              if (context.mounted) {
+                CustomSnackBar.success(
+                  context,
+                  "Your account has been deleted successfully.",
+                );
+                context.go('/login');
+              }
+            }
+          } catch (e) {
+            if (context.mounted) {
+              CustomSnackBar.error(
+                context,
+                "Failed to delete account. Please verify your password.",
+              );
+            }
           }
         }
       },

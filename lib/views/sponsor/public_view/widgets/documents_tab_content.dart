@@ -107,7 +107,10 @@ class DocumentsTabContent extends StatelessWidget {
               ),
             ),
           ] else if (isLocked) ...[
-            LockedDocumentsCard(onSignNda: onSignNda),
+            LockedDocumentsCard(
+              isTerminated: project.stage.toLowerCase().contains('terminated'),
+              onSignNda: onSignNda,
+            ),
           ] else if (project.documents.isEmpty) ...[
             Container(
               width: double.infinity,

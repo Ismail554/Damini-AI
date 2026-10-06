@@ -41,6 +41,7 @@ class InvestorContributionCard extends StatelessWidget {
                   onTap: () => context.push(
                     '/public-profile',
                     extra: {
+                      'userId': contribution.id,
                       'name': contribution.name,
                       'title': contribution.type,
                       'avatarUrl': contribution.avatarUrl,
@@ -72,6 +73,7 @@ class InvestorContributionCard extends StatelessWidget {
                         () => context.push(
                               '/public-profile',
                               extra: {
+                                'userId': contribution.id,
                                 'name': contribution.name,
                                 'title': contribution.type,
                                 'avatarUrl': contribution.avatarUrl,

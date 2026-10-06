@@ -32,6 +32,7 @@ class NdaState {
     String? signatureFileName,
     bool? isSubmitting,
     String? error,
+    bool clearError = false,
   }) {
     return NdaState(
       isLoading: isLoading ?? this.isLoading,
@@ -40,7 +41,7 @@ class NdaState {
       signature: signature ?? this.signature,
       signatureFileName: signatureFileName ?? this.signatureFileName,
       isSubmitting: isSubmitting ?? this.isSubmitting,
-      error: error,
+      error: clearError ? null : (error ?? this.error),
     );
   }
 }
@@ -57,11 +58,15 @@ class NdaNotifier extends Notifier<NdaState> {
 
   Future<void> _loadAgreement() async {
     try {
-      final data = await _repository.fetchNdaAgreement();
-      state = state.copyWith(isLoading: false, agreement: data);
+      final data = await _repository.fetchSponsorNda();
+      state = state.copyWith(isLoading: false, agreement: data, clearError: true);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
+  }
+
+  Future<void> refresh() async {
+    await _loadAgreement();
   }
 
   void toggleAgreement(bool value) {
@@ -74,6 +79,32 @@ class NdaNotifier extends Notifier<NdaState> {
 
   void setSignatureFileName(String? fileName) {
     state = state.copyWith(signatureFileName: fileName);
+  }
+
+  Future<bool> updateSponsorNda({
+    String? confidentialityTerms,
+    String? pitchDeckPath,
+    List<String>? customClauses,
+  }) async {
+    state = state.copyWith(isSubmitting: true, clearError: true);
+    try {
+      final updated = await _repository.updateSponsorNda(
+        confidentialityTerms: confidentialityTerms,
+        pitchDeckPath: pitchDeckPath,
+        customClauses: customClauses,
+      );
+      state = state.copyWith(
+        isSubmitting: false,
+        agreement: updated,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isSubmitting: false,
+        error: e.toString(),
+      );
+      return false;
+    }
   }
 
   Future<bool> submit() async {

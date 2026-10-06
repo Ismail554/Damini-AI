@@ -75,4 +75,8 @@ class SettingsNotifier extends Notifier<SettingsState> {
       state = state.copyWith(notificationsEnabled: !value);
     }
   }
+
+  Future<bool> deleteAccount(String password) async {
+    return await _repository.deleteAccount(password);
+  }
 }

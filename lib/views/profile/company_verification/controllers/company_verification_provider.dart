@@ -2,11 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/company_verification_model.dart';
 import '../repositories/company_verification_repository.dart';
 
-final companyVerificationRepositoryProvider =
-    Provider<CompanyVerificationRepository>((ref) {
-  return CompanyVerificationRepositoryImpl();
-});
-
 class CompanyVerificationState {
   final CompanyVerificationModel verification;
   final bool isLoading;
@@ -41,8 +36,22 @@ class CompanyVerificationNotifier extends Notifier<CompanyVerificationState> {
 
   @override
   CompanyVerificationState build() {
-    _repo = ref.read(companyVerificationRepositoryProvider);
-    return const CompanyVerificationState();
+    _repo = ref.watch(companyVerificationRepositoryProvider);
+    Future.microtask(() => loadStatus());
+    return const CompanyVerificationState(isLoading: true);
+  }
+
+  Future<void> loadStatus() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final status = await _repo.getVerificationStatus();
+      state = state.copyWith(
+        isLoading: false,
+        verification: status,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
   }
 
   void updateModel(CompanyVerificationModel model) {
@@ -65,6 +74,7 @@ class CompanyVerificationNotifier extends Notifier<CompanyVerificationState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final success = await _repo.submitVerification(state.verification);
+      await loadStatus();
       state = state.copyWith(isLoading: false, isSubmitted: success);
       return success;
     } catch (e) {
