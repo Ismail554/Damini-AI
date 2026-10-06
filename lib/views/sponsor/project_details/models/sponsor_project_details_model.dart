@@ -1,54 +1,8 @@
 import '../../../../core/constants/api_endpoints.dart';
+import '../../public_view/models/project_document_model.dart';
 import '../../public_view/models/project_public_view_model.dart';
 
-class ProjectDocumentModel {
-  final int id;
-  final String title;
-  final String fileUrl;
-  final bool isConfidential;
-  final DateTime? createdAt;
-
-  const ProjectDocumentModel({
-    required this.id,
-    required this.title,
-    required this.fileUrl,
-    this.isConfidential = false,
-    this.createdAt,
-  });
-
-  factory ProjectDocumentModel.fromJson(Map<String, dynamic> json) {
-    final id = json['id'] is int
-        ? json['id'] as int
-        : int.tryParse(json['id']?.toString() ?? '0') ?? 0;
-    final title = json['title']?.toString() ?? 'Untitled Document';
-    final rawFile =
-        json['file']?.toString() ?? json['file_url']?.toString() ?? '';
-
-    String fileUrl = rawFile;
-    if (fileUrl.isNotEmpty &&
-        !fileUrl.startsWith('http://') &&
-        !fileUrl.startsWith('https://')) {
-      final base = ApiEndpoints.baseUrl.endsWith('/')
-          ? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)
-          : ApiEndpoints.baseUrl;
-      final path = fileUrl.startsWith('/') ? fileUrl : '/$fileUrl';
-      fileUrl = '$base$path';
-    }
-
-    final isConfidential = json['is_confidential'] == true;
-    final createdAtStr = json['created_at']?.toString();
-    final createdAt =
-        createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
-
-    return ProjectDocumentModel(
-      id: id,
-      title: title,
-      fileUrl: fileUrl,
-      isConfidential: isConfidential,
-      createdAt: createdAt,
-    );
-  }
-}
+export '../../public_view/models/project_document_model.dart';
 
 class InvestorContributionModel {
   final String id;
@@ -169,6 +123,10 @@ class SponsorProjectDetailsModel {
   final bool isSponsorVerified;
   final List<ProjectDocumentModel> documents;
   final DateTime? createdAt;
+  final bool ndaSigned;
+  final String? myRequestStatus;
+  final String? terminationReason;
+  final DateTime? terminatedAt;
 
   const SponsorProjectDetailsModel({
     required this.id,
@@ -205,6 +163,10 @@ class SponsorProjectDetailsModel {
     this.isSponsorVerified = false,
     this.documents = const [],
     this.createdAt,
+    this.ndaSigned = false,
+    this.myRequestStatus,
+    this.terminationReason,
+    this.terminatedAt,
   });
 
   factory SponsorProjectDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -374,6 +336,12 @@ class SponsorProjectDetailsModel {
     final createdAtStr = json['created_at']?.toString();
     final createdAt =
         createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
+    final ndaSigned = json['nda_signed'] == true;
+    final myRequestStatus = json['my_request_status']?.toString();
+    final terminationReason = json['termination_reason']?.toString();
+    final terminatedAtStr = json['terminated_at']?.toString();
+    final terminatedAt =
+        terminatedAtStr != null ? DateTime.tryParse(terminatedAtStr) : null;
 
     return SponsorProjectDetailsModel(
       id: id,
@@ -410,6 +378,95 @@ class SponsorProjectDetailsModel {
       isSponsorVerified: isSponsorVerified,
       documents: documents,
       createdAt: createdAt,
+      ndaSigned: ndaSigned,
+      myRequestStatus: myRequestStatus,
+      terminationReason: terminationReason,
+      terminatedAt: terminatedAt,
+    );
+  }
+
+  SponsorProjectDetailsModel copyWith({
+    String? id,
+    String? title,
+    String? location,
+    String? badgeText,
+    String? raisedAmount,
+    String? goalAmount,
+    String? percentage,
+    double? progress,
+    String? remainingAmount,
+    int? investorsCount,
+    String? targetRoi,
+    String? pendingReviewAmount,
+    List<InvestorContributionModel>? contributions,
+    String? potentialMonthlyRevenue,
+    int? holdPeriodMonths,
+    int? timelineToOperationsMonths,
+    int? timelineMonths,
+    String? skinInTheGame,
+    String? shortDescription,
+    String? businessDescription,
+    String? currentStatus,
+    String? nextMilestones,
+    String? useOfFunds,
+    List<TeamMemberModel>? teamMembers,
+    String? teamMembersText,
+    String? confidentialityAgreementText,
+    String? industry,
+    String? category,
+    String? minimumInvestment,
+    String? coverImageUrl,
+    String? sponsorCompanyName,
+    bool? isSponsorVerified,
+    List<ProjectDocumentModel>? documents,
+    DateTime? createdAt,
+    bool? ndaSigned,
+    String? myRequestStatus,
+    String? terminationReason,
+    DateTime? terminatedAt,
+  }) {
+    return SponsorProjectDetailsModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      location: location ?? this.location,
+      badgeText: badgeText ?? this.badgeText,
+      raisedAmount: raisedAmount ?? this.raisedAmount,
+      goalAmount: goalAmount ?? this.goalAmount,
+      percentage: percentage ?? this.percentage,
+      progress: progress ?? this.progress,
+      remainingAmount: remainingAmount ?? this.remainingAmount,
+      investorsCount: investorsCount ?? this.investorsCount,
+      targetRoi: targetRoi ?? this.targetRoi,
+      pendingReviewAmount: pendingReviewAmount ?? this.pendingReviewAmount,
+      contributions: contributions ?? this.contributions,
+      potentialMonthlyRevenue:
+          potentialMonthlyRevenue ?? this.potentialMonthlyRevenue,
+      holdPeriodMonths: holdPeriodMonths ?? this.holdPeriodMonths,
+      timelineToOperationsMonths:
+          timelineToOperationsMonths ?? this.timelineToOperationsMonths,
+      timelineMonths: timelineMonths ?? this.timelineMonths,
+      skinInTheGame: skinInTheGame ?? this.skinInTheGame,
+      shortDescription: shortDescription ?? this.shortDescription,
+      businessDescription: businessDescription ?? this.businessDescription,
+      currentStatus: currentStatus ?? this.currentStatus,
+      nextMilestones: nextMilestones ?? this.nextMilestones,
+      useOfFunds: useOfFunds ?? this.useOfFunds,
+      teamMembers: teamMembers ?? this.teamMembers,
+      teamMembersText: teamMembersText ?? this.teamMembersText,
+      confidentialityAgreementText:
+          confidentialityAgreementText ?? this.confidentialityAgreementText,
+      industry: industry ?? this.industry,
+      category: category ?? this.category,
+      minimumInvestment: minimumInvestment ?? this.minimumInvestment,
+      coverImageUrl: coverImageUrl ?? this.coverImageUrl,
+      sponsorCompanyName: sponsorCompanyName ?? this.sponsorCompanyName,
+      isSponsorVerified: isSponsorVerified ?? this.isSponsorVerified,
+      documents: documents ?? this.documents,
+      createdAt: createdAt ?? this.createdAt,
+      ndaSigned: ndaSigned ?? this.ndaSigned,
+      myRequestStatus: myRequestStatus ?? this.myRequestStatus,
+      terminationReason: terminationReason ?? this.terminationReason,
+      terminatedAt: terminatedAt ?? this.terminatedAt,
     );
   }
 
@@ -434,6 +491,9 @@ class SponsorProjectDetailsModel {
       teamSize: '${teamMembers.length} Members',
       teamMembers: teamMembers,
       businessDescription: businessDescription,
+      isNdaSigned: ndaSigned,
+      myRequestStatus: myRequestStatus,
+      documents: documents,
       minContribution: minimumInvestment,
       expectedRoi: targetRoi,
       monthlyRevenue: potentialMonthlyRevenue ?? '\$0.00',

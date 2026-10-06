@@ -8,6 +8,7 @@ import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/custom_button.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
+import '../../../../core/utils/file_downloader.dart';
 import '../widgets/nda_agreement_card.dart';
 import '../widgets/nda_document_attachment_card.dart';
 import '../widgets/nda_header.dart';
@@ -191,9 +192,12 @@ class _NdaViewState extends State<NdaView> {
                     SizedBox(height: AppDimens.spaceLg),
                     NdaDocumentAttachmentCard(
                       onDownload: () {
-                        CustomSnackBar.success(
+                        FileDownloader.downloadFile(
                           context,
-                          "Downloading NDA overview!",
+                          url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+                          suggestedName:
+                              "NDA_Overview_${widget.disclosingParty.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}.pdf",
+                          extension: "pdf",
                         );
                       },
                     ),

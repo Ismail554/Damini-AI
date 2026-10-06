@@ -62,7 +62,9 @@ class _RequestCollaborationScreenState
           ),
         );
 
-    if (mounted && success) {
+    if (!mounted) return;
+
+    if (success) {
       setState(() {
         _isSubmitted = true;
       });
@@ -74,9 +76,14 @@ class _RequestCollaborationScreenState
 
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
-          context.pop();
+          context.pop(true);
         }
       });
+    } else {
+      final err = ref.read(requestCollaborationProvider).errorMessage;
+      if (err != null && err.isNotEmpty) {
+        CustomSnackBar.error(context, err);
+      }
     }
   }
 

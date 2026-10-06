@@ -63,15 +63,40 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
     }
     _isBookmarked = _project.isSaved;
 
-    if (widget.projectId != null &&
-        widget.projectId!.isNotEmpty &&
-        widget.project == null) {
-      _loadProjectDetails(widget.projectId!);
+    final targetId = widget.projectId ??
+        (widget.project?.id.isNotEmpty == true ? widget.project!.id : null);
+    final isRealId = targetId != null &&
+        targetId.isNotEmpty &&
+        !targetId.startsWith('pub_') &&
+        !targetId.startsWith('draft_');
+    if (isRealId) {
+      _loadProjectDetails(targetId);
     }
 
     _pageController = PageController(initialPage: _selectedTabIndex);
     _sheetController = DraggableScrollableController()
       ..addListener(_onSheetMoved);
+  }
+
+  bool _isRefreshingDocs = false;
+
+  Future<void> _handleSignNda() async {
+    final signed = await context.push<bool>(
+      '/sign-nda',
+      extra: {
+        'projectId': _project.id,
+        'disclosingParty': _project.sponsorName,
+        'project': _project,
+      },
+    );
+
+    if (signed == true && mounted) {
+      setState(() => _isRefreshingDocs = true);
+      await _loadProjectDetails(_project.id);
+      if (mounted) {
+        setState(() => _isRefreshingDocs = false);
+      }
+    }
   }
 
   Future<void> _loadProjectDetails(String id) async {
@@ -304,6 +329,10 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
                       onToggleSheet: _toggleSheet,
                       onTabSelected: _onTabSelected,
                       sheetSolidBg: sheetSolidBg,
+                      isInvestor: isInvestor,
+                      isRefreshingDocs: _isRefreshingDocs,
+                      onSignNda: _handleSignNda,
+                      onRefreshDocs: () => _loadProjectDetails(_project.id),
                     ),
                   ),
                 ),
@@ -354,8 +383,15 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
                 child: SizedBox(
                   height: 48.h,
                   child: ElevatedButton(
-                    onPressed: () =>
-                        context.push('/request-collaboration', extra: _project),
+                    onPressed: () async {
+                      final submitted = await context.push<bool>(
+                        '/request-collaboration',
+                        extra: _project,
+                      );
+                      if (submitted == true && mounted) {
+                        _loadProjectDetails(_project.id);
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0066FF),
                       foregroundColor: Colors.white,

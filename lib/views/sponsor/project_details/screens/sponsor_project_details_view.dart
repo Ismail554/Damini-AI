@@ -12,11 +12,13 @@ import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import 'package:Braintech/core/widgets/custom_snackbar.dart';
 import '../../chat/repositories/chat_repository.dart';
+import '../../all_projects/controllers/sponsor_projects_provider.dart';
 import '../models/sponsor_project_details_model.dart';
 import '../widgets/investor_contribution_card.dart';
 import '../widgets/sponsor_project_bottom_bar.dart';
 import '../widgets/sponsor_project_header.dart';
 import '../widgets/sponsor_project_stats_card.dart';
+import '../widgets/terminate_project_dialog.dart';
 
 class SponsorProjectDetailsView extends ConsumerStatefulWidget {
   final String? projectId;
@@ -45,6 +47,34 @@ class _SponsorProjectDetailsViewState
       Future.microtask(() {
         ref.read(sponsorProjectProvider.notifier).loadProject(targetId);
       });
+    }
+  }
+
+  Future<void> _handleTerminateProject(
+    SponsorProjectDetailsModel project,
+  ) async {
+    final reason = await TerminateProjectDialog.show(
+      context,
+      projectTitle: project.title,
+    );
+    if (reason == null || reason.isEmpty) return;
+
+    if (!mounted) return;
+    final success = await ref
+        .read(sponsorProjectProvider.notifier)
+        .terminateProject(project.id, reason);
+
+    if (!mounted) return;
+    if (success) {
+      CustomSnackBar.success(
+        context,
+        "Project has been terminated successfully.",
+      );
+      ref.invalidate(sponsorProjectsProvider);
+    } else {
+      final error = ref.read(sponsorProjectProvider).error ??
+          "Failed to terminate project.";
+      CustomSnackBar.error(context, error);
     }
   }
 
@@ -131,7 +161,61 @@ class _SponsorProjectDetailsViewState
                               title: project.title,
                               location: project.location,
                               badgeText: project.badgeText,
+                              isTerminated: project.badgeText.toLowerCase() == 'terminated',
+                              onTerminate: () => _handleTerminateProject(project),
                             ),
+                            if (project.badgeText.toLowerCase() == 'terminated' &&
+                                project.terminationReason != null &&
+                                project.terminationReason!.isNotEmpty) ...[
+                              SizedBox(height: AppDimens.spaceMd),
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(AppDimens.paddingMd),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFDC2626).withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+                                  border: Border.all(
+                                    color: const Color(0xFFDC2626).withValues(alpha: 0.3),
+                                    width: AppDimens.borderThin,
+                                  ),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline_rounded,
+                                      color: const Color(0xFFDC2626),
+                                      size: 20.r,
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Project Terminated",
+                                            style: GoogleFonts.outfit(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color(0xFFDC2626),
+                                            ),
+                                          ),
+                                          SizedBox(height: 2.h),
+                                          Text(
+                                            project.terminationReason!,
+                                            style: GoogleFonts.outfit(
+                                              fontSize: 12.sp,
+                                              color: tc.textSecondary,
+                                              height: 1.35,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                             SizedBox(height: AppDimens.spaceLg),
                             SponsorProjectStatsCard(project: project),
                             SizedBox(height: AppDimens.spaceLg),

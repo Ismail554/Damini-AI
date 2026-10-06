@@ -1,4 +1,4 @@
-enum ChatMessageType { text, image, voice }
+enum ChatMessageType { text, image, voice, system }
 
 class ChatMessageModel {
   final String id;
@@ -29,9 +29,14 @@ class ChatMessageModel {
     final rawType = (json['message_type'] ?? json['type'] ?? 'text')
         .toString()
         .toLowerCase();
+    final rawSenderRole =
+        (json['sender_role'] ?? json['senderRole'])?.toString();
     ChatMessageType msgType = ChatMessageType.text;
     if (rawType == 'image') msgType = ChatMessageType.image;
     if (rawType == 'voice') msgType = ChatMessageType.voice;
+    if (rawType == 'system' || rawSenderRole?.toLowerCase() == 'system') {
+      msgType = ChatMessageType.system;
+    }
 
     final senderIdStr =
         json['sender_id']?.toString() ?? json['senderId']?.toString();

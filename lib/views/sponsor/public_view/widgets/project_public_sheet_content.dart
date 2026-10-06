@@ -21,6 +21,10 @@ class ProjectPublicSheetContent extends StatelessWidget {
   final VoidCallback onToggleSheet;
   final ValueChanged<int> onTabSelected;
   final Color sheetSolidBg;
+  final bool isInvestor;
+  final bool isRefreshingDocs;
+  final VoidCallback? onSignNda;
+  final VoidCallback? onRefreshDocs;
 
   const ProjectPublicSheetContent({
     super.key,
@@ -32,6 +36,10 @@ class ProjectPublicSheetContent extends StatelessWidget {
     required this.onToggleSheet,
     required this.onTabSelected,
     required this.sheetSolidBg,
+    this.isInvestor = false,
+    this.isRefreshingDocs = false,
+    this.onSignNda,
+    this.onRefreshDocs,
   });
 
   @override
@@ -121,7 +129,13 @@ class ProjectPublicSheetContent extends StatelessWidget {
               children: [
                 OverviewTabContent(project: project),
                 DetailsTabContent(project: project),
-                DocumentsTabContent(project: project),
+                DocumentsTabContent(
+                  project: project,
+                  isInvestor: isInvestor,
+                  isRefreshingDocs: isRefreshingDocs,
+                  onSignNda: onSignNda,
+                  onRefresh: onRefreshDocs,
+                ),
                 FinancialsTabContent(project: project),
               ],
             ),

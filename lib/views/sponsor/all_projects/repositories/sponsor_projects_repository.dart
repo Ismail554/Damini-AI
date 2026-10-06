@@ -14,11 +14,15 @@ class SponsorProjectsRepository {
 
   SponsorProjectsRepository(this._apiService);
 
-  /// Fetch all projects from GET /api/v1/projects/sponsor/
-  Future<List<SponsorProjectModel>> fetchProjects() async {
+  /// Fetch projects from GET /api/v1/projects/sponsor/
+  /// Supports optional status filter: ?status=active|completed|terminated
+  Future<List<SponsorProjectModel>> fetchProjects({String? status}) async {
     try {
       final response = await _apiService.get(
         ApiEndpoints.sponsorProjects,
+        queryParameters: (status != null && status.isNotEmpty)
+            ? {'status': status.toLowerCase()}
+            : null,
         requireAuth: true,
       );
 
@@ -77,10 +81,7 @@ class SponsorProjectsRepository {
 
   Future<List<SponsorProjectModel>> fetchActiveProjects() async {
     try {
-      final all = await fetchProjects();
-      return all
-          .where((p) => p.status == SponsorProjectStatus.active)
-          .toList();
+      return await fetchProjects(status: 'active');
     } catch (_) {
       return SponsorProjectModel.mockActiveList();
     }
@@ -88,10 +89,7 @@ class SponsorProjectsRepository {
 
   Future<List<SponsorProjectModel>> fetchCompletedProjects() async {
     try {
-      final all = await fetchProjects();
-      return all
-          .where((p) => p.status == SponsorProjectStatus.completed)
-          .toList();
+      return await fetchProjects(status: 'completed');
     } catch (_) {
       return SponsorProjectModel.mockCompletedList();
     }
@@ -99,10 +97,7 @@ class SponsorProjectsRepository {
 
   Future<List<SponsorProjectModel>> fetchTerminatedProjects() async {
     try {
-      final all = await fetchProjects();
-      return all
-          .where((p) => p.status == SponsorProjectStatus.terminated)
-          .toList();
+      return await fetchProjects(status: 'terminated');
     } catch (_) {
       return SponsorProjectModel.mockTerminatedList();
     }

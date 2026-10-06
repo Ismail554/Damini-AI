@@ -14,6 +14,8 @@ class SponsorProjectModel {
   final SponsorProjectStatus status;
   final String? category;
   final DateTime? createdAt;
+  final String? terminationReason;
+  final DateTime? terminatedAt;
 
   const SponsorProjectModel({
     required this.id,
@@ -27,6 +29,8 @@ class SponsorProjectModel {
     required this.status,
     this.category,
     this.createdAt,
+    this.terminationReason,
+    this.terminatedAt,
   });
 
   factory SponsorProjectModel.fromJson(Map<String, dynamic> json) {
@@ -110,6 +114,10 @@ class SponsorProjectModel {
     final createdAtStr = json['created_at']?.toString();
     final createdAt =
         createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
+    final terminationReason = json['termination_reason']?.toString();
+    final terminatedAtStr = json['terminated_at']?.toString();
+    final terminatedAt =
+        terminatedAtStr != null ? DateTime.tryParse(terminatedAtStr) : null;
 
     return SponsorProjectModel(
       id: id,
@@ -123,6 +131,8 @@ class SponsorProjectModel {
       status: status,
       category: category,
       createdAt: createdAt,
+      terminationReason: terminationReason,
+      terminatedAt: terminatedAt,
     );
   }
 

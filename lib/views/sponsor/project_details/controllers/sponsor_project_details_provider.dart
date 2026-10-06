@@ -1,43 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../collaboration_requests/models/collaboration_request_model.dart';
 import '../models/sponsor_project_details_model.dart';
+import '../models/sponsor_project_state.dart';
 import '../repositories/sponsor_project_details_repository.dart';
 
-class SponsorProjectState {
-  final bool isLoading;
-  final String? error;
-  final SponsorProjectDetailsModel project;
-  final List<CollaborationRequestModel> pendingList;
-  final List<CollaborationRequestModel> approvedList;
-  final List<CollaborationRequestModel> confirmationList;
-
-  const SponsorProjectState({
-    this.isLoading = false,
-    this.error,
-    required this.project,
-    required this.pendingList,
-    required this.approvedList,
-    required this.confirmationList,
-  });
-
-  SponsorProjectState copyWith({
-    bool? isLoading,
-    String? error,
-    SponsorProjectDetailsModel? project,
-    List<CollaborationRequestModel>? pendingList,
-    List<CollaborationRequestModel>? approvedList,
-    List<CollaborationRequestModel>? confirmationList,
-  }) {
-    return SponsorProjectState(
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      project: project ?? this.project,
-      pendingList: pendingList ?? this.pendingList,
-      approvedList: approvedList ?? this.approvedList,
-      confirmationList: confirmationList ?? this.confirmationList,
-    );
-  }
-}
+export '../models/sponsor_project_state.dart';
 
 final sponsorProjectProvider =
     NotifierProvider<SponsorProjectNotifier, SponsorProjectState>(
@@ -62,25 +29,32 @@ class SponsorProjectNotifier extends Notifier<SponsorProjectState> {
   /// Load project from backend API: GET /api/v1/projects/{id}/
   Future<void> loadProject(String projectId, {bool isRefresh = false}) async {
     if (projectId.isEmpty) return;
-
-    if (isRefresh) {
-      state = state.copyWith(isLoading: false, error: null);
-    } else {
-      state = state.copyWith(isLoading: true, error: null);
-    }
+    state = state.copyWith(isLoading: !isRefresh, error: null);
 
     try {
       final project = await _repository.fetchProjectDetails(projectId);
-      state = state.copyWith(
-        isLoading: false,
-        error: null,
-        project: project,
-      );
+      state = state.copyWith(isLoading: false, error: null, project: project);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to load project details: $e',
+      state = state.copyWith(isLoading: false, error: 'Failed to load project details: $e');
+    }
+  }
+
+  /// Terminate project: POST /api/v1/projects/{id}/terminate/
+  Future<bool> terminateProject(String projectId, String reason) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _repository.terminateProject(projectId, reason);
+      final updated = state.project.copyWith(
+        badgeText: 'Terminated',
+        currentStatus: 'Terminated',
+        terminationReason: reason,
+        terminatedAt: DateTime.now(),
       );
+      state = state.copyWith(isLoading: false, error: null, project: updated);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: 'Failed to terminate project: $e');
+      return false;
     }
   }
 
@@ -130,31 +104,9 @@ class SponsorProjectNotifier extends Notifier<SponsorProjectState> {
       updatedContributions.insert(0, contribution);
     }
 
-    final updatedProject = SponsorProjectDetailsModel(
-      id: state.project.id,
-      title: state.project.title,
-      location: state.project.location,
-      badgeText: state.project.badgeText,
-      raisedAmount: state.project.raisedAmount,
-      goalAmount: state.project.goalAmount,
-      percentage: state.project.percentage,
-      progress: state.project.progress,
-      remainingAmount: state.project.remainingAmount,
-      investorsCount: updatedContributions.length,
-      targetRoi: state.project.targetRoi,
-      pendingReviewAmount: state.project.pendingReviewAmount,
+    final updatedProject = state.project.copyWith(
       contributions: updatedContributions,
-      shortDescription: state.project.shortDescription,
-      businessDescription: state.project.businessDescription,
-      industry: state.project.industry,
-      category: state.project.category,
-      minimumInvestment: state.project.minimumInvestment,
-      timelineMonths: state.project.timelineMonths,
-      coverImageUrl: state.project.coverImageUrl,
-      sponsorCompanyName: state.project.sponsorCompanyName,
-      isSponsorVerified: state.project.isSponsorVerified,
-      documents: state.project.documents,
-      createdAt: state.project.createdAt,
+      investorsCount: updatedContributions.length,
     );
 
     // Add to Confirmation Tab list
@@ -223,31 +175,9 @@ class SponsorProjectNotifier extends Notifier<SponsorProjectState> {
       return c;
     }).toList();
 
-    final updatedProject = SponsorProjectDetailsModel(
-      id: state.project.id,
-      title: state.project.title,
-      location: state.project.location,
-      badgeText: state.project.badgeText,
-      raisedAmount: state.project.raisedAmount,
-      goalAmount: state.project.goalAmount,
-      percentage: state.project.percentage,
-      progress: state.project.progress,
-      remainingAmount: state.project.remainingAmount,
-      investorsCount: updatedContributions.length,
-      targetRoi: state.project.targetRoi,
-      pendingReviewAmount: state.project.pendingReviewAmount,
+    final updatedProject = state.project.copyWith(
       contributions: updatedContributions,
-      shortDescription: state.project.shortDescription,
-      businessDescription: state.project.businessDescription,
-      industry: state.project.industry,
-      category: state.project.category,
-      minimumInvestment: state.project.minimumInvestment,
-      timelineMonths: state.project.timelineMonths,
-      coverImageUrl: state.project.coverImageUrl,
-      sponsorCompanyName: state.project.sponsorCompanyName,
-      isSponsorVerified: state.project.isSponsorVerified,
-      documents: state.project.documents,
-      createdAt: state.project.createdAt,
+      investorsCount: updatedContributions.length,
     );
 
     state = state.copyWith(

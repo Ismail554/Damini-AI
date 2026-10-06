@@ -1,4 +1,5 @@
 import '../../create_project/models/project_draft_model.dart';
+import 'project_document_model.dart';
 
 class TeamMemberModel {
   final String name;
@@ -33,6 +34,8 @@ class ProjectPublicViewModel {
   final List<TeamMemberModel> teamMembers;
   final String businessDescription;
   final bool isNdaSigned;
+  final String? myRequestStatus;
+  final List<ProjectDocumentModel> documents;
   final String minContribution;
   final String expectedRoi;
   final String monthlyRevenue;
@@ -59,6 +62,8 @@ class ProjectPublicViewModel {
     required this.teamMembers,
     required this.businessDescription,
     this.isNdaSigned = false,
+    this.myRequestStatus,
+    this.documents = const [],
     this.minContribution = "\$50,000",
     this.expectedRoi = "18%",
     this.monthlyRevenue = "\$18,000",

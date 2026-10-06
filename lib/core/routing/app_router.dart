@@ -19,6 +19,7 @@ import '../../views/sponsor/collaboration_requests/screens/collaboration_request
 import '../../views/sponsor/public_view/screens/project_public_view.dart';
 import '../../views/sponsor/public_view/models/project_public_view_model.dart';
 import '../../views/sponsor/nda/screens/nda_view.dart';
+import '../../views/sponsor/nda/screens/sign_nda_view.dart';
 import '../../views/sponsor/group_chat/screens/group_chat_view.dart';
 import '../../views/sponsor/chat/screens/direct_chat_view.dart';
 import '../../views/sponsor/chat/models/chat_item_model.dart';
@@ -348,6 +349,25 @@ class AppRouter {
             context: context,
             state: state,
             child: NdaView(disclosingParty: disclosingParty),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/sign-nda',
+        pageBuilder: (context, state) {
+          final extra = state.extra is Map ? (state.extra as Map) : const {};
+          final projectId = extra['projectId']?.toString() ?? '';
+          final disclosingParty =
+              extra['disclosingParty'] as String? ?? 'Acme Corp';
+          final project = extra['project'] as ProjectPublicViewModel?;
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: SignNdaView(
+              projectId: projectId,
+              disclosingParty: disclosingParty,
+              project: project,
+            ),
           );
         },
       ),

@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/api_error_handler.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/request_collaboration_model.dart';
 import '../repositories/request_collaboration_repository.dart';
 
 final requestCollaborationRepositoryProvider =
     Provider<RequestCollaborationRepository>((ref) {
-  return RequestCollaborationRepositoryImpl();
+  return RequestCollaborationRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
 class RequestCollaborationState {
@@ -50,6 +52,9 @@ class RequestCollaborationNotifier
       final success = await repo.submitCollaborationRequest(submission);
       state = state.copyWith(isLoading: false, isSubmitted: success);
       return success;
+    } on AppException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.message);
+      return false;
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
       return false;

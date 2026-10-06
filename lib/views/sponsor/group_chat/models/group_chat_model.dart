@@ -46,9 +46,14 @@ class GroupChatMessage {
     final rawType = (json['message_type'] ?? json['type'] ?? 'text')
         .toString()
         .toLowerCase();
+    final rawSenderRole =
+        (json['sender_role'] ?? json['senderRole'])?.toString();
     ChatMessageType msgType = ChatMessageType.text;
     if (rawType == 'image') msgType = ChatMessageType.image;
     if (rawType == 'voice') msgType = ChatMessageType.voice;
+    if (rawType == 'system' || rawSenderRole?.toLowerCase() == 'system') {
+      msgType = ChatMessageType.system;
+    }
 
     final rawAvatar = (json['avatar_type'] ?? json['avatarType'] ?? 'sponsor')
         .toString()
@@ -68,7 +73,7 @@ class GroupChatMessage {
 
     final sName = json['sender_name']?.toString() ??
         json['senderName']?.toString() ??
-        'User';
+        (msgType == ChatMessageType.system ? 'System' : 'User');
 
     String initials = json['avatar_initials']?.toString() ??
         json['avatarInitials']?.toString() ??

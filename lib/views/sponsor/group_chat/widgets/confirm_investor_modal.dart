@@ -39,6 +39,7 @@ class ConfirmInvestorModal extends StatefulWidget {
 
 class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
   final Set<String> _selectedIds = {};
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -232,7 +233,10 @@ class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
               text:
                   'Confirm ${selected.length} Investor${selected.length > 1 ? 's' : ''} ($totalBudget)',
               variant: CustomButtonVariant.gradient,
-              onPressed: selected.isEmpty ? () {} : () => _handleConfirm(selected),
+              isLoading: _isSubmitting,
+              onPressed: (selected.isEmpty || _isSubmitting)
+                  ? () {}
+                  : () => _handleConfirm(selected),
             ),
           ],
         ],
@@ -241,7 +245,8 @@ class _ConfirmInvestorModalState extends State<ConfirmInvestorModal> {
   }
 
   void _handleConfirm(List<GroupMemberCardItem> selected) {
-    if (selected.isEmpty) return;
+    if (selected.isEmpty || _isSubmitting) return;
+    setState(() => _isSubmitting = true);
     _saveCachedSelection();
     final contributions = selected.map((inv) {
       return InvestorContributionModel(

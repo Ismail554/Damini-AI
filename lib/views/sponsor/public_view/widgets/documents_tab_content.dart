@@ -1,23 +1,32 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
-import '../../../../core/widgets/custom_button.dart';
 import '../models/project_public_view_model.dart';
+import 'locked_documents_card.dart';
+import 'project_document_card.dart';
 
 class DocumentsTabContent extends StatelessWidget {
   final ProjectPublicViewModel project;
+  final bool isInvestor;
+  final bool isRefreshingDocs;
   final VoidCallback? onSignNda;
+  final VoidCallback? onRefresh;
 
-  const DocumentsTabContent({super.key, required this.project, this.onSignNda});
+  const DocumentsTabContent({
+    super.key,
+    required this.project,
+    this.isInvestor = false,
+    this.isRefreshingDocs = false,
+    this.onSignNda,
+    this.onRefresh,
+  });
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
+    final isLocked = isInvestor && !project.isNdaSigned;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -25,101 +34,174 @@ class DocumentsTabContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Business Description",
-            style: GoogleFonts.outfit(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-              color: tc.textPrimary,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Documents",
+                style: GoogleFonts.outfit(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: tc.textPrimary,
+                ),
+              ),
+              Row(
+                children: [
+                  if (!isLocked && project.documents.isNotEmpty) ...[
+                    Text(
+                      "${project.documents.length} File${project.documents.length > 1 ? 's' : ''}",
+                      style: GoogleFonts.outfit(
+                        fontSize: 12.sp,
+                        color: tc.textSecondary,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                  ],
+                  if (onRefresh != null)
+                    InkWell(
+                      onTap: onRefresh,
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Padding(
+                        padding: EdgeInsets.all(4.r),
+                        child: Icon(
+                          Icons.refresh_rounded,
+                          size: 18.r,
+                          color: tc.textSecondary,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
           ),
           SizedBox(height: AppDimens.spaceMd),
 
-          // Locked Confidential Documents Glass Card
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(AppDimens.paddingXl),
-                decoration: BoxDecoration(
-                  color: tc.cardBg,
-                  borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-                  border: Border.all(
-                    color: tc.borderColor,
-                    width: AppDimens.borderThin,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: tc.shadowColor,
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // Lock Icon Badge
-                    Container(
-                      padding: EdgeInsets.all(14.r),
-                      decoration: BoxDecoration(
-                        color: tc.cardInner,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: tc.borderColor,
-                          width: AppDimens.borderThin,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.lock_outline_rounded,
-                        color: tc.textPrimary,
-                        size: 26.r,
-                      ),
-                    ),
-                    SizedBox(height: AppDimens.spaceLg),
-
-                    // Confidential Title
-                    Text(
-                      "Confidential Documents",
-                      style: GoogleFonts.outfit(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        color: tc.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: AppDimens.spaceSm),
-
-                    // Subtitle Body Text
-                    Text(
-                      "You must sign a Non-Disclosure Agreement (NDA) to view the pitch deck, financials, and legal documents.",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.outfit(
-                        fontSize: 13.sp,
-                        color: tc.textSecondary,
-                        height: 1.45,
-                      ),
-                    ),
-                    SizedBox(height: AppDimens.spaceXl),
-
-                    // Sign NDA Reusable CustomButton
-                    CustomButton(
-                      text: "Sign NDA to Unlock",
-                      variant: CustomButtonVariant.gradient,
-                      width: 220.w,
-                      height: 48.h,
-                      onPressed:
-                          onSignNda ??
-                          () => context.push(
-                            '/nda',
-                            extra: {'disclosingParty': project.sponsorName},
-                          ),
-                    ),
-                  ],
+          if (isRefreshingDocs) ...[
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(AppDimens.paddingXl),
+              decoration: BoxDecoration(
+                color: tc.cardBg,
+                borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+                border: Border.all(
+                  color: tc.borderColor,
+                  width: AppDimens.borderThin,
                 ),
               ),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  SizedBox(height: AppDimens.spaceMd),
+                  Text(
+                    "Unlocking confidential documents...",
+                    style: GoogleFonts.outfit(
+                      fontSize: 13.sp,
+                      color: tc.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ] else if (isLocked) ...[
+            LockedDocumentsCard(onSignNda: onSignNda),
+          ] else if (project.documents.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(AppDimens.paddingXl),
+              decoration: BoxDecoration(
+                color: tc.cardBg,
+                borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+                border: Border.all(
+                  color: tc.borderColor,
+                  width: AppDimens.borderThin,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.folder_open_rounded,
+                    size: 40.r,
+                    color: tc.textTertiary,
+                  ),
+                  SizedBox(height: AppDimens.spaceMd),
+                  Text(
+                    "No Documents Uploaded",
+                    style: GoogleFonts.outfit(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      color: tc.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    "The sponsor has not uploaded any documents for this project yet.",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.outfit(
+                      fontSize: 12.sp,
+                      color: tc.textSecondary,
+                    ),
+                  ),
+                  if (onRefresh != null) ...[
+                    SizedBox(height: AppDimens.spaceMd),
+                    InkWell(
+                      onTap: onRefresh,
+                      borderRadius: BorderRadius.circular(20.r),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 8.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: tc.cardInner,
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(
+                            color: tc.borderColor,
+                            width: AppDimens.borderThin,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.refresh_rounded,
+                              size: 14.r,
+                              color: tc.textPrimary,
+                            ),
+                            SizedBox(width: 6.w),
+                            Text(
+                              "Refresh",
+                              style: GoogleFonts.outfit(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                                color: tc.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ] else ...[
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: project.documents.length,
+              separatorBuilder: (context, index) =>
+                  SizedBox(height: AppDimens.spaceMd),
+              itemBuilder: (context, index) {
+                return ProjectDocumentCard(
+                  document: project.documents[index],
+                );
+              },
+            ),
+          ],
         ],
       ),
     );

@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/chat_websocket_service.dart';
+import '../../../../core/services/storage_service.dart';
 import '../../chat/models/chat_message_model.dart';
 import '../../chat/repositories/chat_repository.dart';
+import '../models/group_chat_header_model.dart';
 import '../models/group_chat_model.dart';
 import '../repositories/group_chat_repository.dart';
 
@@ -14,6 +16,11 @@ class GroupChatState {
   final List<GroupChatMessage> messages;
   final List<AiSuggestion> suggestions;
   final List<String> participants;
+  final List<GroupChatParticipant> participantDetails;
+  final bool isOwner;
+  final int activeMemberCount;
+  final bool isSubmitting;
+  final bool isKicked;
   final bool isLoading;
   final bool isConnected;
   final String? typingUser;
@@ -25,6 +32,11 @@ class GroupChatState {
     this.messages = const [],
     this.suggestions = const [],
     this.participants = const [],
+    this.participantDetails = const [],
+    this.isOwner = false,
+    this.activeMemberCount = 0,
+    this.isSubmitting = false,
+    this.isKicked = false,
     this.isLoading = false,
     this.isConnected = false,
     this.typingUser,
@@ -37,6 +49,11 @@ class GroupChatState {
     List<GroupChatMessage>? messages,
     List<AiSuggestion>? suggestions,
     List<String>? participants,
+    List<GroupChatParticipant>? participantDetails,
+    bool? isOwner,
+    int? activeMemberCount,
+    bool? isSubmitting,
+    bool? isKicked,
     bool? isLoading,
     bool? isConnected,
     String? typingUser,
@@ -49,6 +66,11 @@ class GroupChatState {
       messages: messages ?? this.messages,
       suggestions: suggestions ?? this.suggestions,
       participants: participants ?? this.participants,
+      participantDetails: participantDetails ?? this.participantDetails,
+      isOwner: isOwner ?? this.isOwner,
+      activeMemberCount: activeMemberCount ?? this.activeMemberCount,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
+      isKicked: isKicked ?? this.isKicked,
       isLoading: isLoading ?? this.isLoading,
       isConnected: isConnected ?? this.isConnected,
       typingUser: clearTypingUser ? null : (typingUser ?? this.typingUser),
@@ -61,6 +83,7 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
   late final ChatRepository _chatRepo;
   late final TextEditingController messageController;
   late final ScrollController scrollController;
+  String? _currentUserId;
 
   StreamSubscription<Map<String, dynamic>>? _wsSubscription;
 
@@ -85,6 +108,8 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
     int? projectId,
     String? projectTitle,
   }) async {
+    _currentUserId = await StorageService.getUuid();
+
     state = state.copyWith(
       conversationId: conversationId,
       projectId: projectId,
@@ -109,7 +134,10 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
 
     if (targetConvId != null && targetConvId.isNotEmpty) {
       await _connectWebSocket(targetConvId);
-      await _fetchMessages(targetConvId);
+      await Future.wait([
+        _fetchHeader(targetConvId),
+        _fetchMessages(targetConvId),
+      ]);
     } else {
       state = state.copyWith(
         isLoading: false,
@@ -117,6 +145,24 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
         suggestions: const [],
       );
     }
+  }
+
+  Future<void> _fetchHeader(String convId) async {
+    try {
+      final header = await _chatRepo.fetchConversationHeader(convId);
+      final names = header.participants.map((p) => p.name).toList();
+      state = state.copyWith(
+        isOwner: header.isOwner,
+        isKicked: !header.isActive,
+        projectTitle: header.projectTitle.isNotEmpty
+            ? header.projectTitle
+            : state.projectTitle,
+        projectId: header.projectId > 0 ? header.projectId : state.projectId,
+        participantDetails: header.participants,
+        participants: names.isNotEmpty ? names : state.participants,
+        activeMemberCount: header.activeMemberCount,
+      );
+    } catch (_) {}
   }
 
   Future<void> _fetchMessages(String convId) async {
@@ -137,9 +183,11 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
 
       state = state.copyWith(
         messages: List.from(fetchedMessages),
-        participants: participantSet.isNotEmpty
-            ? participantSet.toList()
-            : state.participants,
+        participants: state.participantDetails.isNotEmpty
+            ? state.participantDetails.map((p) => p.name).toList()
+            : (participantSet.isNotEmpty
+                ? participantSet.toList()
+                : state.participants),
         suggestions: const [],
         isLoading: false,
       );
@@ -174,7 +222,7 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
   }
 
   void _handleSocketEvent(Map<String, dynamic> event) {
-    final type = event['type']?.toString();
+    final type = (event['event_type'] ?? event['type'])?.toString();
 
     switch (type) {
       case 'new_message':
@@ -232,16 +280,48 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
         }
         break;
 
+      case 'investor_confirmed':
+        final sysMsg = event['system_message'];
+        final text = (sysMsg is Map ? sysMsg['text'] : sysMsg)?.toString() ??
+            '🎉 An investor has been confirmed!';
+        addSystemMessage(text);
+        if (state.conversationId != null) {
+          _fetchHeader(state.conversationId!);
+        }
+        break;
+
       case 'participant_removed':
       case 'participant_left':
         final userName = event['user_name']?.toString();
-        final sysMsg = event['system_message']?.toString() ??
+        final targetUserId = event['user_id']?.toString();
+        final sysMsg = event['system_message'];
+        final text = (sysMsg is Map ? sysMsg['text'] : sysMsg)?.toString() ??
             '⚠️ ${userName ?? "A member"} left the group.';
+
+        final updatedParticipants = List<String>.from(state.participants);
         if (userName != null) {
-          final updated = List<String>.from(state.participants)..remove(userName);
-          state = state.copyWith(participants: updated);
+          updatedParticipants.remove(userName);
         }
-        addSystemMessage(sysMsg);
+        final updatedDetails = List<GroupChatParticipant>.from(state.participantDetails)
+          ..removeWhere((p) =>
+              (userName != null && p.name == userName) ||
+              (targetUserId != null && p.userId.toString() == targetUserId));
+
+        final newCount = int.tryParse(event['new_member_count']?.toString() ?? '') ??
+            (updatedDetails.isNotEmpty ? updatedDetails.length : updatedParticipants.length);
+
+        final isMeKicked = (targetUserId != null &&
+            targetUserId.isNotEmpty &&
+            _currentUserId != null &&
+            targetUserId == _currentUserId);
+
+        state = state.copyWith(
+          participants: updatedParticipants,
+          participantDetails: updatedDetails,
+          activeMemberCount: newCount,
+          isKicked: isMeKicked ? true : state.isKicked,
+        );
+        addSystemMessage(text);
         break;
     }
   }
@@ -252,6 +332,7 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
   }
 
   Future<void> sendMessage() async {
+    if (state.isKicked) return;
     final text = messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -286,7 +367,7 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
   }
 
   Future<void> sendImageMessage(String imagePath) async {
-    if (imagePath.isEmpty) return;
+    if (state.isKicked || imagePath.isEmpty) return;
 
     final now = DateTime.now();
     final timeStr =
@@ -327,6 +408,7 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
   }
 
   Future<void> sendVoiceMessage(String duration, {String? filePath}) async {
+    if (state.isKicked) return;
     final now = DateTime.now();
     final timeStr =
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
@@ -376,11 +458,13 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
     final sysMsg = GroupChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      senderName: 'Damani AI',
-      avatarInitials: 'AI',
-      avatarType: ChatAvatarType.ai,
-      isAi: true,
+      senderName: 'System',
+      senderRole: 'System',
+      avatarInitials: 'SY',
+      avatarType: ChatAvatarType.sponsor,
+      isAi: false,
       isMe: false,
+      type: ChatMessageType.system,
       text: text,
       time: timeStr,
     );
@@ -388,9 +472,16 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
     _scrollToBottom();
   }
 
-  Future<void> removeParticipant(String name, {String? userId}) async {
+  Future<bool> removeParticipant(String name, {String? userId}) async {
     final updatedParticipants = List<String>.from(state.participants)..remove(name);
-    state = state.copyWith(participants: updatedParticipants);
+    final updatedDetails = List<GroupChatParticipant>.from(state.participantDetails)
+      ..removeWhere((p) => p.name == name || (userId != null && p.userId.toString() == userId));
+
+    state = state.copyWith(
+      participants: updatedParticipants,
+      participantDetails: updatedDetails,
+      activeMemberCount: updatedDetails.isNotEmpty ? updatedDetails.length : updatedParticipants.length,
+    );
     addSystemMessage('⚠️ $name was removed from the group by the owner.');
 
     if (state.conversationId != null && userId != null) {
@@ -399,7 +490,82 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
           conversationId: state.conversationId!,
           userId: userId,
         );
-      } catch (_) {}
+        return true;
+      } catch (e) {
+        rethrow;
+      }
+    }
+    return true;
+  }
+
+  Future<bool> confirmInvestors({
+    required int projectId,
+    required List<Map<String, dynamic>> investors,
+  }) async {
+    final convId = state.conversationId;
+    if (convId == null) return false;
+
+    state = state.copyWith(isSubmitting: true);
+    try {
+      final res = await _chatRepo.confirmInvestors(
+        projectId: projectId,
+        conversationId: int.tryParse(convId) ?? 0,
+        investors: investors,
+      );
+
+      final data = res['data'] is Map ? res['data'] as Map<String, dynamic> : res;
+      if (data['system_message'] != null) {
+        final sysMsg = data['system_message'];
+        final text = (sysMsg is Map ? sysMsg['text'] : sysMsg)?.toString();
+        if (text != null && text.isNotEmpty) {
+          addSystemMessage(text);
+        }
+      }
+      await _fetchHeader(convId);
+      return true;
+    } catch (e) {
+      rethrow;
+    } finally {
+      state = state.copyWith(isSubmitting: false);
+    }
+  }
+
+  Future<bool> leaveConversation() async {
+    final convId = state.conversationId;
+    if (convId == null) return false;
+
+    state = state.copyWith(isSubmitting: true);
+    try {
+      await _chatRepo.leaveConversation(convId);
+      return true;
+    } catch (e) {
+      rethrow;
+    } finally {
+      state = state.copyWith(isSubmitting: false);
+    }
+  }
+
+  Future<bool> reportConversation({
+    required String reason,
+    String? description,
+    List<int>? flaggedMessageIds,
+  }) async {
+    final convId = state.conversationId;
+    if (convId == null) return false;
+
+    state = state.copyWith(isSubmitting: true);
+    try {
+      await _chatRepo.reportConversation(
+        conversationId: convId,
+        reason: reason,
+        description: description,
+        flaggedMessageIds: flaggedMessageIds,
+      );
+      return true;
+    } catch (e) {
+      rethrow;
+    } finally {
+      state = state.copyWith(isSubmitting: false);
     }
   }
 

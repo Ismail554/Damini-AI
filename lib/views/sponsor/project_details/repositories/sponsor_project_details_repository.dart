@@ -48,4 +48,17 @@ class SponsorProjectDetailsRepository {
       rethrow;
     }
   }
+
+  /// Terminate project: POST /api/v1/projects/{id}/terminate/
+  Future<void> terminateProject(String projectId, String reason) async {
+    try {
+      await _apiService.post(
+        ApiEndpoints.terminateProject(projectId),
+        data: {'reason': reason},
+        requireAuth: true,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

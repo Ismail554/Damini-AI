@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,14 +50,23 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
     final state = ref.watch(groupChatProvider);
     final notifier = ref.read(groupChatProvider.notifier);
     final userRole = ref.watch(authProvider).userRole?.toLowerCase() ?? 'sponsor';
-    final isOwner = userRole == 'sponsor';
+    final isOwner = state.participantDetails.isNotEmpty ? state.isOwner : (userRole == 'sponsor');
 
     return Scaffold(
       backgroundColor: const Color(0xFF061427),
       appBar: GroupChatAppBar(
-        title: widget.projectTitle,
-        activeMemberCount: state.participants.length,
-        participants: state.participants,
+        title: (state.projectTitle != null && state.projectTitle!.isNotEmpty)
+            ? state.projectTitle
+            : widget.projectTitle,
+        activeMemberCount: state.activeMemberCount > 0
+            ? state.activeMemberCount
+            : (state.participantDetails.isNotEmpty
+                ? state.participantDetails.length
+                : state.participants.length),
+        participants: state.participantDetails.isNotEmpty
+            ? state.participantDetails.map((p) => p.name).toList()
+            : state.participants,
+        participantDetails: state.participantDetails,
         isOwner: isOwner,
         onMenuSelected: (action) =>
             _handleMenuAction(context, ref, action),
@@ -146,13 +156,42 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
                 suggestions: state.suggestions,
                 onSelect: notifier.onSuggestionTap,
               ),
-            DirectChatInputBar(
-              controller: notifier.messageController,
-              onSend: notifier.sendMessage,
-              onSendImage: notifier.sendImageMessage,
-              onSendVoice: notifier.sendVoiceMessage,
-              onTyping: notifier.onTyping,
-            ),
+            if (state.isKicked)
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F1E2E),
+                  border: Border(
+                    top: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08)),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.info_outline_rounded,
+                        color: Colors.orangeAccent, size: 18.sp),
+                    SizedBox(width: 8.w),
+                    Text(
+                      "You are no longer a participant in this conversation.",
+                      style: GoogleFonts.outfit(
+                        color: const Color(0xFF8EB2C7),
+                        fontSize: 12.5.sp,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              DirectChatInputBar(
+                controller: notifier.messageController,
+                onSend: notifier.sendMessage,
+                onSendImage: notifier.sendImageMessage,
+                onSendVoice: notifier.sendVoiceMessage,
+                onTyping: notifier.onTyping,
+              ),
           ],
         ),
       ),
@@ -181,38 +220,187 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
   }
 
   void _openRemoveParticipantModal(BuildContext context, WidgetRef ref) {
-    final participants = ref.read(groupChatProvider).participants;
+    final participantDetails = ref.read(groupChatProvider).participantDetails;
+    final removable = participantDetails.where((p) => !p.isOwner).toList();
+
     RemoveParticipantModal.show(
       context,
-      participants: participants,
-      onRemove: (name) {
-        ref.read(groupChatProvider.notifier).removeParticipant(name);
-        CustomSnackBar.success(context, '$name has been removed from the group.');
+      participants: removable,
+      onRemove: (participant) async {
+        try {
+          await ref.read(groupChatProvider.notifier).removeParticipant(
+                participant.name,
+                userId: participant.userId.toString(),
+              );
+          if (context.mounted) {
+            CustomSnackBar.success(
+              context,
+              '${participant.name} has been removed from the group.',
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            CustomSnackBar.error(
+              context,
+              _extractErrorMessage(e) ??
+                  'Failed to remove ${participant.name}.',
+            );
+          }
+        }
       },
     );
   }
 
   void _openReportModal(BuildContext context) {
+    String selectedReason = 'SPAM';
+    final descController = TextEditingController();
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF0F1E2E),
-        title: Text("Report Group Chat", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Text("Are you sure you want to report this group chat for review?", style: GoogleFonts.outfit(color: Colors.white.withValues(alpha: 0.8))),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Cancel", style: GoogleFonts.outfit(color: Colors.grey)),
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (dialogCtx, setDialogState) => AlertDialog(
+          backgroundColor: const Color(0xFF0F1E2E),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              CustomSnackBar.success(context, "Report submitted successfully. Our team will review this chat.");
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.amberAccent, foregroundColor: Colors.black),
-            child: Text("Report", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+          title: Text(
+            "Report Group Chat",
+            style: GoogleFonts.outfit(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18.sp,
+            ),
           ),
-        ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Select a reason for reporting:",
+                  style: GoogleFonts.outfit(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 13.sp,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF16253C),
+                    borderRadius: BorderRadius.circular(10.r),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedReason,
+                      isExpanded: true,
+                      dropdownColor: const Color(0xFF16253C),
+                      style: GoogleFonts.outfit(
+                          color: Colors.white, fontSize: 13.sp),
+                      items: const [
+                        DropdownMenuItem(value: 'SPAM', child: Text('Spam')),
+                        DropdownMenuItem(
+                            value: 'HARASSMENT', child: Text('Harassment')),
+                        DropdownMenuItem(
+                            value: 'SUSPICIOUS_ACTIVITY',
+                            child: Text('Suspicious Activity')),
+                        DropdownMenuItem(
+                            value: 'FRAUD', child: Text('Fraud / Scam')),
+                        DropdownMenuItem(value: 'OTHER', child: Text('Other')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setDialogState(() => selectedReason = val);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: 14.h),
+                Text(
+                  "Description (optional):",
+                  style: GoogleFonts.outfit(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontSize: 13.sp,
+                  ),
+                ),
+                SizedBox(height: 6.h),
+                TextField(
+                  controller: descController,
+                  maxLines: 3,
+                  style:
+                      GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp),
+                  decoration: InputDecoration(
+                    hintText: "Add details about the issue...",
+                    hintStyle: GoogleFonts.outfit(
+                        color: const Color(0xFF6B8A9D), fontSize: 12.sp),
+                    filled: true,
+                    fillColor: const Color(0xFF16253C),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.r),
+                      borderSide: const BorderSide(color: Color(0xFF006EDB)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child:
+                  Text("Cancel", style: GoogleFonts.outfit(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final reason = selectedReason;
+                final desc = descController.text.trim();
+                Navigator.pop(dialogCtx);
+                try {
+                  await ref
+                      .read(groupChatProvider.notifier)
+                      .reportConversation(
+                        reason: reason,
+                        description: desc.isNotEmpty ? desc : null,
+                      );
+                  if (context.mounted) {
+                    CustomSnackBar.success(
+                      context,
+                      "Report submitted successfully. Our team will review this chat.",
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    CustomSnackBar.error(
+                      context,
+                      _extractErrorMessage(e) ?? "Failed to submit report.",
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amberAccent,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r)),
+              ),
+              child: Text("Report",
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -220,24 +408,58 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
   void _openLeaveModal(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         backgroundColor: const Color(0xFF0F1E2E),
-        title: Text("Leave Group Chat", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Text("Are you sure you want to leave this project group chat?", style: GoogleFonts.outfit(color: Colors.white.withValues(alpha: 0.8))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Text(
+          "Leave Group Chat",
+          style: GoogleFonts.outfit(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18.sp,
+          ),
+        ),
+        content: Text(
+          "Are you sure you want to leave this project group chat? You will no longer receive messages or updates.",
+          style: GoogleFonts.outfit(
+            color: Colors.white.withValues(alpha: 0.8),
+            fontSize: 13.5.sp,
+          ),
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Cancel", style: GoogleFonts.outfit(color: Colors.grey)),
+            onPressed: () => Navigator.pop(dialogCtx),
+            child:
+                Text("Cancel", style: GoogleFonts.outfit(color: Colors.grey)),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              if (context.mounted) {
-                context.pop();
+            onPressed: () async {
+              Navigator.pop(dialogCtx);
+              try {
+                await ref.read(groupChatProvider.notifier).leaveConversation();
+                if (context.mounted) {
+                  CustomSnackBar.success(context, "You left the group chat.");
+                  context.pop();
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  CustomSnackBar.error(
+                    context,
+                    _extractErrorMessage(e) ?? "Failed to leave group chat.",
+                  );
+                }
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
-            child: Text("Leave", style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r)),
+            ),
+            child: Text("Leave",
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -267,7 +489,8 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
             id: req.id,
             name: req.investorName,
             role: req.investorType.isNotEmpty ? req.investorType : 'Investor',
-            offeredBudget: req.proposedBudget.isNotEmpty ? req.proposedBudget : '\$0',
+            offeredBudget:
+                req.proposedBudget.isNotEmpty ? req.proposedBudget : '\$0',
             initials: _getInitials(req.investorName),
             avatarBg: colors[(colorIdx++) % colors.length],
           ),
@@ -275,44 +498,111 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
       }
     }
 
-    for (final p in chatState.participants) {
-      if (!availableInvestors.any((inv) => inv.name.toLowerCase() == p.toLowerCase())) {
+    for (final p in chatState.participantDetails) {
+      if (!p.isOwner &&
+          !availableInvestors.any(
+              (inv) => inv.name.toLowerCase() == p.name.toLowerCase())) {
         availableInvestors.add(
           GroupMemberCardItem(
-            id: 'participant_${p.hashCode}',
-            name: p,
-            role: 'Participant',
+            id: p.userId.toString(),
+            name: p.name,
+            role: p.role.isNotEmpty ? p.role : 'Investor',
             offeredBudget: '\$0',
-            initials: _getInitials(p),
+            initials: p.initials.isNotEmpty ? p.initials : _getInitials(p.name),
             avatarBg: colors[(colorIdx++) % colors.length],
           ),
         );
       }
     }
 
+    if (chatState.participantDetails.isEmpty) {
+      for (final p in chatState.participants) {
+        if (!availableInvestors
+            .any((inv) => inv.name.toLowerCase() == p.toLowerCase())) {
+          availableInvestors.add(
+            GroupMemberCardItem(
+              id: 'participant_${p.hashCode}',
+              name: p,
+              role: 'Participant',
+              offeredBudget: '\$0',
+              initials: _getInitials(p),
+              avatarBg: colors[(colorIdx++) % colors.length],
+            ),
+          );
+        }
+      }
+    }
+
     ConfirmInvestorModal.show(
       context,
       availableInvestors: availableInvestors,
-      onConfirm: (contributions) {
+      onConfirm: (contributions) async {
         if (contributions.isEmpty) return;
+
+        // Synchronize with local project state
         final sponsorNotifier = ref.read(sponsorProjectProvider.notifier);
         for (final item in contributions) {
           sponsorNotifier.addContribution(item);
         }
 
-        final names = contributions.map((c) => c.name).join(', ');
-        final amount = contributions.first.amount;
+        // Prepare backend payload
+        final investorPayloads = contributions.map((c) {
+          int invId = int.tryParse(c.id.split('_').first) ?? 0;
+          if (invId == 0) {
+            final match = chatState.participantDetails
+                .where((p) => p.name.toLowerCase() == c.name.toLowerCase())
+                .firstOrNull;
+            invId = match?.userId ?? 0;
+          }
+          final cleanAmount = double.tryParse(
+                  c.amount.replaceAll(RegExp(r'[^0-9.]'), '')) ??
+              0.0;
+          return {
+            'investor_id': invId,
+            'name': c.name,
+            'confirmed_amount': cleanAmount,
+            'share_percentage': 0.0,
+            'notes': 'Confirmed via Group Chat',
+          };
+        }).toList();
 
-        ref.read(groupChatProvider.notifier).addSystemMessage(
-          '🎉 Confirmed investor${contributions.length > 1 ? 's' : ''}: $names with $amount budget each!',
-        );
+        final effectiveProjectId = widget.projectId ?? chatState.projectId ?? 0;
 
-        CustomSnackBar.success(
-          context,
-          'Added ${contributions.length} investor${contributions.length > 1 ? 's' : ''} to project contributions!',
-        );
+        try {
+          await ref.read(groupChatProvider.notifier).confirmInvestors(
+                projectId: effectiveProjectId,
+                investors: investorPayloads,
+              );
+          if (context.mounted) {
+            CustomSnackBar.success(
+              context,
+              'Confirmed ${contributions.length} investor${contributions.length > 1 ? 's' : ''} successfully!',
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            CustomSnackBar.error(
+              context,
+              _extractErrorMessage(e) ??
+                  'Failed to confirm investors on server.',
+            );
+          }
+        }
       },
     );
+  }
+
+  String? _extractErrorMessage(dynamic e) {
+    if (e is DioException) {
+      final resData = e.response?.data;
+      if (resData is Map) {
+        if (resData['message'] != null) return resData['message'].toString();
+        if (resData['detail'] != null) return resData['detail'].toString();
+        if (resData['error'] != null) return resData['error'].toString();
+      }
+      if (e.message != null && e.message!.isNotEmpty) return e.message;
+    }
+    return null;
   }
 
   String _getInitials(String name) {

@@ -68,9 +68,18 @@ class SponsorProjectsNotifier extends Notifier<SponsorProjectsState> {
       final completed = projects
           .where((p) => p.status == SponsorProjectStatus.completed)
           .toList();
-      final terminated = projects
+      var terminated = projects
           .where((p) => p.status == SponsorProjectStatus.terminated)
           .toList();
+
+      if (terminated.isEmpty) {
+        try {
+          final termList = await _repository.fetchTerminatedProjects();
+          if (termList.isNotEmpty) {
+            terminated = termList;
+          }
+        } catch (_) {}
+      }
 
       state = state.copyWith(
         isLoading: false,

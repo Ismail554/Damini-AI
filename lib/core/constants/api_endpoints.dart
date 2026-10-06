@@ -42,8 +42,12 @@ class ApiEndpoints {
   static const String projects = "/api/v1/projects/";
   static String projectDetails(String id) => "/api/v1/projects/$id/";
   static String saveProject(String id) => "/api/v1/projects/$id/save/";
+  static String signNda(String id) => "/api/v1/projects/$id/sign-nda/";
+  static String createCollaborationRequest(String id) =>
+      "/api/v1/projects/$id/requests/";
   static String confirmInvestors(String projectId) =>
       "/api/v1/projects/$projectId/confirm-investors/";
+  static String terminateProject(String id) => "/api/v1/projects/$id/terminate/";
 
   // Chat & Notifications
   static const String startConversation =
@@ -58,6 +62,14 @@ class ApiEndpoints {
       "/api/v1/notifications/chat/conversations/$conversationId/read/";
   static String removeParticipant(String conversationId, String userId) =>
       "/api/v1/notifications/chat/conversations/$conversationId/participants/$userId/";
+  static String conversationHeader(String conversationId) =>
+      "/api/v1/notifications/chat/conversations/$conversationId/header/";
+  static String conversationConfirmInvestors(String conversationId) =>
+      "/api/v1/notifications/chat/conversations/$conversationId/confirm-investors/";
+  static String leaveConversation(String conversationId) =>
+      "/api/v1/notifications/chat/conversations/$conversationId/leave/";
+  static String reportConversation(String conversationId) =>
+      "/api/v1/notifications/chat/conversations/$conversationId/report/";
 
   static String chatWebSocket(String conversationId, String token) {
     final wsBase = baseUrl

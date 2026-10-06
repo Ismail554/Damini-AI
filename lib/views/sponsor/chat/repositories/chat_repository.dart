@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/api_service.dart';
+import '../../group_chat/models/group_chat_header_model.dart';
 import '../../group_chat/models/group_chat_model.dart';
 import '../models/chat_item_model.dart';
 import '../models/chat_message_model.dart';
@@ -322,6 +323,130 @@ class ChatRepository {
         requireAuth: true,
       );
       return true;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// GET /api/v1/notifications/chat/conversations/{id}/header/
+  Future<GroupChatHeaderModel> fetchConversationHeader(
+      String conversationId) async {
+    try {
+      final response = await _api.get(
+        ApiEndpoints.conversationHeader(conversationId),
+        requireAuth: true,
+      );
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+      return GroupChatHeaderModel.fromJson(
+          data is Map ? Map<String, dynamic>.from(data) : {});
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// POST /api/v1/notifications/chat/conversations/{id}/confirm-investors/
+  /// (with fallback to /api/v1/projects/{project_id}/confirm-investors/)
+  Future<Map<String, dynamic>> confirmInvestors({
+    required int projectId,
+    required int conversationId,
+    required List<Map<String, dynamic>> investors,
+  }) async {
+    final payload = {
+      if (conversationId > 0) 'conversation_id': conversationId,
+      if (projectId > 0) 'project_id': projectId,
+      'investors': investors,
+    };
+
+    final primaryEndpoint = conversationId > 0
+        ? ApiEndpoints.conversationConfirmInvestors(conversationId.toString())
+        : ApiEndpoints.confirmInvestors(projectId.toString());
+
+    try {
+      final response = await _api.post(
+        primaryEndpoint,
+        data: payload,
+        requireAuth: true,
+      );
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+      return data is Map ? Map<String, dynamic>.from(data) : {};
+    } on DioException catch (dioErr) {
+      if (dioErr.response?.statusCode == 404 && projectId > 0 && conversationId > 0) {
+        final fallbackEndpoint = ApiEndpoints.confirmInvestors(projectId.toString());
+        final fallbackRes = await _api.post(
+          fallbackEndpoint,
+          data: payload,
+          requireAuth: true,
+        );
+        dynamic data = fallbackRes.data;
+        if (data is String) {
+          try {
+            data = jsonDecode(data);
+          } catch (_) {}
+        }
+        return data is Map ? Map<String, dynamic>.from(data) : {};
+      }
+      rethrow;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// POST /api/v1/notifications/chat/conversations/{id}/leave/
+  Future<Map<String, dynamic>> leaveConversation(String conversationId) async {
+    try {
+      final response = await _api.post(
+        ApiEndpoints.leaveConversation(conversationId),
+        data: {},
+        requireAuth: true,
+      );
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+      return data is Map ? Map<String, dynamic>.from(data) : {};
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// POST /api/v1/notifications/chat/conversations/{id}/report/
+  Future<Map<String, dynamic>> reportConversation({
+    required String conversationId,
+    required String reason,
+    String? description,
+    List<int>? flaggedMessageIds,
+  }) async {
+    try {
+      final response = await _api.post(
+        ApiEndpoints.reportConversation(conversationId),
+        data: {
+          'reason': reason,
+          if (description != null && description.isNotEmpty)
+            'description': description,
+          if (flaggedMessageIds != null && flaggedMessageIds.isNotEmpty)
+            'flagged_message_ids': flaggedMessageIds,
+        },
+        requireAuth: true,
+      );
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+      return data is Map ? Map<String, dynamic>.from(data) : {};
     } catch (e) {
       rethrow;
     }

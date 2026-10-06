@@ -23,10 +23,41 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.message.type == ChatMessageType.system ||
+        widget.message.senderRole?.toLowerCase() == 'system') {
+      return _buildSystemMessage();
+    }
     if (widget.message.isMe) {
       return _buildMyMessage();
     }
     return _buildOtherMessage();
+  }
+
+  Widget _buildSystemMessage() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.h),
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+          constraints: BoxConstraints(maxWidth: 0.85.sw),
+          decoration: BoxDecoration(
+            color: const Color(0xFF132235),
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          ),
+          child: Text(
+            widget.message.text,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.outfit(
+              color: const Color(0xFF8EB2C7),
+              fontSize: 12.sp,
+              fontStyle: FontStyle.italic,
+              height: 1.3,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildMyMessage() {

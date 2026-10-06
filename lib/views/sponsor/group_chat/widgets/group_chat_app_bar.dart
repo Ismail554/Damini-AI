@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../models/group_chat_header_model.dart';
 
 class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final int activeMemberCount;
   final List<String> participants;
+  final List<GroupChatParticipant>? participantDetails;
   final Function(String action)? onMenuSelected;
   final bool isOwner;
 
@@ -15,6 +17,7 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.activeMemberCount = 0,
     this.participants = const [],
+    this.participantDetails,
     this.onMenuSelected,
     this.isOwner = true,
   });
@@ -145,6 +148,45 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildAvatarStack() {
+    final colors = [
+      const Color(0xFF9333EA),
+      const Color(0xFF006EDB),
+      const Color(0xFF10B981),
+      const Color(0xFFF59E0B),
+    ];
+
+    if (participantDetails != null && participantDetails!.isNotEmpty) {
+      final displayItems = participantDetails!.take(3).toList();
+      final stackWidth = 26.w + (displayItems.length - 1) * 14.w;
+
+      return SizedBox(
+        width: stackWidth,
+        height: 32.h,
+        child: Stack(
+          children: [
+            for (int i = 0; i < displayItems.length; i++)
+              Positioned(
+                left: (i * 14).w,
+                child: _buildAvatarCircle(
+                  bg: colors[i % colors.length],
+                  avatarUrl: displayItems[i].avatarUrl,
+                  child: Text(
+                    displayItems[i].initials.isNotEmpty
+                        ? displayItems[i].initials
+                        : _getInitials(displayItems[i].name),
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
     if (participants.isEmpty) {
       return Container(
         width: 32.w,
@@ -163,13 +205,6 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       );
     }
-
-    final colors = [
-      const Color(0xFF9333EA),
-      const Color(0xFF006EDB),
-      const Color(0xFF10B981),
-      const Color(0xFFF59E0B),
-    ];
 
     final displayItems = participants.take(3).toList();
     final stackWidth = 26.w + (displayItems.length - 1) * 14.w;
@@ -209,7 +244,11 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
     return 'U';
   }
 
-  Widget _buildAvatarCircle({required Color bg, required Widget child}) {
+  Widget _buildAvatarCircle({
+    required Color bg,
+    required Widget child,
+    String? avatarUrl,
+  }) {
     return Container(
       width: 26.w,
       height: 26.w,
@@ -217,8 +256,16 @@ class GroupChatAppBar extends StatelessWidget implements PreferredSizeWidget {
         color: bg,
         shape: BoxShape.circle,
         border: Border.all(color: const Color(0xFF071B33), width: 1.5),
+        image: avatarUrl != null && avatarUrl.isNotEmpty
+            ? DecorationImage(
+                image: NetworkImage(avatarUrl),
+                fit: BoxFit.cover,
+              )
+            : null,
       ),
-      child: Center(child: child),
+      child: (avatarUrl == null || avatarUrl.isEmpty)
+          ? Center(child: child)
+          : null,
     );
   }
 }
