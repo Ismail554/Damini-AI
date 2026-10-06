@@ -69,16 +69,13 @@ class SponsorChatNotifier extends Notifier<SponsorChatState> {
       state = state.copyWith(
         isLoading: false,
         isRefreshing: false,
-        allChats: items.isNotEmpty ? items : _repository.fetchChats(),
+        allChats: items,
         error: null,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         isRefreshing: false,
-        allChats: state.allChats.isNotEmpty
-            ? state.allChats
-            : _repository.fetchChats(),
         error:
             state.allChats.isEmpty ? 'Failed to load conversations: $e' : null,
       );

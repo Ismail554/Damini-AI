@@ -61,7 +61,7 @@ class _CompanyVerificationViewState
 
   Future<void> _pickFile({required bool isLicense}) async {
     try {
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg'],
       );
@@ -139,7 +139,6 @@ class _CompanyVerificationViewState
 
     final status = state.verification.status.toUpperCase();
     final isApproved = status == 'APPROVED';
-    final isPending = status == 'PENDING';
 
     return CommonBackground(
       showGrid: false,

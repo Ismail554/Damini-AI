@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/api_service.dart';
+import '../../project_details/models/sponsor_project_details_model.dart';
 import '../models/project_public_view_model.dart';
 
 final projectPublicRepositoryProvider =
@@ -55,7 +56,40 @@ class ProjectPublicRepository {
     }
   }
 
+  /// Fetch project details for public view: GET /api/v1/projects/{id}/
   Future<ProjectPublicViewModel> fetchProjectPublicDetails([String? id]) async {
+    if (id != null &&
+        id.isNotEmpty &&
+        !id.startsWith('pub_') &&
+        !id.startsWith('draft_')) {
+      try {
+        final response = await _apiService.get(
+          ApiEndpoints.projectDetails(id),
+          requireAuth: true,
+        );
+
+        dynamic data = response.data;
+        if (data is String) {
+          try {
+            data = jsonDecode(data);
+          } catch (_) {}
+        }
+
+        Map<String, dynamic>? projectMap;
+        if (data is Map && data['data'] is Map) {
+          projectMap = Map<String, dynamic>.from(data['data'] as Map);
+        } else if (data is Map<String, dynamic>) {
+          projectMap = data;
+        } else if (data is Map) {
+          projectMap = Map<String, dynamic>.from(data);
+        }
+
+        if (projectMap != null) {
+          final details = SponsorProjectDetailsModel.fromJson(projectMap);
+          return details.toPublicViewModel();
+        }
+      } catch (_) {}
+    }
     return ProjectPublicViewModel.mockData();
   }
 }

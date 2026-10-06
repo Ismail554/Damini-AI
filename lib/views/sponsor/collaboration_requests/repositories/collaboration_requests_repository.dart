@@ -72,44 +72,26 @@ class CollaborationRequestsRepository {
   }
 
   Future<List<CollaborationRequestModel>> fetchPendingRequests() async {
-    try {
-      final all = await fetchCollaborationRequests();
-      return all.where((r) => r.status.toUpperCase() == 'PENDING').toList();
-    } catch (_) {
-      return CollaborationRequestModel.mockPendingList();
-    }
+    final all = await fetchCollaborationRequests();
+    return all.where((r) => r.status.toUpperCase() == 'PENDING').toList();
   }
 
   Future<List<CollaborationRequestModel>> fetchApprovedRequests() async {
-    try {
-      final all = await fetchCollaborationRequests();
-      final approved = all
-          .where((r) =>
-              r.status.toUpperCase() == 'APPROVED' ||
-              r.status.toUpperCase() == 'ACCEPTED')
-          .toList();
-      return approved.isNotEmpty
-          ? approved
-          : CollaborationRequestModel.mockHistoryList();
-    } catch (_) {
-      return CollaborationRequestModel.mockHistoryList();
-    }
+    final all = await fetchCollaborationRequests();
+    return all
+        .where((r) =>
+            r.status.toUpperCase() == 'APPROVED' ||
+            r.status.toUpperCase() == 'ACCEPTED')
+        .toList();
   }
 
   Future<List<CollaborationRequestModel>> fetchConfirmationRequests() async {
-    try {
-      final all = await fetchCollaborationRequests();
-      final conf = all
-          .where((r) =>
-              r.status.toUpperCase() == 'CONFIRMED' ||
-              r.status.toUpperCase() == 'RECEIVED')
-          .toList();
-      return conf.isNotEmpty
-          ? conf
-          : CollaborationRequestModel.mockConfirmationList();
-    } catch (_) {
-      return CollaborationRequestModel.mockConfirmationList();
-    }
+    final all = await fetchCollaborationRequests();
+    return all
+        .where((r) =>
+            r.status.toUpperCase() == 'CONFIRMED' ||
+            r.status.toUpperCase() == 'RECEIVED')
+        .toList();
   }
 
   /// POST /api/v1/projects/{projectId}/confirm-investors/

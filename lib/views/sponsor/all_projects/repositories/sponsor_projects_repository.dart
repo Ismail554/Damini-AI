@@ -80,26 +80,14 @@ class SponsorProjectsRepository {
   }
 
   Future<List<SponsorProjectModel>> fetchActiveProjects() async {
-    try {
-      return await fetchProjects(status: 'active');
-    } catch (_) {
-      return SponsorProjectModel.mockActiveList();
-    }
+    return await fetchProjects(status: 'active');
   }
 
   Future<List<SponsorProjectModel>> fetchCompletedProjects() async {
-    try {
-      return await fetchProjects(status: 'completed');
-    } catch (_) {
-      return SponsorProjectModel.mockCompletedList();
-    }
+    return await fetchProjects(status: 'completed');
   }
 
   Future<List<SponsorProjectModel>> fetchTerminatedProjects() async {
-    try {
-      return await fetchProjects(status: 'terminated');
-    } catch (_) {
-      return SponsorProjectModel.mockTerminatedList();
-    }
+    return await fetchProjects(status: 'terminated');
   }
 }

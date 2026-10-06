@@ -123,6 +123,7 @@ class SponsorProjectDetailsModel {
   final bool isSponsorVerified;
   final List<ProjectDocumentModel> documents;
   final DateTime? createdAt;
+  final bool isSaved;
   final bool ndaSigned;
   final String? myRequestStatus;
   final String? terminationReason;
@@ -163,6 +164,7 @@ class SponsorProjectDetailsModel {
     this.isSponsorVerified = false,
     this.documents = const [],
     this.createdAt,
+    this.isSaved = false,
     this.ndaSigned = false,
     this.myRequestStatus,
     this.terminationReason,
@@ -336,6 +338,7 @@ class SponsorProjectDetailsModel {
     final createdAtStr = json['created_at']?.toString();
     final createdAt =
         createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
+    final isSaved = json['is_saved'] == true || json['saved'] == true;
     final ndaSigned = json['nda_signed'] == true;
     final myRequestStatus = json['my_request_status']?.toString();
     final terminationReason = json['termination_reason']?.toString();
@@ -378,6 +381,7 @@ class SponsorProjectDetailsModel {
       isSponsorVerified: isSponsorVerified,
       documents: documents,
       createdAt: createdAt,
+      isSaved: isSaved,
       ndaSigned: ndaSigned,
       myRequestStatus: myRequestStatus,
       terminationReason: terminationReason,
@@ -420,6 +424,7 @@ class SponsorProjectDetailsModel {
     bool? isSponsorVerified,
     List<ProjectDocumentModel>? documents,
     DateTime? createdAt,
+    bool? isSaved,
     bool? ndaSigned,
     String? myRequestStatus,
     String? terminationReason,
@@ -463,6 +468,7 @@ class SponsorProjectDetailsModel {
       isSponsorVerified: isSponsorVerified ?? this.isSponsorVerified,
       documents: documents ?? this.documents,
       createdAt: createdAt ?? this.createdAt,
+      isSaved: isSaved ?? this.isSaved,
       ndaSigned: ndaSigned ?? this.ndaSigned,
       myRequestStatus: myRequestStatus ?? this.myRequestStatus,
       terminationReason: terminationReason ?? this.terminationReason,
@@ -493,6 +499,7 @@ class SponsorProjectDetailsModel {
       businessDescription: businessDescription,
       isNdaSigned: ndaSigned,
       myRequestStatus: myRequestStatus,
+      isSaved: isSaved,
       documents: documents,
       minContribution: minimumInvestment,
       expectedRoi: targetRoi,

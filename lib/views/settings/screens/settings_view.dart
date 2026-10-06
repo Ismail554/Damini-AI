@@ -8,6 +8,7 @@ import 'package:Braintech/views/auth/session/controllers/session_provider.dart';
 import 'package:Braintech/core/theme/theme_provider.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
+import 'package:Braintech/core/widgets/custom_snackbar.dart';
 import 'package:Braintech/core/widgets/logout_dialog.dart';
 import '../../profile/personal_info/controllers/personal_info_provider.dart';
 import '../controllers/settings_provider.dart';
