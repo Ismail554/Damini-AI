@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
+import 'package:Braintech/core/widgets/custom_snackbar.dart';
 
 import '../controllers/project_creation_ai_provider.dart';
 import '../widgets/damini_ai_interactive_header.dart';
@@ -24,6 +25,14 @@ class ProjectCreationAiChatView extends ConsumerStatefulWidget {
 class _ProjectCreationAiChatViewState
     extends ConsumerState<ProjectCreationAiChatView> {
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(projectCreationAiProvider.notifier).initConversation();
+    });
+  }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -49,6 +58,15 @@ class _ProjectCreationAiChatViewState
     final state = ref.watch(projectCreationAiProvider);
     final notifier = ref.read(projectCreationAiProvider.notifier);
 
+    // Listen to error notifications
+    ref.listen<ProjectCreationAiState>(projectCreationAiProvider, (prev, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage!.isNotEmpty &&
+          next.errorMessage != prev?.errorMessage) {
+        CustomSnackBar.error(context, next.errorMessage!);
+      }
+    });
+
     _scrollToBottom();
 
     return CommonBackground(
@@ -59,11 +77,19 @@ class _ProjectCreationAiChatViewState
           currentStep: state.currentStepIndex,
           totalSteps: state.totalSteps,
           stepTitle: state.stepTitle,
-          isTyping: state.isTyping,
+          isTyping: state.isTyping || state.isInitializing,
           onReset: () => notifier.clearChat(),
         ),
         body: Column(
           children: [
+            // Subtly show initializing indicator
+            if (state.isInitializing)
+              const LinearProgressIndicator(
+                minHeight: 2,
+                backgroundColor: Colors.transparent,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFC026D3)),
+              ),
+
             Expanded(
               child: ListView.builder(
                 controller: _scrollController,
@@ -131,9 +157,54 @@ class _ProjectCreationAiChatViewState
             ),
             SizedBox(height: 6.h),
 
+            // Retry countdown banner if rate-limited or 503
+            if (state.retryAfterSeconds != null &&
+                state.retryAfterSeconds! > 0)
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+                padding:
+                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8.r),
+                  border:
+                      Border.all(color: Colors.amber.withValues(alpha: 0.4)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.hourglass_top_rounded,
+                        color: Colors.amber, size: 14.r),
+                    SizedBox(width: 6.w),
+                    Text(
+                      "AI advisor is busy. You can send in ${state.retryAfterSeconds}s...",
+                      style: GoogleFonts.outfit(
+                        fontSize: 12.sp,
+                        color: Colors.amber[800] ?? Colors.amber,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             // Text Input Field
-            AiChatInputField(
-              onSend: (text) => notifier.sendMessage(text),
+            AbsorbPointer(
+              absorbing: (state.retryAfterSeconds != null &&
+                      state.retryAfterSeconds! > 0) ||
+                  state.isTyping ||
+                  state.isInitializing,
+              child: Opacity(
+                opacity: (state.retryAfterSeconds != null &&
+                            state.retryAfterSeconds! > 0) ||
+                        state.isTyping ||
+                        state.isInitializing
+                    ? 0.6
+                    : 1.0,
+                child: AiChatInputField(
+                  onSend: (text) => notifier.sendMessage(text),
+                ),
+              ),
             ),
           ],
         ),

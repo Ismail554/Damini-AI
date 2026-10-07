@@ -334,7 +334,11 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
           break;
         }
       }
-      industryId ??= industriesList.isNotEmpty ? industriesList.first.id.toString() : null;
+      industryId ??= widget.initialDraft?.industryId?.toString();
+      industryId ??=
+          industriesList.isNotEmpty ? industriesList.first.id.toString() : null;
+    } else if (widget.initialDraft?.industryId != null) {
+      industryId = widget.initialDraft!.industryId.toString();
     }
 
     final rawTeam = _teamMembersController.text.trim();

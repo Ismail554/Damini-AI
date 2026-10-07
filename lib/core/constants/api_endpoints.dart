@@ -54,6 +54,14 @@ class ApiEndpoints {
       "/api/v1/projects/$projectId/confirm-investors/";
   static String terminateProject(String id) => "/api/v1/projects/$id/terminate/";
 
+  // AI Project Creation (Damini Advisor)
+  static const String aiProjectConversations =
+      "/api/v1/ai/projects/conversations/";
+  static String aiProjectMessages(String conversationId) =>
+      "/api/v1/ai/projects/conversations/$conversationId/messages/";
+  static String aiProjectConversation(String conversationId) =>
+      "/api/v1/ai/projects/conversations/$conversationId/";
+
   // Chat & Notifications
   static const String startConversation =
       "/api/v1/notifications/chat/conversations/start/";

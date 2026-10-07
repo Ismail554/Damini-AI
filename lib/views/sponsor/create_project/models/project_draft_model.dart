@@ -9,6 +9,7 @@ class ProjectDraftModel {
   final String fundingGoal;
   final String targetRoi;
   final String? industry;
+  final int? industryId;
   final String? country;
   final String location;
   final String fundingStage;
@@ -37,6 +38,7 @@ class ProjectDraftModel {
     this.fundingGoal = '5000000',
     this.targetRoi = '18',
     this.industry,
+    this.industryId,
     this.country,
     this.location = '',
     this.fundingStage = 'Seed',
@@ -83,6 +85,7 @@ class ProjectDraftModel {
       'fundingGoal': fundingGoal,
       'targetRoi': targetRoi,
       'industry': industry,
+      'industryId': industryId,
       'country': country,
       'location': location,
       'fundingStage': fundingStage,
@@ -106,35 +109,92 @@ class ProjectDraftModel {
   }
 
   factory ProjectDraftModel.fromMap(Map<String, dynamic> map) {
+    int? parsedIndustryId;
+    if (map['industryId'] is int) {
+      parsedIndustryId = map['industryId'] as int;
+    } else if (map['industry_id'] != null) {
+      parsedIndustryId = int.tryParse(map['industry_id'].toString());
+    }
+
+    String? parsedTimeline = map['timeline']?.toString();
+    if ((parsedTimeline == null || parsedTimeline.isEmpty) &&
+        map['timeline_months'] != null) {
+      parsedTimeline = "${map['timeline_months']} months";
+    }
+
+    String? parsedHoldPeriod = map['holdPeriod']?.toString();
+    if ((parsedHoldPeriod == null || parsedHoldPeriod.isEmpty) &&
+        map['hold_period_months'] != null) {
+      parsedHoldPeriod = "${map['hold_period_months']} months";
+    }
+
+    String? parsedTimelineOps = map['timelineOps']?.toString();
+    if ((parsedTimelineOps == null || parsedTimelineOps.isEmpty) &&
+        map['timeline_to_operations_months'] != null) {
+      parsedTimelineOps = "${map['timeline_to_operations_months']} months";
+    }
+
     return ProjectDraftModel(
       id: map['id']?.toString() ?? '',
       title: map['title']?.toString() ?? '',
-      shortDesc: map['shortDesc']?.toString() ?? '',
-      fullDesc: map['fullDesc']?.toString() ?? '',
-      minInvestment: map['minInvestment']?.toString() ?? '',
-      fundingGoal: map['fundingGoal']?.toString() ?? '5000000',
-      targetRoi: map['targetRoi']?.toString() ?? '18',
-      industry: map['industry'] as String?,
-      country: map['country'] as String?,
+      shortDesc: map['shortDesc']?.toString() ??
+          map['short_description']?.toString() ??
+          '',
+      fullDesc: map['fullDesc']?.toString() ??
+          map['full_description']?.toString() ??
+          map['business_description']?.toString() ??
+          '',
+      minInvestment: map['minInvestment']?.toString() ??
+          map['minimum_investment']?.toString() ??
+          '',
+      fundingGoal: map['fundingGoal']?.toString() ??
+          map['funding_goal']?.toString() ??
+          '5000000',
+      targetRoi: map['targetRoi']?.toString() ??
+          map['target_roi']?.toString() ??
+          '18',
+      industry: (map['industry'] ?? map['industry_name'])?.toString(),
+      industryId: parsedIndustryId,
+      country: map['country']?.toString(),
       location: map['location']?.toString() ?? '',
-      fundingStage: map['fundingStage']?.toString() ?? 'Seed',
-      timeline: map['timeline']?.toString() ?? '36 months',
-      status: map['status']?.toString() ?? '',
-      milestones: map['milestones']?.toString() ?? '',
-      useOfFunds: map['useOfFunds']?.toString() ?? '',
-      sponsorInvestment: map['sponsorInvestment']?.toString() ?? '',
-      minContribution: map['minContribution']?.toString() ?? '',
-      expectedRoi: map['expectedRoi']?.toString() ?? '',
-      monthlyRevenue: map['monthlyRevenue']?.toString() ?? '',
-      holdPeriod: map['holdPeriod']?.toString() ?? '',
-      timelineOps: map['timelineOps']?.toString() ?? '',
-      teamMembers: map['teamMembers']?.toString() ?? '',
-      ndaAgreement: map['ndaAgreement']?.toString() ?? '',
+      fundingStage: map['fundingStage']?.toString() ??
+          map['funding_stage']?.toString() ??
+          'Seed',
+      timeline: parsedTimeline ?? '36 months',
+      status: map['status']?.toString() ??
+          map['current_status']?.toString() ??
+          '',
+      milestones: map['milestones']?.toString() ??
+          map['next_milestones']?.toString() ??
+          '',
+      useOfFunds: map['useOfFunds']?.toString() ??
+          map['use_of_funds']?.toString() ??
+          '',
+      sponsorInvestment: map['sponsorInvestment']?.toString() ??
+          map['skin_in_the_game']?.toString() ??
+          '',
+      minContribution: map['minContribution']?.toString() ??
+          map['minimum_contribution']?.toString() ??
+          '',
+      expectedRoi: map['expectedRoi']?.toString() ??
+          map['expected_roi']?.toString() ??
+          '',
+      monthlyRevenue: map['monthlyRevenue']?.toString() ??
+          map['potential_monthly_revenue']?.toString() ??
+          '',
+      holdPeriod: parsedHoldPeriod ?? '',
+      timelineOps: parsedTimelineOps ?? '',
+      teamMembers: map['teamMembers']?.toString() ??
+          map['team_members_text']?.toString() ??
+          '',
+      ndaAgreement: map['ndaAgreement']?.toString() ??
+          map['confidentiality_agreement_text']?.toString() ??
+          '',
       coverImagePath: map['coverImagePath'] as String?,
       lastEditedMs: map['lastEditedMs'] is int
           ? map['lastEditedMs'] as int
           : (int.tryParse(map['lastEditedMs']?.toString() ?? '') ?? 0),
-      lastEdited: map['lastEdited'] as String?,
+      lastEdited: (map['lastEdited'] ?? map['last_edited']) as String?,
     );
   }
 
