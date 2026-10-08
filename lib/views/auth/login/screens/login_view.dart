@@ -9,6 +9,7 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../core/widgets/common_background.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
 import '../../../../shared/global_key.dart';
+import '../../providers/social_auth_provider.dart';
 import '../../widgets/labeled_text_field.dart';
 import '../../widgets/social_auth_section.dart';
 import '../models/login_request_model.dart';
@@ -71,8 +72,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
   @override
   Widget build(BuildContext context) {
     final loginAsync = ref.watch(loginProvider);
+    final socialState = ref.watch(socialAuthProvider);
     final passwordToggleState = ref.watch(loginState);
     final colors = AppThemeColors.of(context);
+    final isAnyLoading = loginAsync.isLoading || socialState.isLoading;
 
     return CommonBackground(
       showGrid: false,
@@ -133,32 +136,39 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          height: 24.r,
-                          width: 24.r,
-                          child: Checkbox(
-                            value: _rememberMe,
-                            onChanged: (val) =>
-                                setState(() => _rememberMe = val ?? false),
-                            activeColor: AppColors.primaryColor,
-                            side: BorderSide(color: colors.textPrimary),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4.r),
+                    Flexible(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            height: 24.r,
+                            width: 24.r,
+                            child: Checkbox(
+                              value: _rememberMe,
+                              onChanged: (val) =>
+                                  setState(() => _rememberMe = val ?? false),
+                              activeColor: AppColors.primaryColor,
+                              side: BorderSide(color: colors.textPrimary),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4.r),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          "Remember me",
-                          style: GoogleFonts.outfit(
-                            fontSize: 14.sp,
-                            color: colors.textPrimary,
+                          SizedBox(width: 8.w),
+                          Flexible(
+                            child: Text(
+                              "Remember me",
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.outfit(
+                                fontSize: 14.sp,
+                                color: colors.textPrimary,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    SizedBox(width: 8.w),
                     GestureDetector(
                       onTap: () => context.push('/forgot-password'),
                       child: Text(
@@ -178,7 +188,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   width: double.infinity,
                   height: 56.h,
                   child: ElevatedButton(
-                    onPressed: loginAsync.isLoading ? null : _handleLogin,
+                    onPressed: isAnyLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
@@ -205,7 +215,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
                   ),
                 ),
                 SizedBox(height: 24.h),
-                const SocialAuthSection(),
+                SocialAuthSection(
+                  enabled: !isAnyLoading,
+                  dividerAtTop: true,
+                ),
                 SizedBox(height: 32.h),
 
                 Center(

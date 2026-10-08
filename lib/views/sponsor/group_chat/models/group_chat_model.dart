@@ -34,24 +34,98 @@ class GroupChatMessage {
   factory GroupChatMessage.fromJson(
     Map<String, dynamic> json, {
     String? currentUserId,
+    String? currentUserName,
   }) {
-    final senderIdStr =
-        json['sender_id']?.toString() ?? json['senderId']?.toString();
+    final senderIdStr = json['sender_id']?.toString() ??
+        json['senderId']?.toString() ??
+        (json['sender'] is Map
+            ? json['sender']['id']?.toString()
+            : json['sender']?.toString());
+
+    final rawSenderName = json['sender_name']?.toString() ??
+        json['senderName']?.toString() ??
+        (json['sender'] is Map
+            ? (json['sender']['name'] ??
+                    json['sender']['full_name'] ??
+                    '${json['sender']['first_name'] ?? ''} ${json['sender']['last_name'] ?? ''}')
+                ?.toString()
+                .trim()
+            : null);
+
     final isMeFlag = json['is_me'] == true ||
         json['isMe'] == true ||
         (currentUserId != null &&
             senderIdStr != null &&
-            currentUserId == senderIdStr);
+            currentUserId.trim().isNotEmpty &&
+            currentUserId.trim() == senderIdStr.trim()) ||
+        (currentUserName != null &&
+            rawSenderName != null &&
+            currentUserName.trim().isNotEmpty &&
+            rawSenderName.trim().isNotEmpty &&
+            currentUserName.trim().toLowerCase() ==
+                rawSenderName.trim().toLowerCase());
 
-    final rawType = (json['message_type'] ?? json['type'] ?? 'text')
+    final rawType = (json['message_type'] ??
+            json['messageType'] ??
+            json['msg_type'] ??
+            json['type'] ??
+            'text')
         .toString()
         .toLowerCase();
-    final rawSenderRole =
-        (json['sender_role'] ?? json['senderRole'])?.toString();
+
+    final rawSenderRole = json['sender_role']?.toString() ??
+        json['senderRole']?.toString() ??
+        (json['sender'] is Map ? json['sender']['role']?.toString() : null);
+
+    final mediaUrlStr = (json['media_url'] ??
+            json['mediaUrl'] ??
+            json['file'] ??
+            json['attachment'] ??
+            json['media'] ??
+            json['audio'] ??
+            json['image'] ??
+            json['url'])
+        ?.toString() ??
+        '';
+
+    final voiceDurStr = (json['voice_duration'] ??
+            json['voiceDuration'] ??
+            json['duration'] ??
+            json['audio_duration'] ??
+            json['length'])
+        ?.toString();
+
+    final rawText = (json['text'] ??
+            json['content'] ??
+            json['message'] ??
+            json['body'] ??
+            json['msg'] ??
+            '')
+        .toString();
+
+    final mediaLower = mediaUrlStr.toLowerCase();
+
     ChatMessageType msgType = ChatMessageType.text;
-    if (rawType == 'image') msgType = ChatMessageType.image;
-    if (rawType == 'voice') msgType = ChatMessageType.voice;
-    if (rawType == 'system' || rawSenderRole?.toLowerCase() == 'system') {
+    if (rawType.contains('image') ||
+        rawType.contains('photo') ||
+        mediaLower.contains('.jpg') ||
+        mediaLower.contains('.png') ||
+        mediaLower.contains('.jpeg') ||
+        mediaLower.contains('.webp')) {
+      msgType = ChatMessageType.image;
+    } else if (rawType.contains('voice') ||
+        rawType.contains('audio') ||
+        (voiceDurStr != null && voiceDurStr.trim().isNotEmpty) ||
+        mediaLower.contains('.m4a') ||
+        mediaLower.contains('.mp3') ||
+        mediaLower.contains('.wav') ||
+        mediaLower.contains('.aac') ||
+        mediaLower.contains('.ogg') ||
+        rawText.trim().toLowerCase() == 'voice message' ||
+        rawText.trim().toLowerCase().contains('voice note')) {
+      msgType = ChatMessageType.voice;
+    } else if (rawType == 'system' ||
+        rawSenderRole?.toLowerCase() == 'system') {
       msgType = ChatMessageType.system;
     }
 
@@ -63,17 +137,20 @@ class GroupChatMessage {
     if (rawAvatar == 'investor') avatarType = ChatAvatarType.investor;
 
     String timeStr = json['time']?.toString() ?? '';
-    if (timeStr.isEmpty && json['created_at'] != null) {
-      final dt = DateTime.tryParse(json['created_at'].toString())?.toLocal();
+    if (timeStr.isEmpty &&
+        (json['created_at'] != null || json['timestamp'] != null)) {
+      final rawDt = (json['created_at'] ?? json['timestamp']).toString();
+      final dt = DateTime.tryParse(rawDt)?.toLocal();
       if (dt != null) {
         timeStr =
             '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
       }
     }
 
-    final sName = json['sender_name']?.toString() ??
-        json['senderName']?.toString() ??
-        (msgType == ChatMessageType.system ? 'System' : 'User');
+    final sName = isMeFlag
+        ? 'You'
+        : (rawSenderName ??
+            (msgType == ChatMessageType.system ? 'System' : 'User'));
 
     String initials = json['avatar_initials']?.toString() ??
         json['avatarInitials']?.toString() ??
@@ -87,21 +164,54 @@ class GroupChatMessage {
       }
     }
 
+    String finalText = rawText;
+    if (msgType == ChatMessageType.voice && finalText.trim().isEmpty) {
+      finalText = 'Voice message';
+    }
+
     return GroupChatMessage(
       id: json['id']?.toString() ?? '',
       senderName: sName,
-      senderRole:
-          json['sender_role']?.toString() ?? json['senderRole']?.toString(),
+      senderRole: rawSenderRole,
       avatarInitials: initials,
       avatarType: avatarType,
       isAi: json['is_ai'] == true || json['isAi'] == true,
       isMe: isMeFlag,
-      text: json['text']?.toString() ?? '',
+      text: finalText,
       time: timeStr.isNotEmpty ? timeStr : 'Just now',
       type: msgType,
-      mediaUrl: json['media_url']?.toString() ?? json['mediaUrl']?.toString(),
-      voiceDuration: json['voice_duration']?.toString() ??
-          json['voiceDuration']?.toString(),
+      mediaUrl: mediaUrlStr.isNotEmpty ? mediaUrlStr : null,
+      voiceDuration: voiceDurStr,
+    );
+  }
+
+  GroupChatMessage copyWith({
+    String? id,
+    String? senderName,
+    String? senderRole,
+    String? avatarInitials,
+    ChatAvatarType? avatarType,
+    bool? isAi,
+    bool? isMe,
+    String? text,
+    String? time,
+    ChatMessageType? type,
+    String? mediaUrl,
+    String? voiceDuration,
+  }) {
+    return GroupChatMessage(
+      id: id ?? this.id,
+      senderName: senderName ?? this.senderName,
+      senderRole: senderRole ?? this.senderRole,
+      avatarInitials: avatarInitials ?? this.avatarInitials,
+      avatarType: avatarType ?? this.avatarType,
+      isAi: isAi ?? this.isAi,
+      isMe: isMe ?? this.isMe,
+      text: text ?? this.text,
+      time: time ?? this.time,
+      type: type ?? this.type,
+      mediaUrl: mediaUrl ?? this.mediaUrl,
+      voiceDuration: voiceDuration ?? this.voiceDuration,
     );
   }
 }

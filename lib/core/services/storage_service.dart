@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../shared/global_key.dart';
 
@@ -46,13 +47,62 @@ class StorageService {
 
   static Future<void> saveUuid(String uuid) async {
     try {
-      await _storage.write(key: GlobalKeys.uuid, value: uuid);
+      await _storage.write(key: GlobalKeys.uuid, value: uuid.trim());
     } catch (_) {}
+  }
+
+  static String? extractUserIdFromJwt(String? token) {
+    if (token == null || token.trim().isEmpty) return null;
+    try {
+      final parts = token.trim().split('.');
+      if (parts.length != 3) return null;
+      final normalized = base64Url.normalize(parts[1]);
+      final decoded = utf8.decode(base64Url.decode(normalized));
+      final payload = jsonDecode(decoded);
+      if (payload is Map) {
+        final uid = payload['user_id'] ??
+            payload['userId'] ??
+            payload['id'] ??
+            payload['sub'];
+        if (uid != null) return uid.toString();
+      }
+    } catch (_) {}
+    return null;
   }
 
   static Future<String?> getUuid() async {
     try {
-      return await _storage.read(key: GlobalKeys.uuid);
+      final val = await _storage.read(key: GlobalKeys.uuid);
+      if (val != null && val.trim().isNotEmpty) {
+        return val.trim();
+      }
+      // Fallback: extract user_id from stored access token
+      final token = await getToken();
+      final extracted = extractUserIdFromJwt(token);
+      if (extracted != null && extracted.isNotEmpty) {
+        await saveUuid(extracted);
+        return extracted;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> saveUserName(String name) async {
+    try {
+      final trimmed = name.trim();
+      if (trimmed.isNotEmpty) {
+        await _storage.write(key: GlobalKeys.userName, value: trimmed);
+      }
+    } catch (_) {}
+  }
+
+  static Future<String?> getUserName() async {
+    try {
+      final val = await _storage.read(key: GlobalKeys.userName);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
     } catch (_) {
       return null;
     }
@@ -205,6 +255,7 @@ class StorageService {
       await _storage.delete(key: GlobalKeys.access);
       await _storage.delete(key: GlobalKeys.refresh);
       await _storage.delete(key: GlobalKeys.uuid);
+      await _storage.delete(key: GlobalKeys.userName);
       await _storage.delete(key: GlobalKeys.userRole);
       await _storage.delete(key: GlobalKeys.isRoleSelected);
       await _storage.delete(key: GlobalKeys.registeredDeviceToken);

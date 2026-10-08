@@ -36,6 +36,56 @@ class LoginProvider extends AsyncNotifier<LoginResponseModel?> {
     }
     return isSuccess;
   }
+
+  Future<bool> loginWithGoogle(String idToken) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(loginRepositoryProvider).loginWithGoogle(idToken),
+    );
+
+    final isSuccess = state.value?.success ?? false;
+    if (isSuccess) {
+      final role = state.value?.role?.trim().toLowerCase();
+      final validRole = GlobalKeys.isValidRole(role) ? role : null;
+      ref
+          .read(sessionProvider.notifier)
+          .updateSession(
+            isAuthenticated: true,
+            userRole: validRole,
+            isApiConnected: true,
+          );
+    }
+    return isSuccess;
+  }
+
+  Future<bool> loginWithApple({
+    required String idToken,
+    String? firstName,
+    String? lastName,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(loginRepositoryProvider).loginWithApple(
+        idToken: idToken,
+        firstName: firstName,
+        lastName: lastName,
+      ),
+    );
+
+    final isSuccess = state.value?.success ?? false;
+    if (isSuccess) {
+      final role = state.value?.role?.trim().toLowerCase();
+      final validRole = GlobalKeys.isValidRole(role) ? role : null;
+      ref
+          .read(sessionProvider.notifier)
+          .updateSession(
+            isAuthenticated: true,
+            userRole: validRole,
+            isApiConnected: true,
+          );
+    }
+    return isSuccess;
+  }
 }
 
 final loginProvider = AsyncNotifierProvider<LoginProvider, LoginResponseModel?>(

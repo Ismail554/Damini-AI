@@ -10,6 +10,7 @@
 analyzer:
   errors:
     unnecessary_brace_in_string_interps: ignore
+    package_names: ignore
   exclude:
     - build/**
     - android/**

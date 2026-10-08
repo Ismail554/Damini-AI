@@ -214,6 +214,8 @@ class ChatRepository {
     String conversationId, {
     int? beforeId,
     int limit = 30,
+    String? currentUserId,
+    String? currentUserName,
   }) async {
     try {
       final query = <String, dynamic>{
@@ -235,19 +237,31 @@ class ChatRepository {
       }
 
       List rawList = [];
-      if (data is Map && data['data'] is List) {
-        rawList = data['data'] as List;
+      if (data is Map) {
+        if (data['data'] is List) {
+          rawList = data['data'] as List;
+        } else if (data['data'] is Map && data['data']['messages'] is List) {
+          rawList = data['data']['messages'] as List;
+        } else if (data['data'] is Map && data['data']['results'] is List) {
+          rawList = data['data']['results'] as List;
+        } else if (data['results'] is List) {
+          rawList = data['results'] as List;
+        } else if (data['messages'] is List) {
+          rawList = data['messages'] as List;
+        }
       } else if (data is List) {
         rawList = data;
-      } else if (data is Map && data['results'] is List) {
-        rawList = data['results'] as List;
       }
 
       final messages = <GroupChatMessage>[];
       for (final item in rawList.whereType<Map>()) {
         try {
           messages.add(
-            GroupChatMessage.fromJson(Map<String, dynamic>.from(item)),
+            GroupChatMessage.fromJson(
+              Map<String, dynamic>.from(item),
+              currentUserId: currentUserId,
+              currentUserName: currentUserName,
+            ),
           );
         } catch (_) {}
       }

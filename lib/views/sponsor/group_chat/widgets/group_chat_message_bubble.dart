@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/chat_audio_service.dart';
 import '../../chat/models/chat_message_model.dart';
 import '../models/group_chat_model.dart';
 
@@ -18,8 +22,201 @@ class GroupChatMessageBubble extends StatefulWidget {
   State<GroupChatMessageBubble> createState() => _GroupChatMessageBubbleState();
 }
 
-class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble> {
+class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble>
+    with SingleTickerProviderStateMixin {
   bool _isPlayingVoice = false;
+  AudioPlayer? _audioPlayer;
+  StreamSubscription? _posSubscription;
+  StreamSubscription? _completeSubscription;
+  StreamSubscription? _stateSubscription;
+  StreamSubscription? _durationSubscription;
+
+  Timer? _simulatedTimer;
+  Duration _currentPosition = Duration.zero;
+  Duration _totalDuration = const Duration(seconds: 15);
+  AnimationController? _waveAnimController;
+
+  bool _isLoadingAudio = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _totalDuration = _parseDuration(widget.message.voiceDuration);
+    _waveAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 750),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant GroupChatMessageBubble oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.message.voiceDuration != widget.message.voiceDuration) {
+      _totalDuration = _parseDuration(widget.message.voiceDuration);
+    }
+  }
+
+  Duration _parseDuration(String? dur) {
+    if (dur == null || dur.trim().isEmpty) return const Duration(seconds: 15);
+    final parts = dur.trim().split(':');
+    if (parts.length == 2) {
+      final m = int.tryParse(parts[0]) ?? 0;
+      final s = int.tryParse(parts[1]) ?? 0;
+      final total = m * 60 + s;
+      return Duration(seconds: total > 0 ? total : 2);
+    }
+    final secs = int.tryParse(dur.trim()) ?? 15;
+    return Duration(seconds: secs > 0 ? secs : 2);
+  }
+
+  @override
+  void dispose() {
+    _simulatedTimer?.cancel();
+    _posSubscription?.cancel();
+    _completeSubscription?.cancel();
+    _stateSubscription?.cancel();
+    _durationSubscription?.cancel();
+    if (_audioPlayer != null) {
+      ChatAudioService.unregisterActivePlayer(_audioPlayer!);
+      _audioPlayer?.dispose();
+    }
+    _waveAnimController?.dispose();
+    super.dispose();
+  }
+
+  void _initAudioPlayer() {
+    if (_audioPlayer != null) return;
+    final player = AudioPlayer();
+    _audioPlayer = player;
+
+    _posSubscription = player.onPositionChanged.listen((pos) {
+      if (mounted) {
+        setState(() {
+          _currentPosition = pos;
+        });
+      }
+    });
+
+    _durationSubscription = player.onDurationChanged.listen((dur) {
+      if (mounted && dur > Duration.zero) {
+        setState(() {
+          _totalDuration = dur;
+        });
+      }
+    });
+
+    _stateSubscription = player.onPlayerStateChanged.listen((state) {
+      if (mounted) {
+        final isPlaying = state == PlayerState.playing;
+        setState(() {
+          _isPlayingVoice = isPlaying;
+          if (isPlaying) _isLoadingAudio = false;
+        });
+        if (isPlaying) {
+          if (!(_waveAnimController?.isAnimating ?? false)) {
+            _waveAnimController?.repeat(reverse: true);
+          }
+        } else {
+          _waveAnimController?.stop();
+        }
+      }
+    });
+
+    _completeSubscription = player.onPlayerComplete.listen((_) {
+      if (mounted) {
+        setState(() {
+          _isPlayingVoice = false;
+          _currentPosition = Duration.zero;
+        });
+        _waveAnimController?.stop();
+      }
+    });
+  }
+
+  void _toggleVoicePlayback() {
+    if (_isPlayingVoice) {
+      _pauseVoicePlayback();
+    } else {
+      _startVoicePlayback();
+    }
+  }
+
+  Future<void> _startVoicePlayback() async {
+    _initAudioPlayer();
+    await ChatAudioService.ensureAudioContext();
+
+    if (mounted) setState(() => _isLoadingAudio = true);
+
+    try {
+      await _audioPlayer!.setAudioContext(ChatAudioService.audioContext);
+      await _audioPlayer!.setVolume(1.0);
+
+      ChatAudioService.registerActivePlayer(_audioPlayer!, () {
+        if (mounted) _pauseVoicePlayback();
+      });
+
+      if (_audioPlayer?.state == PlayerState.paused) {
+        await _audioPlayer!.resume();
+        if (mounted) {
+          setState(() {
+            _isLoadingAudio = false;
+            _isPlayingVoice = true;
+          });
+        }
+        return;
+      }
+
+      final file =
+          await ChatAudioService.resolvePlayableFile(widget.message.mediaUrl);
+
+      if (file != null && file.existsSync()) {
+        try {
+          await _audioPlayer!.play(DeviceFileSource(file.path));
+        } catch (playErr) {
+          debugPrint("DeviceFileSource failed ($playErr), trying BytesSource...");
+          final bytes = await file.readAsBytes();
+          await _audioPlayer!.play(BytesSource(bytes));
+        }
+        _waveAnimController?.repeat(reverse: true);
+        if (mounted) {
+          setState(() {
+            _isLoadingAudio = false;
+            _isPlayingVoice = true;
+          });
+        }
+        return;
+      }
+    } catch (e) {
+      debugPrint("AudioPlayer playback error: $e");
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoadingAudio = false;
+        _isPlayingVoice = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Audio message is currently unavailable to play'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _pauseVoicePlayback() async {
+    _simulatedTimer?.cancel();
+    _waveAnimController?.stop();
+    try {
+      await _audioPlayer?.pause();
+    } catch (_) {}
+    if (mounted) {
+      setState(() {
+        _isPlayingVoice = false;
+        _isLoadingAudio = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,36 +369,73 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble> {
   }
 
   Widget _buildBubbleContent({required bool isMe}) {
-    if (widget.message.type == ChatMessageType.image) {
+    final mediaLower = (widget.message.mediaUrl ?? '').toLowerCase();
+    final isVoice = widget.message.type == ChatMessageType.voice ||
+        (widget.message.voiceDuration != null &&
+            widget.message.voiceDuration!.trim().isNotEmpty) ||
+        mediaLower.contains('.m4a') ||
+        mediaLower.contains('.mp3') ||
+        mediaLower.contains('.wav') ||
+        mediaLower.contains('.aac') ||
+        mediaLower.contains('.ogg');
+
+    final isImage = widget.message.type == ChatMessageType.image ||
+        mediaLower.contains('.jpg') ||
+        mediaLower.contains('.png') ||
+        mediaLower.contains('.jpeg') ||
+        mediaLower.contains('.webp');
+
+    if (isImage) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12.r),
         child: _buildImageWidget(),
       );
     }
 
-    if (widget.message.type == ChatMessageType.voice) {
+    if (isVoice) {
+      final totalSec =
+          _totalDuration.inSeconds > 0 ? _totalDuration.inSeconds : 15;
+      final curSec = _currentPosition.inSeconds;
+      final displaySec = _isPlayingVoice || _currentPosition > Duration.zero
+          ? curSec
+          : totalSec;
+      final displayTime =
+          '${displaySec ~/ 60}:${(displaySec % 60).toString().padLeft(2, '0')}';
+
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
-            onTap: () => setState(() => _isPlayingVoice = !_isPlayingVoice),
+            onTap: _toggleVoicePlayback,
+            behavior: HitTestBehavior.opaque,
             child: CircleAvatar(
               radius: 16.r,
               backgroundColor: isMe
                   ? Colors.white.withValues(alpha: 0.25)
                   : const Color(0xFF006EDB),
-              child: Icon(
-                _isPlayingVoice ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                color: Colors.white,
-                size: 18.r,
-              ),
+              child: _isLoadingAudio
+                  ? SizedBox(
+                      width: 14.r,
+                      height: 14.r,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.w,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Icon(
+                      _isPlayingVoice
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      color: Colors.white,
+                      size: 19.r,
+                    ),
             ),
           ),
           SizedBox(width: 10.w),
           _buildWaveformUI(isMe),
           SizedBox(width: 8.w),
           Text(
-            widget.message.voiceDuration ?? "0:15",
+            displayTime,
             style: GoogleFonts.outfit(
               fontSize: 12.sp,
               color: Colors.white,
@@ -210,6 +444,11 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble> {
           ),
         ],
       );
+    }
+
+    final rawText = widget.message.text.trim();
+    if (rawText.isEmpty) {
+      return const SizedBox.shrink();
     }
 
     return Text(
@@ -294,22 +533,64 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble> {
   }
 
   Widget _buildWaveformUI(bool isMe) {
-    final heights = [10.h, 18.h, 6.h, 22.h, 14.h, 26.h, 12.h, 20.h, 8.h, 16.h];
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: heights.map((h) {
-        return Container(
-          margin: EdgeInsets.symmetric(horizontal: 1.5.w),
-          width: 3.w,
-          height: h,
-          decoration: BoxDecoration(
-            color: isMe
-                ? Colors.white.withValues(alpha: _isPlayingVoice ? 0.9 : 0.6)
-                : const Color(0xFF006EDB).withValues(alpha: _isPlayingVoice ? 0.9 : 0.6),
-            borderRadius: BorderRadius.circular(2.r),
-          ),
+    final baseHeights = [
+      10.h,
+      18.h,
+      8.h,
+      22.h,
+      14.h,
+      26.h,
+      12.h,
+      20.h,
+      9.h,
+      24.h,
+      16.h,
+      12.h,
+    ];
+    final totalMs = _totalDuration.inMilliseconds > 0
+        ? _totalDuration.inMilliseconds
+        : 15000;
+    final progress =
+        (_currentPosition.inMilliseconds / totalMs).clamp(0.0, 1.0);
+    final activeBarCount = (progress * baseHeights.length).round();
+
+    return AnimatedBuilder(
+      animation: _waveAnimController ?? const AlwaysStoppedAnimation(0.0),
+      builder: (context, _) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(baseHeights.length, (index) {
+            final isBarActive = index <= activeBarCount;
+            double h = baseHeights[index];
+
+            if (_isPlayingVoice && _waveAnimController != null) {
+              final phase = (_waveAnimController!.value * 2 * math.pi) +
+                  (index * 0.55);
+              final dynamicFactor = (math.sin(phase) * 3.5.h);
+              h = (h + dynamicFactor).clamp(6.h, 28.h);
+            }
+
+            final double opacity;
+            if (isBarActive) {
+              opacity = 1.0;
+            } else {
+              opacity = isMe ? 0.35 : 0.3;
+            }
+
+            return Container(
+              margin: EdgeInsets.symmetric(horizontal: 1.5.w),
+              width: 3.w,
+              height: h,
+              decoration: BoxDecoration(
+                color: isMe
+                    ? Colors.white.withValues(alpha: opacity)
+                    : const Color(0xFF006EDB).withValues(alpha: opacity),
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            );
+          }),
         );
-      }).toList(),
+      },
     );
   }
 

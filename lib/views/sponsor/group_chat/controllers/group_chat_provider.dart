@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/chat_websocket_service.dart';
@@ -8,6 +9,7 @@ import '../../chat/repositories/chat_repository.dart';
 import '../models/group_chat_header_model.dart';
 import '../models/group_chat_model.dart';
 import '../repositories/group_chat_repository.dart';
+import '../../profile/controllers/sponsor_profile_provider.dart';
 
 class GroupChatState {
   final String? conversationId;
@@ -84,6 +86,7 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
   late final TextEditingController messageController;
   late final ScrollController scrollController;
   String? _currentUserId;
+  String? _currentUserName;
 
   StreamSubscription<Map<String, dynamic>>? _wsSubscription;
 
@@ -109,6 +112,18 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
     String? projectTitle,
   }) async {
     _currentUserId = await StorageService.getUuid();
+    _currentUserName = await StorageService.getUserName();
+    if (_currentUserName == null || _currentUserName!.isEmpty) {
+      try {
+        final profile = ref.read(sponsorProfileProvider).profile;
+        if (profile != null &&
+            profile.name.isNotEmpty &&
+            profile.name != 'Member') {
+          _currentUserName = profile.name;
+          await StorageService.saveUserName(profile.name);
+        }
+      } catch (_) {}
+    }
 
     state = state.copyWith(
       conversationId: conversationId,
@@ -134,10 +149,8 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
 
     if (targetConvId != null && targetConvId.isNotEmpty) {
       await _connectWebSocket(targetConvId);
-      await Future.wait([
-        _fetchHeader(targetConvId),
-        _fetchMessages(targetConvId),
-      ]);
+      await _fetchHeader(targetConvId);
+      await _fetchMessages(targetConvId);
     } else {
       state = state.copyWith(
         isLoading: false,
@@ -151,6 +164,35 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
     try {
       final header = await _chatRepo.fetchConversationHeader(convId);
       final names = header.participants.map((p) => p.name).toList();
+
+      if (header.isOwner) {
+        final ownerParticipant =
+            header.participants.where((p) => p.isOwner).firstOrNull;
+        if (ownerParticipant != null) {
+          if (_currentUserId == null || _currentUserId!.isEmpty) {
+            _currentUserId = ownerParticipant.userId.toString();
+            await StorageService.saveUuid(_currentUserId!);
+          }
+          if (_currentUserName == null || _currentUserName!.isEmpty) {
+            _currentUserName = ownerParticipant.name;
+            await StorageService.saveUserName(_currentUserName!);
+          }
+        }
+      } else {
+        final myPart = header.participants
+            .where((p) =>
+                (_currentUserId != null &&
+                    p.userId.toString() == _currentUserId) ||
+                (_currentUserName != null &&
+                    p.name.trim().toLowerCase() ==
+                        _currentUserName!.trim().toLowerCase()))
+            .firstOrNull;
+        if (myPart != null) {
+          _currentUserId ??= myPart.userId.toString();
+          _currentUserName ??= myPart.name;
+        }
+      }
+
       state = state.copyWith(
         isOwner: header.isOwner,
         isKicked: !header.isActive,
@@ -167,7 +209,11 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
 
   Future<void> _fetchMessages(String convId) async {
     try {
-      final fetchedMessages = await _chatRepo.fetchMessages(convId);
+      final fetchedMessages = await _chatRepo.fetchMessages(
+        convId,
+        currentUserId: _currentUserId,
+        currentUserName: _currentUserName,
+      );
 
       // Collect active participants from message history
       final participantSet = <String>{};
@@ -193,11 +239,10 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
       );
 
       _chatRepo.markConversationAsRead(convId);
-    } catch (_) {
+    } catch (e) {
+      debugPrint("Fetch messages error for $convId: $e");
       state = state.copyWith(
         isLoading: false,
-        messages: const [],
-        suggestions: const [],
       );
     } finally {
       _scrollToBottom();
@@ -232,30 +277,67 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
                 ? event['data'] as Map<String, dynamic>
                 : null);
         if (msgData != null) {
-          final newMsg = GroupChatMessage.fromJson(msgData);
-          if (!state.messages.any((m) => m.id == newMsg.id)) {
-            final updatedParticipants = List<String>.from(state.participants);
-            if (!newMsg.isMe &&
-                !newMsg.isAi &&
-                newMsg.senderName.trim().isNotEmpty &&
-                newMsg.senderName.trim().toLowerCase() != 'user' &&
-                newMsg.senderName.trim().toLowerCase() != 'you') {
-              if (!updatedParticipants.contains(newMsg.senderName.trim())) {
-                updatedParticipants.add(newMsg.senderName.trim());
-              }
-            }
+          final newMsg = GroupChatMessage.fromJson(
+            msgData,
+            currentUserId: _currentUserId,
+            currentUserName: _currentUserName,
+          );
 
-            state = state.copyWith(
-              messages: [...state.messages, newMsg],
-              participants: updatedParticipants,
+          // 1. Avoid duplicate if message already exists with real ID
+          if (state.messages.any((m) => m.id == newMsg.id && !m.id.startsWith('temp_'))) {
+            break;
+          }
+
+          // 2. If it's my message, reconcile with pending optimistic message
+          if (newMsg.isMe) {
+            final tempIndex = state.messages.lastIndexWhere(
+              (m) =>
+                  m.id.startsWith('temp_') &&
+                  m.type == newMsg.type &&
+                  (newMsg.type != ChatMessageType.text ||
+                      m.text.trim() == newMsg.text.trim()),
             );
-            _scrollToBottom();
-
-            if (!newMsg.isMe) {
-              final ws = ref.read(chatWebSocketServiceProvider);
-              final msgId = int.tryParse(newMsg.id);
-              if (msgId != null) ws.markRead(msgId);
+            if (tempIndex != -1) {
+              final existing = state.messages[tempIndex];
+              final hasLocalFile = existing.mediaUrl != null &&
+                  File(existing.mediaUrl!).existsSync() &&
+                  File(existing.mediaUrl!).lengthSync() > 10;
+              final merged = newMsg.copyWith(
+                mediaUrl: hasLocalFile
+                    ? existing.mediaUrl
+                    : (newMsg.mediaUrl ?? existing.mediaUrl),
+                voiceDuration: newMsg.voiceDuration ?? existing.voiceDuration,
+              );
+              final updated = List<GroupChatMessage>.from(state.messages);
+              updated[tempIndex] = merged;
+              state = state.copyWith(messages: updated);
+              _scrollToBottom();
+              break;
             }
+          }
+
+          // 3. Otherwise, append to messages
+          final updatedParticipants = List<String>.from(state.participants);
+          if (!newMsg.isMe &&
+              !newMsg.isAi &&
+              newMsg.senderName.trim().isNotEmpty &&
+              newMsg.senderName.trim().toLowerCase() != 'user' &&
+              newMsg.senderName.trim().toLowerCase() != 'you') {
+            if (!updatedParticipants.contains(newMsg.senderName.trim())) {
+              updatedParticipants.add(newMsg.senderName.trim());
+            }
+          }
+
+          state = state.copyWith(
+            messages: [...state.messages, newMsg],
+            participants: updatedParticipants,
+          );
+          _scrollToBottom();
+
+          if (!newMsg.isMe) {
+            final ws = ref.read(chatWebSocketServiceProvider);
+            final msgId = int.tryParse(newMsg.id);
+            if (msgId != null) ws.markRead(msgId);
           }
         }
         break;
@@ -354,6 +436,7 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
       isMe: true,
       text: text,
       time: timeStr,
+      type: ChatMessageType.text,
     );
 
     state = state.copyWith(messages: [...state.messages, optimisticMsg]);
@@ -361,7 +444,10 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
 
     final ws = ref.read(chatWebSocketServiceProvider);
     final sent = ws.sendMessage(text: text);
-    if (!sent && state.conversationId == null) {
+    if (!sent && state.conversationId != null) {
+      await ws.connect(state.conversationId!);
+      ws.sendMessage(text: text);
+    } else if (!sent && state.conversationId == null) {
       await _fallbackRepo.sendMessage(text);
     }
   }
@@ -399,11 +485,19 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
       final uploadedUrl = uploadRes['media_url'] as String? ?? imagePath;
 
       final ws = ref.read(chatWebSocketServiceProvider);
-      ws.sendMessage(
+      final sent = ws.sendMessage(
         text: 'Photo',
         messageType: 'image',
         mediaUrl: uploadedUrl,
       );
+      if (!sent && state.conversationId != null) {
+        await ws.connect(state.conversationId!);
+        ws.sendMessage(
+          text: 'Photo',
+          messageType: 'image',
+          mediaUrl: uploadedUrl,
+        );
+      }
     } catch (_) {}
   }
 
@@ -432,23 +526,40 @@ class GroupChatNotifier extends Notifier<GroupChatState> {
     state = state.copyWith(messages: [...state.messages, optimisticMsg]);
     _scrollToBottom();
 
-    if (filePath != null && filePath.isNotEmpty) {
+    String? uploadedUrl;
+    if (filePath != null && filePath.isNotEmpty && File(filePath).existsSync()) {
       try {
         final uploadRes = await _chatRepo.uploadMedia(
           filePath: filePath,
           type: 'voice',
           voiceDuration: duration,
         );
-        final uploadedUrl = uploadRes['media_url'] as String?;
+        debugPrint("Voice upload response: $uploadRes");
+        uploadedUrl = (uploadRes['media_url'] ??
+                uploadRes['file'] ??
+                uploadRes['url'] ??
+                uploadRes['media'])
+            ?.toString();
+      } catch (e) {
+        debugPrint("Error uploading voice file: $e");
+      }
+    }
 
-        final ws = ref.read(chatWebSocketServiceProvider);
-        ws.sendMessage(
-          text: 'Voice message',
-          messageType: 'voice',
-          mediaUrl: uploadedUrl,
-          voiceDuration: duration,
-        );
-      } catch (_) {}
+    final ws = ref.read(chatWebSocketServiceProvider);
+    final sent = ws.sendMessage(
+      text: 'Voice message',
+      messageType: 'voice',
+      mediaUrl: uploadedUrl,
+      voiceDuration: duration,
+    );
+    if (!sent && state.conversationId != null) {
+      await ws.connect(state.conversationId!);
+      ws.sendMessage(
+        text: 'Voice message',
+        messageType: 'voice',
+        mediaUrl: uploadedUrl,
+        voiceDuration: duration,
+      );
     }
   }
 

@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/chat_websocket_service.dart';
+import '../../../../core/services/storage_service.dart';
 import '../models/chat_item_model.dart';
 import '../models/chat_message_model.dart';
 import '../repositories/chat_repository.dart';
@@ -46,6 +48,8 @@ class DirectChatNotifier extends Notifier<DirectChatState> {
   late final ChatRepository _chatRepo;
   late final TextEditingController textController;
   late final ScrollController scrollController;
+  String? _currentUserId;
+  String? _currentUserName;
 
   StreamSubscription<Map<String, dynamic>>? _wsSubscription;
 
@@ -70,6 +74,8 @@ class DirectChatNotifier extends Notifier<DirectChatState> {
   }
 
   Future<void> _init() async {
+    _currentUserId = await StorageService.getUuid();
+    _currentUserName = await StorageService.getUserName();
     final isBackendId = int.tryParse(chatItem.id) != null;
 
     if (isBackendId) {
@@ -82,7 +88,11 @@ class DirectChatNotifier extends Notifier<DirectChatState> {
 
   Future<void> _fetchMessages(String convId) async {
     try {
-      final fetched = await _chatRepo.fetchMessages(convId);
+      final fetched = await _chatRepo.fetchMessages(
+        convId,
+        currentUserId: _currentUserId,
+        currentUserName: _currentUserName,
+      );
       if (fetched.isNotEmpty) {
         final mapped = fetched
             .map((g) => ChatMessageModel(
@@ -148,17 +158,50 @@ class DirectChatNotifier extends Notifier<DirectChatState> {
           final newMsg = ChatMessageModel.fromJson(
             msgData,
             chatId: chatItem.id,
+            currentUserId: _currentUserId,
+            currentUserName: _currentUserName,
           );
 
-          if (!state.messages.any((m) => m.id == newMsg.id)) {
-            state = state.copyWith(messages: [...state.messages, newMsg]);
-            _scrollToBottom();
+          // 1. Avoid duplicate if message already exists with real ID
+          if (state.messages.any((m) => m.id == newMsg.id && !m.id.startsWith('temp_'))) {
+            break;
+          }
 
-            if (!newMsg.isMe) {
-              final ws = ref.read(chatWebSocketServiceProvider);
-              final msgId = int.tryParse(newMsg.id);
-              if (msgId != null) ws.markRead(msgId);
+          // 2. If it's my message, reconcile with pending optimistic message
+          if (newMsg.isMe) {
+            final tempIndex = state.messages.lastIndexWhere(
+              (m) =>
+                  m.id.startsWith('temp_') &&
+                  m.type == newMsg.type &&
+                  (newMsg.type != ChatMessageType.text ||
+                      m.text.trim() == newMsg.text.trim()),
+            );
+            if (tempIndex != -1) {
+              final existing = state.messages[tempIndex];
+              final hasLocalFile = existing.mediaUrl != null &&
+                  File(existing.mediaUrl!).existsSync() &&
+                  File(existing.mediaUrl!).lengthSync() > 10;
+              final merged = newMsg.copyWith(
+                mediaUrl: hasLocalFile
+                    ? existing.mediaUrl
+                    : (newMsg.mediaUrl ?? existing.mediaUrl),
+                voiceDuration: newMsg.voiceDuration ?? existing.voiceDuration,
+              );
+              final updated = List<ChatMessageModel>.from(state.messages);
+              updated[tempIndex] = merged;
+              state = state.copyWith(messages: updated);
+              _scrollToBottom();
+              break;
             }
+          }
+
+          state = state.copyWith(messages: [...state.messages, newMsg]);
+          _scrollToBottom();
+
+          if (!newMsg.isMe) {
+            final ws = ref.read(chatWebSocketServiceProvider);
+            final msgId = int.tryParse(newMsg.id);
+            if (msgId != null) ws.markRead(msgId);
           }
         }
         break;
@@ -204,7 +247,11 @@ class DirectChatNotifier extends Notifier<DirectChatState> {
     _scrollToBottom();
 
     final ws = ref.read(chatWebSocketServiceProvider);
-    ws.sendMessage(text: text);
+    final sent = ws.sendMessage(text: text);
+    if (!sent && int.tryParse(chatItem.id) != null) {
+      await ws.connect(chatItem.id);
+      ws.sendMessage(text: text);
+    }
   }
 
   Future<void> sendImageMessage(String imagePath) async {
@@ -236,11 +283,19 @@ class DirectChatNotifier extends Notifier<DirectChatState> {
       final uploadedUrl = uploadRes['media_url'] as String? ?? imagePath;
 
       final ws = ref.read(chatWebSocketServiceProvider);
-      ws.sendMessage(
+      final sent = ws.sendMessage(
         text: 'Photo',
         messageType: 'image',
         mediaUrl: uploadedUrl,
       );
+      if (!sent && int.tryParse(chatItem.id) != null) {
+        await ws.connect(chatItem.id);
+        ws.sendMessage(
+          text: 'Photo',
+          messageType: 'image',
+          mediaUrl: uploadedUrl,
+        );
+      }
     } catch (_) {}
   }
 
@@ -264,23 +319,40 @@ class DirectChatNotifier extends Notifier<DirectChatState> {
     state = state.copyWith(messages: [...state.messages, newMessage]);
     _scrollToBottom();
 
-    if (filePath != null && filePath.isNotEmpty) {
+    String? uploadedUrl;
+    if (filePath != null && filePath.isNotEmpty && File(filePath).existsSync()) {
       try {
         final uploadRes = await _chatRepo.uploadMedia(
           filePath: filePath,
           type: 'voice',
           voiceDuration: duration,
         );
-        final uploadedUrl = uploadRes['media_url'] as String?;
+        debugPrint("Direct chat voice upload response: $uploadRes");
+        uploadedUrl = (uploadRes['media_url'] ??
+                uploadRes['file'] ??
+                uploadRes['url'] ??
+                uploadRes['media'])
+            ?.toString();
+      } catch (e) {
+        debugPrint("Error uploading voice file in direct chat: $e");
+      }
+    }
 
-        final ws = ref.read(chatWebSocketServiceProvider);
-        ws.sendMessage(
-          text: 'Voice message',
-          messageType: 'voice',
-          mediaUrl: uploadedUrl,
-          voiceDuration: duration,
-        );
-      } catch (_) {}
+    final ws = ref.read(chatWebSocketServiceProvider);
+    final sent = ws.sendMessage(
+      text: 'Voice message',
+      messageType: 'voice',
+      mediaUrl: uploadedUrl,
+      voiceDuration: duration,
+    );
+    if (!sent && int.tryParse(chatItem.id) != null) {
+      await ws.connect(chatItem.id);
+      ws.sendMessage(
+        text: 'Voice message',
+        messageType: 'voice',
+        mediaUrl: uploadedUrl,
+        voiceDuration: duration,
+      );
     }
   }
 

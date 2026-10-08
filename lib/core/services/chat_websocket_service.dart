@@ -87,8 +87,12 @@ class ChatWebSocketService {
       'type': 'send_message',
       'message_type': messageType,
       'text': text,
+      'content': text,
+      'message': text,
       'media_url': ?mediaUrl,
+      'file': ?mediaUrl,
       'voice_duration': ?voiceDuration,
+      'duration': ?voiceDuration,
     };
 
     try {

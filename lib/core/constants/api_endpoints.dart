@@ -1,14 +1,23 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiEndpoints {
-  static String get baseUrl =>
-      dotenv.env['BASE_URL'] ?? "https://clubby-andy-irksomely.ngrok-free.dev";
+  static String get baseUrl {
+    if (dotenv.isInitialized) {
+      try {
+        final url = dotenv.env['BASE_URL'];
+        if (url != null && url.isNotEmpty) return url;
+      } catch (_) {}
+    }
+    return "https://clubby-andy-irksomely.ngrok-free.dev";
+  }
   static const String register = "/api/v1/auth/register/";
   static const String verifyOtp = "/api/v1/auth/verify-otp/";
   static const String resendOtp = "/api/v1/auth/resend-otp/";
   static const String refreshToken = "/api/v1/auth/token/refresh/";
   static const String login = "/api/v1/auth/login/";
   static const String logout = "/api/v1/auth/logout/";
+  static const String googleLogin = "/api/v1/auth/google/";
+  static const String appleLogin = "/api/v1/auth/apple/";
 
   // Onboarding & Profiles
   static const String setRole = "/api/v1/profiles/set-role/";

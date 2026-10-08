@@ -8,6 +8,7 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_spacing.dart';
 import '../../../../core/widgets/common_background.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../providers/social_auth_provider.dart';
 import '../../widgets/labeled_text_field.dart';
 import '../../widgets/social_auth_section.dart';
 import '../models/signup_request_model.dart';
@@ -141,8 +142,10 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
   @override
   Widget build(BuildContext context) {
     final signupState = ref.watch(signupProvider);
+    final socialState = ref.watch(socialAuthProvider);
     final state = ref.watch(signupStateProvider);
     final stateProvider = ref.read(signupStateProvider.notifier);
+    final isAnyLoading = signupState.isLoading || socialState.isLoading;
 
     return CommonBackground(
       showGrid: false,
@@ -156,7 +159,9 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
               children: [
                 const SignupHeader(),
                 AppSpacing.h14,
-                const SocialAuthSection(),
+                SocialAuthSection(
+                  enabled: !isAnyLoading,
+                ),
                 AppSpacing.h12,
 
                 Row(
@@ -273,7 +278,7 @@ class _SignUpViewState extends ConsumerState<SignUpView> {
                   width: double.infinity,
                   height: 56.h,
                   child: ElevatedButton(
-                    onPressed: signupState.isLoading ? null : _handleSignUp,
+                    onPressed: isAnyLoading ? null : _handleSignUp,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,

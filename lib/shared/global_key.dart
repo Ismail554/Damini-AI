@@ -3,6 +3,7 @@ class GlobalKeys {
   static const String access = 'access';
   static const String refresh = 'refresh';
   static const String uuid = 'uuid';
+  static const String userName = 'user_full_name';
   static const String userRole = 'user_role';
   static const String isRoleSelected = 'is_role_selected';
   static const String isApiConnected = 'is_api_connected';

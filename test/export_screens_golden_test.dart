@@ -103,7 +103,7 @@ void main() {
 
     for (final entry in screens.entries) {
       await tester.pumpWidget(buildTestableScreen(entry.value));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 300));
       tester.takeException();
 
       await expectLater(

@@ -8,6 +8,7 @@ import '../../../../shared/global_key.dart';
 import '../models/session_model.dart';
 import '../models/switch_role_response_model.dart';
 import '../repositories/switch_role_repository.dart';
+import '../../providers/social_auth_provider.dart';
 
 export '../models/session_model.dart';
 export '../models/switch_role_response_model.dart';
@@ -113,6 +114,9 @@ class SessionNotifier extends Notifier<SessionState> {
     } catch (e) {
       log('Logout API error: $e');
     } finally {
+      try {
+        await ref.read(googleAuthServiceProvider).signOut();
+      } catch (_) {}
       await NotificationService.onLogout();
       await StorageService.clearAll();
       state = state.copyWith(

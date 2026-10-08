@@ -132,7 +132,10 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
                           itemCount: state.messages.length,
                           itemBuilder: (context, index) {
                             final message = state.messages[index];
-                            return GroupChatMessageBubble(message: message);
+                            return GroupChatMessageBubble(
+                              key: ValueKey(message.id),
+                              message: message,
+                            );
                           },
                         ),
             ),

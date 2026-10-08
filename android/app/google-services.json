@@ -12,7 +12,20 @@
           "package_name": "com.braintekh.diafi"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1003008036989-d4t2houo0pt3ivfe3i4ortj0lc59a98g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.braintekh.diafi",
+            "certificate_hash": "b6a57d1f50e209bde458107221234e7f688dfe35"
+          }
+        },
+        {
+          "client_id": "1003008036989-vtiu7c5gn3936pj7jn5mg3nn5ao2k9bd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1003008036989-6tk0cdire97kg6hnk0jq91ns6hsj970u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1003008036989-pei20lpe6ngj908p6vnphjj4qpk3r7if.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.braintekh.diafi"
+              }
+            }
+          ]
         }
       }
     }

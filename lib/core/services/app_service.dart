@@ -25,13 +25,23 @@ class AppService {
       if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
-        );
-        await NotificationService.init();
-        // Fire-and-forget: never block app start on network.
-        unawaited(NotificationService.syncPendingDeviceToken());
+        ).timeout(const Duration(seconds: 4));
+
+        // Push notifications & permission requests run asynchronously
+        // so they never block runApp() or freeze on the native splash.
+        unawaited(_initPushNotifications());
       }
     } catch (e) {
       log('Firebase initialization error: $e');
+    }
+  }
+
+  static Future<void> _initPushNotifications() async {
+    try {
+      await NotificationService.init();
+      await NotificationService.syncPendingDeviceToken();
+    } catch (e) {
+      log('Push notification init error: $e');
     }
   }
 }
