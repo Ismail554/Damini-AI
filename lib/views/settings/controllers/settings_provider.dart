@@ -76,7 +76,7 @@ class SettingsNotifier extends Notifier<SettingsState> {
     }
   }
 
-  Future<bool> deleteAccount(String password) async {
+  Future<bool> deleteAccount([String? password]) async {
     return await _repository.deleteAccount(password);
   }
 }

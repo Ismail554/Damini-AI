@@ -177,10 +177,12 @@ class _SponsorProjectsViewState extends ConsumerState<SponsorProjectsView> {
             parent: BouncingScrollPhysics(),
           ),
           children: [
-            SizedBox(height: 120.h),
-            AppEmptyView(
-              message: emptyMessage,
-              icon: Icons.folder_open_rounded,
+            SizedBox(height: 60.h),
+            AppEmptyView.projects(
+              title: emptyMessage,
+              subtitle: "Start funding your dream by launching and showcasing your project to verified investors.",
+              actionLabel: "Create Project",
+              onAction: () => context.push('/create-project'),
             ),
           ],
         ),

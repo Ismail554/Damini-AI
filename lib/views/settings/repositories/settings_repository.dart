@@ -11,7 +11,7 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
 abstract class SettingsRepository {
   Future<UserSettingsModel> getUserSettings();
   Future<bool> updateNotificationPreference(bool enabled);
-  Future<bool> deleteAccount(String password);
+  Future<bool> deleteAccount([String? password]);
 }
 
 class SettingsRepositoryImpl implements SettingsRepository {
@@ -60,11 +60,10 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
-  Future<bool> deleteAccount(String password) async {
+  Future<bool> deleteAccount([String? password]) async {
     try {
-      final response = await _apiService.post(
+      final response = await _apiService.delete(
         ApiEndpoints.deleteAccount,
-        data: {'password': password},
         requireAuth: true,
       );
       return response.statusCode == 200 ||

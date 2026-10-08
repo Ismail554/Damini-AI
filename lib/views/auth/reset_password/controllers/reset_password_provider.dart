@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/reset_password_model.dart';
 import '../repositories/reset_password_repository.dart';
 
 final resetPasswordRepositoryProvider = Provider<ResetPasswordRepository>((ref) {
-  return ResetPasswordRepositoryImpl();
+  return ResetPasswordRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
 class ResetPasswordState {
@@ -40,13 +41,23 @@ class ResetPasswordNotifier extends Notifier<ResetPasswordState> {
   @override
   ResetPasswordState build() => const ResetPasswordState();
 
-  Future<bool> resetPassword(String newPassword) async {
+  Future<bool> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
     state = state.copyWith(isLoading: true, clearError: true, isSuccess: false);
 
     try {
       final repository = ref.read(resetPasswordRepositoryProvider);
       final response = await repository.resetPassword(
-        ResetPasswordRequestModel(newPassword: newPassword),
+        ResetPasswordRequestModel(
+          email: email,
+          code: code,
+          newPassword: newPassword,
+          confirmPassword: confirmPassword,
+        ),
       );
 
       if (response.success) {

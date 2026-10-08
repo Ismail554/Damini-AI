@@ -15,6 +15,7 @@ import '../widgets/investor_category_chip.dart';
 import '../widgets/trending_opportunity_card.dart';
 import '../../../profile/widgets/profile_quick_view_sheet.dart';
 import 'package:Braintech/core/widgets/app_avatar.dart';
+import 'package:Braintech/core/widgets/app_state_widgets.dart';
 
 class InvestorDashboard extends ConsumerStatefulWidget {
   const InvestorDashboard({super.key});
@@ -314,39 +315,17 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
   Widget _buildEmptySearchState(AppThemeColors tc, String query) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 20.w),
       decoration: BoxDecoration(
         color: tc.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         border: Border.all(color: tc.borderColor),
       ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.search_off_rounded,
-            size: 48.sp,
-            color: tc.textTertiary,
-          ),
-          AppSpacing.h12,
-          Text(
-            "No results found for \"$query\"",
-            style: GoogleFonts.outfit(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.w600,
-              color: tc.textPrimary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          AppSpacing.h6,
-          Text(
-            "Try searching for another keyword or category.",
-            style: GoogleFonts.outfit(
-              fontSize: 12.sp,
-              color: tc.textTertiary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: AppEmptyView.search(
+        query: query,
+        onClear: () {
+          _searchController.clear();
+          ref.read(investorDashboardProvider.notifier).setSearchQuery('');
+        },
       ),
     );
   }
@@ -354,20 +333,16 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
   Widget _buildEmptyCategoryState(AppThemeColors tc, String category) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: tc.cardBg,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
         border: Border.all(color: tc.borderColor),
       ),
-      child: Center(
-        child: Text(
-          "No trending opportunities found in $category.",
-          style: GoogleFonts.outfit(
-            fontSize: 13.sp,
-            color: tc.textTertiary,
-          ),
-        ),
+      child: AppEmptyView(
+        isCompact: true,
+        title: "No $category Opportunities",
+        subtitle: "There are currently no trending deals listed in the $category category.",
+        icon: Icons.category_outlined,
       ),
     );
   }
@@ -430,13 +405,14 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
 
   Widget _buildFeaturedList(List<FeaturedOpportunityModel> items) {
     if (items.isEmpty) {
-      return SizedBox(
-        height: 100.h,
-        child: Center(
-          child: Text(
-            "No featured opportunities available in this category.",
-            style: GoogleFonts.outfit(fontSize: 13.sp, color: Colors.grey),
-          ),
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 8.h),
+        child: const AppEmptyView(
+          isCompact: true,
+          title: "No Featured Opportunities",
+          subtitle: "No featured opportunities available in this category.",
+          icon: Icons.star_border_rounded,
         ),
       );
     }

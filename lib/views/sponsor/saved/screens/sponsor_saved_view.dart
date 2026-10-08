@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import '../../../../core/services/api_error_handler.dart';
@@ -464,15 +465,22 @@ class SponsorSavedView extends ConsumerWidget {
       }
 
       if (state.projects.isEmpty) {
-        String emptyMsg = "No saved projects yet";
+        String emptyTitle = "No Saved Projects Yet";
+        String emptySub = "You haven't bookmarked any projects yet. Discover and save projects to easily access them.";
         if (state.searchQuery.isNotEmpty) {
-          emptyMsg = 'No saved projects found for "${state.searchQuery}"';
+          emptyTitle = "No Projects Found";
+          emptySub = 'No saved projects found matching "${state.searchQuery}".';
         } else if (state.selectedFilter.toLowerCase() != 'all') {
-          emptyMsg = 'No ${state.selectedFilter.toLowerCase()} projects found';
+          emptyTitle = "No ${state.selectedFilter} Projects";
+          emptySub = 'No saved projects found in the ${state.selectedFilter} category.';
         }
-        return AppEmptyView(
-          message: emptyMsg,
-          icon: Icons.bookmark_border_rounded,
+        return AppEmptyView.saved(
+          title: emptyTitle,
+          subtitle: emptySub,
+          actionLabel: state.searchQuery.isNotEmpty ? "Clear Search" : "Explore Projects",
+          onAction: state.searchQuery.isNotEmpty
+              ? () => ref.read(sponsorSavedProvider.notifier).clearSearch()
+              : () => context.push('/all-projects'),
         );
       }
 
@@ -511,10 +519,15 @@ class SponsorSavedView extends ConsumerWidget {
       final profiles = state.profiles;
       if (profiles.isEmpty) {
         return AppEmptyView(
-          message: state.searchQuery.isNotEmpty
-              ? 'No saved profiles found for "${state.searchQuery}"'
-              : "No saved profiles yet",
+          title: state.searchQuery.isNotEmpty ? "No Profiles Found" : "No Saved Profiles Yet",
+          subtitle: state.searchQuery.isNotEmpty
+              ? 'No saved profiles found matching "${state.searchQuery}".'
+              : "You haven't saved any investor or partner profiles yet. Bookmark profiles to see them here.",
           icon: Icons.person_outline_rounded,
+          actionLabel: state.searchQuery.isNotEmpty ? "Clear Search" : null,
+          onAction: state.searchQuery.isNotEmpty
+              ? () => ref.read(sponsorSavedProvider.notifier).clearSearch()
+              : null,
         );
       }
 

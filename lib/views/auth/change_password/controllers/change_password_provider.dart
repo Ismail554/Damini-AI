@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/api_service.dart';
+import '../models/change_password_model.dart';
 export '../models/change_password_model.dart';
 import '../repositories/change_password_repository.dart';
 
 final changePasswordRepositoryProvider =
     Provider<ChangePasswordRepository>((ref) {
-  return ChangePasswordRepositoryImpl();
+  return ChangePasswordRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
 class ChangePasswordState {
@@ -13,12 +15,14 @@ class ChangePasswordState {
   final bool obscureNew;
   final bool obscureConfirm;
   final bool isLoading;
+  final String? errorMessage;
 
   const ChangePasswordState({
     this.obscureCurrent = true,
     this.obscureNew = true,
     this.obscureConfirm = true,
     this.isLoading = false,
+    this.errorMessage,
   });
 
   ChangePasswordState copyWith({
@@ -26,12 +30,15 @@ class ChangePasswordState {
     bool? obscureNew,
     bool? obscureConfirm,
     bool? isLoading,
+    String? errorMessage,
+    bool clearError = false,
   }) {
     return ChangePasswordState(
       obscureCurrent: obscureCurrent ?? this.obscureCurrent,
       obscureNew: obscureNew ?? this.obscureNew,
       obscureConfirm: obscureConfirm ?? this.obscureConfirm,
       isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 }
@@ -84,9 +91,24 @@ class ChangePasswordNotifier extends Notifier<ChangePasswordState> {
   }
 
   Future<bool> changePassword() async {
-    state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(milliseconds: 1000));
-    state = state.copyWith(isLoading: false);
-    return true;
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final repo = ref.read(changePasswordRepositoryProvider);
+      final success = await repo.changePassword(
+        ChangePasswordModel(
+          currentPassword: currentPasswordController.text.trim(),
+          newPassword: newPasswordController.text.trim(),
+          confirmPassword: confirmPasswordController.text.trim(),
+        ),
+      );
+      state = state.copyWith(isLoading: false);
+      return success;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
   }
 }

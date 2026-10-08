@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
+import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,7 +52,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
                       _buildFilterChips(tc, ref, historyState.selectedFilter),
                       AppSpacing.h16,
                       if (records.isEmpty)
-                        _buildEmptyState(tc)
+                        _buildEmptyState(context, tc, historyState.selectedFilter)
                       else
                         ListView.separated(
                           shrinkWrap: true,
@@ -502,24 +503,18 @@ class InvestmentHistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(AppThemeColors tc) {
+  Widget _buildEmptyState(BuildContext context, AppThemeColors tc, String currentFilter) {
     return Padding(
-      padding: EdgeInsets.only(top: 40.h),
-      child: Center(
-        child: Column(
-          children: [
-            Icon(Icons.trending_up_rounded, size: 48.r, color: tc.textTertiary),
-            SizedBox(height: 12.h),
-            Text(
-              "No investment records found",
-              style: GoogleFonts.outfit(
-                fontSize: 15.sp,
-                fontWeight: FontWeight.w600,
-                color: tc.textSecondary,
-              ),
-            ),
-          ],
-        ),
+      padding: EdgeInsets.only(top: 24.h),
+      child: AppEmptyView.investments(
+        title: currentFilter != "All"
+            ? "No $currentFilter Investments"
+            : "No Investment Records Yet",
+        subtitle: currentFilter != "All"
+            ? "There are no investments in the '$currentFilter' status."
+            : "You haven't committed to any deals yet. Browse active investment opportunities to start building your portfolio.",
+        actionLabel: "Explore Opportunities",
+        onAction: () => context.push('/discover'),
       ),
     );
   }

@@ -206,9 +206,14 @@ class ChangePasswordView extends ConsumerWidget {
     }
 
     final success = await notifier.changePassword();
-    if (success && context.mounted) {
+    if (!context.mounted) return;
+    if (success) {
       CustomSnackBar.success(context, "Password updated successfully!");
       context.pop();
+    } else {
+      final error = ref.read(changePasswordProvider).errorMessage ??
+          "Failed to update password";
+      CustomSnackBar.error(context, error);
     }
   }
 }

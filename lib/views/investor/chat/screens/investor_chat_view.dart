@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
+import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import '../../../sponsor/chat/models/chat_item_model.dart';
 import '../../../sponsor/chat/widgets/chat_search_bar.dart';
 import '../controllers/investor_chat_provider.dart';
@@ -43,26 +44,24 @@ class InvestorChatView extends ConsumerWidget {
             hintText: "Search conversations...",
           ),
           SizedBox(height: AppDimens.spaceLg),
-          if (state.isLoading)
-            Padding(
-              padding: EdgeInsets.only(top: 40.h),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF006EDB),
+          if (state.isLoading && state.chats.isEmpty)
+            Column(
+              children: List.generate(
+                4,
+                (index) => Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: const AppShimmer.card(height: 72),
                 ),
               ),
             )
           else if (state.chats.isEmpty)
             Padding(
               padding: EdgeInsets.only(top: 40.h),
-              child: Center(
-                child: Text(
-                  "No messages found",
-                  style: GoogleFonts.outfit(
-                    fontSize: 14.sp,
-                    color: tc.textTertiary,
-                  ),
-                ),
+              child: AppEmptyView.messages(
+                title: state.searchQuery.isNotEmpty ? "No Messages Found" : "No Messages Yet",
+                subtitle: state.searchQuery.isNotEmpty
+                    ? 'No conversations found matching "${state.searchQuery}".'
+                    : "You don't have any active conversations. Start chatting with project sponsors.",
               ),
             )
           else

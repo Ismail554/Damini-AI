@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
+import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
+import 'package:go_router/go_router.dart';
 import '../controllers/investor_saved_provider.dart';
 import '../widgets/investor_saved_filter_modal.dart';
 import '../widgets/investor_saved_project_card.dart';
@@ -66,15 +68,14 @@ class InvestorSavedView extends ConsumerWidget {
               // Project Cards List
               if (items.isEmpty)
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40.h),
-                  child: Center(
-                    child: Text(
-                      "No saved projects match the selected filter.",
-                      style: GoogleFonts.outfit(
-                        fontSize: 14.sp,
-                        color: tc.textSecondary,
-                      ),
-                    ),
+                  padding: EdgeInsets.symmetric(vertical: 20.h),
+                  child: AppEmptyView.saved(
+                    title: "No Saved Projects",
+                    subtitle: state.filterSelected != 'Newest'
+                        ? "No saved projects match the '${state.filterSelected}' filter."
+                        : "You haven't bookmarked any opportunities yet. Discover projects to invest in.",
+                    actionLabel: "Discover Projects",
+                    onAction: () => context.push('/discover'),
                   ),
                 )
               else

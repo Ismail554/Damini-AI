@@ -439,14 +439,11 @@ class _CollaborationRequestsViewState
   }
 
   Widget _buildEmptyState(String message) {
-    final tc = AppThemeColors.of(context);
-    return Center(
-      child: Text(
-        message,
-        style: GoogleFonts.outfit(
-          fontSize: 14.sp,
-          color: tc.textTertiary,
-        ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: AppEmptyView.requests(
+        title: message,
+        subtitle: "When investors send proposals or fund confirmations, they will appear right here.",
       ),
     );
   }

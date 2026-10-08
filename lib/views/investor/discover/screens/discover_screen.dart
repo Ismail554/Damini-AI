@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
+import 'package:Braintech/core/widgets/app_state_widgets.dart';
 import 'package:Braintech/core/widgets/common_background.dart';
 import '../../../sponsor/public_view/models/project_public_view_model.dart';
 import '../controllers/discover_provider.dart';
@@ -589,32 +590,28 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   }
 
   Widget _buildEmptyState(AppThemeColors tc) {
+    final discoverState = ref.read(discoverProvider);
+    final hasSearch = discoverState.searchQuery.trim().isNotEmpty;
+    final hasCategory = discoverState.selectedCategoryIndex != 0;
+
     return Center(
       child: Padding(
         padding: EdgeInsets.all(24.r),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_off_rounded, size: 48.r, color: tc.textTertiary),
-            SizedBox(height: 12.h),
-            Text(
-              "No deals found",
-              style: GoogleFonts.outfit(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-                color: tc.textPrimary,
-              ),
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              "Try selecting another category or clearing search filters.",
-              style: GoogleFonts.outfit(
-                fontSize: 13.sp,
-                color: tc.textTertiary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        child: AppEmptyView(
+          title: hasSearch ? "No Deals Found" : "No Deals in this Category",
+          subtitle: hasSearch
+              ? 'No investment opportunities matching "${discoverState.searchQuery}". Try a different keyword.'
+              : "No deals are currently listed under this category. Check back soon or browse all deals.",
+          icon: hasSearch ? Icons.search_off_rounded : Icons.folder_open_rounded,
+          actionLabel: (hasSearch || hasCategory) ? "Reset Filters" : null,
+          actionIcon: Icons.refresh_rounded,
+          onAction: (hasSearch || hasCategory)
+              ? () {
+                  _searchController.clear();
+                  ref.read(discoverProvider.notifier).setSearchQuery('');
+                  ref.read(discoverProvider.notifier).selectCategory(0);
+                }
+              : null,
         ),
       ),
     );

@@ -61,12 +61,12 @@ class SponsorChatView extends ConsumerWidget {
               )
             else if (state.chats.isEmpty)
               Padding(
-                padding: EdgeInsets.only(top: 80.h),
-                child: const Center(
-                  child: AppEmptyView(
-                    message: "No conversations found",
-                    icon: Icons.chat_bubble_outline_rounded,
-                  ),
+                padding: EdgeInsets.only(top: 40.h),
+                child: AppEmptyView.messages(
+                  title: state.searchQuery.isNotEmpty ? "No Messages Found" : "No Messages Yet",
+                  subtitle: state.searchQuery.isNotEmpty
+                      ? 'No conversations found matching "${state.searchQuery}".'
+                      : "You don't have any active conversations. Start chatting with investors.",
                 ),
               )
             else

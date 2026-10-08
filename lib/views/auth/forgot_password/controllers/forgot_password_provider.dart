@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/forgot_password_model.dart';
 import '../repositories/forgot_password_repository.dart';
 
 final forgotPasswordRepositoryProvider = Provider<ForgotPasswordRepository>((ref) {
-  return ForgotPasswordRepositoryImpl();
+  return ForgotPasswordRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
 class ForgotPasswordState {

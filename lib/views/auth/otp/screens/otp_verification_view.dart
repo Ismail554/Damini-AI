@@ -72,7 +72,14 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
         isApiConnected: true,
       );
       if (message != null) CustomSnackBar.show(context, message);
-      context.go(widget.isRecovery ? '/reset-password' : '/success');
+      if (widget.isRecovery) {
+        context.go(
+          '/reset-password',
+          extra: {'email': widget.email, 'code': code},
+        );
+      } else {
+        context.go('/success');
+      }
     } else if (message != null) {
       CustomSnackBar.show(context, message, isError: true);
     }

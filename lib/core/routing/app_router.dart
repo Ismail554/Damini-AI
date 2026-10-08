@@ -106,11 +106,18 @@ class AppRouter {
       ),
       GoRoute(
         path: '/reset-password',
-        pageBuilder: (context, state) => buildNativePage(
-          context: context,
-          state: state,
-          child: const ResetPasswordView(),
-        ),
+        pageBuilder: (context, state) {
+          final extra = state.extra is Map ? (state.extra as Map) : const {};
+          final email = (extra['email'] as String?) ??
+              state.uri.queryParameters['email'];
+          final code = (extra['code'] as String?) ??
+              state.uri.queryParameters['code'];
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: ResetPasswordView(email: email, code: code),
+          );
+        },
       ),
       GoRoute(
         path: '/success',
