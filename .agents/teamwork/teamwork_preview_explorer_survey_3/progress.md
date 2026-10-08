@@ -1,0 +1,43 @@
+# Progress — Survey Explorer 3
+
+Last visited: 2026-10-08T05:58:00Z
+
+- [x] Initialized DISPATCH.md and BRIEFING.md
+- [x] Read ORIGINAL_REQUEST.md and PROJECT.md
+- [x] Inspect UI/UX consistency across lib/views/ & lib/core/theme/
+  - [x] Shimmer/skeleton vs spinner vs missing loading states:
+    - AppShimmer, AppErrorView, AppEmptyView implemented in lib/core/widgets/app_state_widgets.dart.
+    - Used only in Sponsor module (5 files) and notifications.
+    - Completely absent in Investor module (Dashboard, Discover, Saved, Investment History) where isLoading is ignored and empty states flash during fetch!
+  - [x] Empty state handling across lists, tabs, and detail views:
+    - Sponsor uses AppEmptyView.
+    - Investor screens use ad-hoc text or custom methods without icons or styling.
+  - [x] Error feedback (CustomSnackBar vs generic snackbar / silent failures):
+    - CustomSnackBar implemented with full theme support.
+    - Raw ScaffoldMessenger.of(context).showSnackBar found in forgot_password, reset_password, chat input bar, info_section_card.
+    - Investor repositories silently catch errors (`catch (_) {}`) and return static mock data instead of surfacing errors to UI.
+  - [x] Theme compliance (AppThemeColors vs hardcoded Colors.*):
+    - AppThemeColors well-structured for dark/light modes.
+    - Heavy violations: onboarding_widgets, role_selection_view, choose_type_screen, verification_pending_screen have hardcoded `Colors.white`, unreadable in light mode!
+    - app.dart hardcodes `Brightness.light` for status bar icons unconditionally.
+    - Branding inconsistency: "Damini AI" vs "Braintech" vs "Synvest".
+  - [x] Responsive layout (ScreenUtil .w, .h, .sp, .r vs raw pixels):
+    - Most views use .w, .h, .sp, .r well.
+    - Raw dimensions found in app_theme.dart (BorderRadius.circular(20)), choose_type_screen (size: 20), network_info_bar (EdgeInsets.symmetric(vertical: 4)).
+  - [x] Keyboard overflow risks:
+    - Critical RenderFlex overflow vulnerability in forgot_password_view, otp_verification_view, reset_password_view, and choose_type_screen: unscrollable Column with `const Spacer()` that collapses and overflows when soft keyboard opens.
+- [x] Inspect static analysis & linting:
+  - [x] analysis_options.yaml ignores `package_names` and `unnecessary_brace_in_string_interps`.
+  - [x] `flutter analyze` passes with 0 issues.
+- [x] Inspect automated test suite:
+  - [x] 14 test files examined.
+  - [x] Unit/widget tests pass for Auth (97 tests).
+  - [x] 1 test fails: `export_screens_golden_test.dart` (pixel diff 9.83% and unmocked HTTP 400 network calls).
+  - [x] Major coverage gaps: Sponsor (0%), Chat/WebSocket (0%), Settings/Profile (0%), NDA (0%), Subscription (0%). Investor tests only cover JSON serialization.
+- [x] Security & Storage audit:
+  - [x] Secrets: .env in assets bundle in pubspec.yaml; hardcoded fallback Firebase keys in firebase_options.dart; fallback ngrok ephemeral URL in ApiEndpoints.
+  - [x] Network security flaw: DioService disables SSL certificate validation with `badCertificateCallback = (cert, host, port) => true;`.
+  - [x] Token storage: FlutterSecureStorage used for auth tokens (access, refresh). SharedPreferences used for theme, draft, and mock repositories.
+  - [x] Build release readiness: Android build.gradle.kts lacks `isMinifyEnabled = true` (R8/ProGuard disabled), signingConfig uses debug keys in release build.
+- [ ] Synthesize findings into handoff.md
+- [ ] Send handoff message to orchestrator

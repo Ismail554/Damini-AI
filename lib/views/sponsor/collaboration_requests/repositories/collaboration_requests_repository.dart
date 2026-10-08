@@ -18,14 +18,21 @@ class CollaborationRequestsRepository {
   /// or project-specific GET /api/v1/projects/sponsor/{id}/requests/
   Future<List<CollaborationRequestModel>> fetchCollaborationRequests({
     String? projectId,
+    String? status,
   }) async {
     try {
       final endpoint = (projectId != null && projectId.isNotEmpty)
           ? ApiEndpoints.sponsorProjectRequests(projectId)
           : ApiEndpoints.sponsorCollaborationRequests;
 
+      final queryParams = <String, dynamic>{};
+      if (status != null && status.isNotEmpty) {
+        queryParams['status'] = status;
+      }
+
       final response = await _apiService.get(
         endpoint,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
         requireAuth: true,
       );
 
@@ -95,16 +102,20 @@ class CollaborationRequestsRepository {
   }
 
   /// POST /api/v1/projects/{projectId}/confirm-investors/
-  /// Confirms / approves investor requests for a project.
+  /// Confirms / approves investor requests for a project syndicate.
   Future<bool> confirmInvestors({
     required String projectId,
     required List<int> requestIds,
+    List<String>? confirmedInvestorIds,
+    String? closingDate,
   }) async {
     try {
       final response = await _apiService.post(
         ApiEndpoints.confirmInvestors(projectId),
         data: {
           'request_ids': requestIds,
+          'confirmed_investor_ids': ?confirmedInvestorIds,
+          'closing_date': ?closingDate,
         },
         requireAuth: true,
       );
@@ -123,24 +134,33 @@ class CollaborationRequestsRepository {
   }
 
   /// POST /api/v1/projects/sponsor/requests/{id}/approve/
-  Future<bool> approveRequest(String id) async {
+  Future<Map<String, dynamic>?> approveRequest(String id) async {
     try {
       final response = await _apiService.post(
         ApiEndpoints.approveCollaborationRequest(id),
         requireAuth: true,
       );
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data is Map) {
+          return Map<String, dynamic>.from(response.data as Map);
+        }
+        return {'success': true};
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
   /// POST /api/v1/projects/sponsor/requests/{id}/reject/
-  /// Rejects an investor collaboration request. No request body needed.
-  Future<bool> rejectRequest(String id) async {
+  /// Rejects an investor collaboration request with optional reason.
+  Future<bool> rejectRequest(String id, {String? reason}) async {
     try {
       final response = await _apiService.post(
         ApiEndpoints.rejectCollaborationRequest(id),
+        data: {
+          'reason': ?reason,
+        },
         requireAuth: true,
       );
       final data = response.data;
@@ -158,11 +178,20 @@ class CollaborationRequestsRepository {
   }
 
   /// POST /api/v1/projects/sponsor/requests/{id}/fund-received/
-  Future<bool> fundReceivedRequest(String id) async {
+  Future<bool> fundReceivedRequest(
+    String id, {
+    num? receivedAmount,
+    String? paymentReference,
+    DateTime? receivedAt,
+  }) async {
     try {
       final response = await _apiService.post(
         ApiEndpoints.fundReceivedCollaborationRequest(id),
-        data: {},
+        data: {
+          'received_amount': ?receivedAmount,
+          'payment_reference': ?paymentReference,
+          'received_at': receivedAt != null ? receivedAt.toIso8601String() : DateTime.now().toIso8601String(),
+        },
         requireAuth: true,
       );
       return response.statusCode == 200 || response.statusCode == 201;

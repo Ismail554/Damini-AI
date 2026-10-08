@@ -135,7 +135,14 @@ class InvestorChatView extends ConsumerWidget {
                   onTap: () {
                     ref.read(investorChatProvider.notifier).clearUnread(chat.id);
                     if (chat.isGroupChat) {
-                      context.push('/group-chat', extra: chat.name);
+                      context.push(
+                        '/group-chat',
+                        extra: {
+                          'title': chat.name,
+                          'conversationId': int.tryParse(chat.id),
+                          'projectId': chat.projectId,
+                        },
+                      );
                     } else {
                       context.push(
                         '/direct-chat',

@@ -285,7 +285,12 @@ class AppRouter {
             }
             if (extraMap['id'] != null) {
               projectId = extraMap['id'].toString();
+            } else if (extraMap['projectId'] != null) {
+              projectId = extraMap['projectId'].toString();
             }
+          }
+          if (projectId == null && state.uri.queryParameters['id'] != null) {
+            projectId = state.uri.queryParameters['id'];
           }
           return buildNativePage(
             context: context,

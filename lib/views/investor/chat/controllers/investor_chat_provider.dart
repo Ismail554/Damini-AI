@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/investor_chat_model.dart';
 import '../repositories/investor_chat_repository.dart';
 
 final investorChatRepositoryProvider = Provider<InvestorChatRepository>((ref) {
-  return InvestorChatRepositoryImpl();
+  return InvestorChatRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
 class InvestorChatState {

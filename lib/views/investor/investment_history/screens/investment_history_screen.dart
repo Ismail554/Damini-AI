@@ -46,7 +46,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSummaryCard(tc),
+                      _buildSummaryCard(tc, historyState.summary),
                       AppSpacing.h20,
                       _buildFilterChips(tc, ref, historyState.selectedFilter),
                       AppSpacing.h16,
@@ -116,7 +116,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryCard(AppThemeColors tc) {
+  Widget _buildSummaryCard(AppThemeColors tc, InvestmentPortfolioSummary summary) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(18.r),
@@ -161,7 +161,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
                   ),
                 ),
                 child: Text(
-                  "4 Active Deals",
+                  "${summary.activeDealsCount} Active Deals",
                   style: GoogleFonts.outfit(
                     fontSize: 11.sp,
                     fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
           ),
           SizedBox(height: 12.h),
           Text(
-            "\$560,000",
+            summary.totalInvested,
             style: GoogleFonts.outfit(
               fontSize: 28.sp,
               fontWeight: FontWeight.bold,
@@ -206,7 +206,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    "\$644,200",
+                    summary.totalCurrentValue,
                     style: GoogleFonts.outfit(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
@@ -227,7 +227,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
                   ),
                   SizedBox(height: 2.h),
                   Text(
-                    "+\$84,200 (+15.0%)",
+                    summary.totalProfitLoss,
                     style: GoogleFonts.outfit(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
@@ -474,7 +474,13 @@ class InvestmentHistoryScreen extends ConsumerWidget {
             width: double.infinity,
             height: 38.h,
             child: OutlinedButton(
-              onPressed: () => context.push('/public-view'),
+              onPressed: () {
+                if (item.projectId.isNotEmpty) {
+                  context.push('/public-view', extra: {'id': item.projectId});
+                } else {
+                  context.push('/public-view');
+                }
+              },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: tc.borderColor),
                 shape: RoundedRectangleBorder(

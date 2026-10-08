@@ -1,14 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/api_error_handler.dart';
+import '../../auth/session/controllers/session_provider.dart';
 import '../models/ai_chat_message_model.dart';
+import '../repositories/ai_chat_repository.dart';
 
 class AiChatState {
+  final String? conversationId;
   final List<AiChatMessageModel> messages;
   final bool isTyping;
+  final bool isLoadingInitial;
+  final String? errorMessage;
   final List<String> quickPrompts;
 
   const AiChatState({
+    this.conversationId,
     required this.messages,
     this.isTyping = false,
+    this.isLoadingInitial = false,
+    this.errorMessage,
     this.quickPrompts = const [
       "Analyze high-yield real estate projects",
       "How do I create a new funding request?",
@@ -18,22 +28,32 @@ class AiChatState {
   });
 
   AiChatState copyWith({
+    String? conversationId,
     List<AiChatMessageModel>? messages,
     bool? isTyping,
+    bool? isLoadingInitial,
+    String? errorMessage,
+    bool clearError = false,
     List<String>? quickPrompts,
   }) {
     return AiChatState(
+      conversationId: conversationId ?? this.conversationId,
       messages: messages ?? this.messages,
       isTyping: isTyping ?? this.isTyping,
+      isLoadingInitial: isLoadingInitial ?? this.isLoadingInitial,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       quickPrompts: quickPrompts ?? this.quickPrompts,
     );
   }
 }
 
 class AiChatNotifier extends Notifier<AiChatState> {
+  AiChatRepository get _repository => ref.read(aiChatRepositoryProvider);
+
   @override
   AiChatState build() {
-    return AiChatState(
+    // Initial default state before network resolves
+    final defaultState = AiChatState(
       messages: [
         AiChatMessageModel(
           id: "msg_welcome",
@@ -49,11 +69,57 @@ class AiChatNotifier extends Notifier<AiChatState> {
         ),
       ],
     );
+
+    // Fetch initial state asynchronously on load
+    Future.microtask(() => loadInitialState());
+
+    return defaultState;
   }
 
-  Future<void> sendMessage(String text) async {
+  /// Loads initial state (conversation ID, backend welcome message & quick prompts).
+  Future<void> loadInitialState() async {
+    state = state.copyWith(isLoadingInitial: true, clearError: true);
+    try {
+      final initialData = await _repository.fetchInitialState();
+
+      final welcome = initialData.welcomeMessage ??
+          AiChatMessageModel(
+            id: "msg_welcome",
+            text:
+                "Hello! I am your AI Investment Copilot. How can I help you optimize your portfolio or projects today?",
+            isUser: false,
+            timestamp: DateTime.now(),
+            suggestions: const [
+              "Explore Top Projects",
+              "Draft New Proposal",
+              "Market Analytics",
+            ],
+          );
+
+      state = state.copyWith(
+        conversationId: initialData.conversationId.isNotEmpty
+            ? initialData.conversationId
+            : state.conversationId,
+        messages: [welcome],
+        quickPrompts: initialData.quickPrompts.isNotEmpty
+            ? initialData.quickPrompts
+            : state.quickPrompts,
+        isLoadingInitial: false,
+        clearError: true,
+      );
+    } catch (e) {
+      debugPrint("AiChatNotifier: loadInitialState error: $e");
+      state = state.copyWith(isLoadingInitial: false);
+    }
+  }
+
+  /// Sends a message to the AI Copilot.
+  Future<void> sendMessage(
+    String text, {
+    Map<String, dynamic>? context,
+  }) async {
     final trimmed = text.trim();
-    if (trimmed.isEmpty) return;
+    if (trimmed.isEmpty || state.isTyping) return;
 
     final userMsg = AiChatMessageModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -65,26 +131,106 @@ class AiChatNotifier extends Notifier<AiChatState> {
     state = state.copyWith(
       messages: [...state.messages, userMsg],
       isTyping: true,
+      clearError: true,
     );
 
-    await Future.delayed(const Duration(milliseconds: 1200));
+    final convId = state.conversationId ?? "default_conv";
+    final activeRole = ref.read(sessionProvider).userRole ?? 'investor';
+    final requestContext = context ?? {
+      'current_screen': 'ai_chat',
+      'role': activeRole,
+    };
 
-    final aiReplyText = _generateAiReply(trimmed);
-    final aiMsg = AiChatMessageModel(
-      id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
-      text: aiReplyText,
-      isUser: false,
-      timestamp: DateTime.now(),
-      suggestions: _getFollowUpSuggestions(trimmed),
-    );
+    try {
+      final result = await _repository.sendMessage(
+        conversationId: convId,
+        content: trimmed,
+        context: requestContext,
+      );
 
-    state = state.copyWith(
-      messages: [...state.messages, aiMsg],
-      isTyping: false,
-    );
+      final List<AiChatMessageModel> updatedMessages = [...state.messages];
+
+      if (result.aiReply != null) {
+        updatedMessages.add(result.aiReply!);
+      } else {
+        // Fallback default reply if response lacked payload
+        updatedMessages.add(
+          AiChatMessageModel(
+            id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
+            text: "I have processed your query. Let me know if you need more details.",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
+        );
+      }
+
+      state = state.copyWith(
+        messages: updatedMessages,
+        quickPrompts: result.updatedQuickPrompts != null &&
+                result.updatedQuickPrompts!.isNotEmpty
+            ? result.updatedQuickPrompts!
+            : state.quickPrompts,
+        isTyping: false,
+        clearError: true,
+      );
+    } catch (e) {
+      debugPrint("AiChatNotifier: sendMessage error: $e");
+      String errorText = "Failed to get AI response. Please try again.";
+      if (e is ApiException) {
+        errorText = e.message;
+      } else if (e is AppException) {
+        errorText = e.message;
+      }
+
+      state = state.copyWith(
+        isTyping: false,
+        errorMessage: errorText,
+      );
+    }
   }
 
-  void clearChat() {
+  /// Clears the chat history on backend and resets session.
+  Future<void> clearChat() async {
+    final convId = state.conversationId;
+    state = state.copyWith(isTyping: false, clearError: true);
+
+    if (convId != null && convId.isNotEmpty) {
+      try {
+        final resetData = await _repository.clearChat(conversationId: convId);
+        if (resetData != null) {
+          final welcome = resetData.welcomeMessage ??
+              AiChatMessageModel(
+                id: "msg_welcome",
+                text:
+                    "Hello! I am your AI Investment Copilot. How can I help you optimize your portfolio or projects today?",
+                isUser: false,
+                timestamp: DateTime.now(),
+                suggestions: const [
+                  "Explore Top Projects",
+                  "Draft New Proposal",
+                  "Market Analytics",
+                ],
+              );
+
+          state = state.copyWith(
+            conversationId: resetData.conversationId.isNotEmpty
+                ? resetData.conversationId
+                : convId,
+            messages: [welcome],
+            quickPrompts: resetData.quickPrompts.isNotEmpty
+                ? resetData.quickPrompts
+                : state.quickPrompts,
+            isTyping: false,
+            clearError: true,
+          );
+          return;
+        }
+      } catch (e) {
+        debugPrint("AiChatNotifier: clearChat error: $e");
+      }
+    }
+
+    // Default fallback reset
     state = state.copyWith(
       messages: [
         AiChatMessageModel(
@@ -101,27 +247,8 @@ class AiChatNotifier extends Notifier<AiChatState> {
         ),
       ],
       isTyping: false,
+      clearError: true,
     );
-  }
-
-  String _generateAiReply(String prompt) {
-    final lower = prompt.toLowerCase();
-    if (lower.contains("real estate") || lower.contains("project")) {
-      return "Downtown Tech Hub currently offers a 18% target ROI with a minimum investment of \$1,000. It is located in the Prime Tech District with 75% funded status.";
-    } else if (lower.contains("create") || lower.contains("proposal")) {
-      return "To create a new project draft:\n1. Tap the '+' button on the home dashboard\n2. Fill in project details & budget targets\n3. Submit for sponsor review.";
-    } else if (lower.contains("roi") || lower.contains("calculate")) {
-      return "Based on historical performance, average returns across tech & energy portfolios range from 12% to 25% annually.";
-    }
-    return "I have processed your query regarding '$prompt'. Would you like me to generate a detailed summary or check related opportunity metrics?";
-  }
-
-  List<String> _getFollowUpSuggestions(String prompt) {
-    return const [
-      "Show Financial Breakdown",
-      "Connect with Sponsor",
-      "View Documents",
-    ];
   }
 }
 

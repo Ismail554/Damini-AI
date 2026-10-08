@@ -35,7 +35,9 @@ class DioService {
           final client = HttpClient();
           client.idleTimeout = const Duration(seconds: 15);
           client.connectionTimeout = const Duration(seconds: 30);
-          client.badCertificateCallback = (cert, host, port) => true;
+          if (kDebugMode) {
+            client.badCertificateCallback = (cert, host, port) => true;
+          }
           return client;
         },
       );

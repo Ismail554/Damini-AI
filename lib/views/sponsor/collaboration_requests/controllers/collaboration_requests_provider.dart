@@ -113,20 +113,8 @@ class CollaborationRequestsNotifier
 
   Future<bool> approvePendingRequest(CollaborationRequestModel item) async {
     try {
-      final projId = item.projectId?.toString() ?? state.projectId;
-      final reqId = int.tryParse(item.id);
-
-      bool success = false;
-      if (projId != null && projId.isNotEmpty && reqId != null) {
-        success = await _repository.confirmInvestors(
-          projectId: projId,
-          requestIds: [reqId],
-        );
-      } else {
-        success = await _repository.approveRequest(item.id);
-      }
-
-      if (!success) return false;
+      final res = await _repository.approveRequest(item.id);
+      if (res == null) return false;
 
       final pending = List<CollaborationRequestModel>.from(state.pendingList)
         ..removeWhere((req) => req.id == item.id);

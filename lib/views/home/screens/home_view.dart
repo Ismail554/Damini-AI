@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:cupertino_native/cupertino_native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -240,11 +241,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                 child: Icon(
                                   Icons.smart_toy_outlined,
                                   color: Colors.white,
-                                  size: 22.r,
+                                  size: 22.sp,
                                 ),
                               ),
                             ),
-                            if (isSponsor) SizedBox(height: 12.h),
+                            if (isSponsor) AppSpacing.h12, 
                           ],
 
                           // Blue + Add Button (Sponsor role) with Horizontal Expansion

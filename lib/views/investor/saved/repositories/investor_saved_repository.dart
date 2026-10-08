@@ -1,12 +1,69 @@
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/investor_saved_item_model.dart';
+
+final investorSavedRepositoryProvider =
+    Provider<InvestorSavedRepository>((ref) {
+  return InvestorSavedRepositoryImpl(ref.watch(apiServiceProvider));
+});
 
 abstract class InvestorSavedRepository {
   Future<List<InvestorSavedItemModel>> getSavedItems();
 }
 
 class InvestorSavedRepositoryImpl implements InvestorSavedRepository {
+  final ApiService? _apiService;
+
+  InvestorSavedRepositoryImpl([this._apiService]);
+
   @override
   Future<List<InvestorSavedItemModel>> getSavedItems() async {
+    if (_apiService != null) {
+      try {
+        final response = await _apiService.get(
+          ApiEndpoints.savedProjects,
+          requireAuth: true,
+        );
+
+        dynamic data = response.data;
+        if (data is String) {
+          try {
+            data = jsonDecode(data);
+          } catch (_) {}
+        }
+
+        List list = [];
+        if (data is List) {
+          list = data;
+        } else if (data is Map) {
+          final payload = data['data'] is Map ? data['data'] as Map : data;
+          if (payload['results'] is List) {
+            list = payload['results'] as List;
+          } else if (payload['data'] is List) {
+            list = payload['data'] as List;
+          } else if (payload['saved_projects'] is List) {
+            list = payload['saved_projects'] as List;
+          }
+        }
+
+        if (list.isNotEmpty) {
+          final items = <InvestorSavedItemModel>[];
+          for (final item in list.whereType<Map>()) {
+            try {
+              items.add(
+                InvestorSavedItemModel.fromJson(Map<String, dynamic>.from(item)),
+              );
+            } catch (_) {}
+          }
+          if (items.isNotEmpty) {
+            return items;
+          }
+        }
+      } catch (_) {}
+    }
+
     return const [
       InvestorSavedItemModel(
         id: "inv_saved_1",

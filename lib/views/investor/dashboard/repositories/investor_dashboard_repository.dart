@@ -122,27 +122,80 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
 
   @override
   Future<List<InvestorBannerModel>> getBanners() async {
+    try {
+      final response = await _apiService.get(
+        ApiEndpoints.banners,
+        queryParameters: {'role': 'investor'},
+        requireAuth: true,
+      );
+
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+
+      List list = [];
+      if (data is List) {
+        list = data;
+      } else if (data is Map) {
+        if (data['data'] is List) {
+          list = data['data'] as List;
+        } else if (data['results'] is List) {
+          list = data['results'] as List;
+        }
+      }
+
+      if (list.isNotEmpty) {
+        final banners = <InvestorBannerModel>[];
+        for (final item in list.whereType<Map>()) {
+          try {
+            banners.add(
+              InvestorBannerModel.fromJson(
+                Map<String, dynamic>.from(item),
+              ),
+            );
+          } catch (_) {
+            continue;
+          }
+        }
+        if (banners.isNotEmpty) {
+          return banners;
+        }
+      }
+    } catch (_) {}
+
     return const [
       InvestorBannerModel(
         title: "Exclusive Tech Seed Rounds",
+        location: "United States",
+        targetRaise: "Target Raise: \$5.0M",
         subtitle: "Direct co-investment opportunities with verified lead syndicates.",
         tag: "High Yield",
         bgGradient: [Color(0xFF0F1E2E), Color(0xFF162A3D)],
         actionText: "Explore Rounds",
+        imageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&auto=format&fit=crop",
       ),
       InvestorBannerModel(
         title: "Prime Commercial Real Estate",
+        location: "United Kingdom",
+        targetRaise: "Target Raise: \$12.5M",
         subtitle: "Institutional grade assets structured for steady dividend yields.",
         tag: "Featured",
         bgGradient: [Color(0xFF1E162D), Color(0xFF2A1C3D)],
         actionText: "View Assets",
+        imageUrl: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400&auto=format&fit=crop",
       ),
       InvestorBannerModel(
         title: "Clean Energy Infrastructure",
+        location: "Germany",
+        targetRaise: "Target Raise: \$8.2M",
         subtitle: "Tax-advantaged sustainable utilities investments across Europe.",
         tag: "ESG Impact",
         bgGradient: [Color(0xFF13281E), Color(0xFF1B3D2B)],
         actionText: "Learn More",
+        imageUrl: "https://images.unsplash.com/photo-1509391365360-2e959784a276?q=80&w=400&auto=format&fit=crop",
       ),
     ];
   }

@@ -1,116 +1,149 @@
-# Investor Role — Complete Backend API Specification & Gap Analysis
+# Complete Investor Role — End-to-End Flow & Backend API Specification
 
-Comprehensive API contract and static data audit for the **Investor** module (`lib/views/investor/`).
-
----
-
-## 1. Executive Summary & Audit of Investor Module
-
-| Feature / Screen | File Location | Current State in Flutter | Remaining Backend API Needed |
-|---|---|---|---|
-| **Investor Dashboard** | `lib/views/investor/dashboard/` | ⚠️ Partially Connected (`/users/me/`, `/profiles/industries/`, `/projects/`). Banners & featured filters hardcoded. | `GET /api/v1/banners/`<br>`GET /api/v1/investor/dashboard/` |
-| **Discover Deals & Filters** | `lib/views/investor/discover/` | ❌ **100% Mock Static Data** (`DiscoverRepositoryImpl`) | `GET /api/v1/projects/discover/` (with filters & sorting) |
-| **Investment History & Portfolio** | `lib/views/investor/investment_history/` | ❌ **100% Mock Static Data** (`InvestmentHistoryRepositoryImpl`) | `GET /api/v1/investor/investments/`<br>`GET /api/v1/investor/portfolio-summary/` |
-| **Saved Projects & Bookmarks** | `lib/views/investor/saved/` | ❌ **100% Mock Static Data** (`InvestorSavedRepositoryImpl`) | `GET /api/v1/projects/saved/`<br>`POST /api/v1/projects/{id}/save/` |
-| **Collaboration Request** | `lib/views/investor/request_collaboration/` | ⚠️ Endpoint defined (`POST /api/v1/projects/{id}/requests/`) | Needs full backend handling & status tracking |
-| **Investor Chat & Conversations** | `lib/views/investor/chat/` | ❌ **100% Mock Static Data** (`InvestorChatRepositoryImpl`) | `GET /api/v1/notifications/chat/conversations/`<br>WebSocket real-time chat |
-| **Project Details (Investor View)** | `lib/views/sponsor/public_view/` | ⚠️ Partially connected (`GET /api/v1/projects/{id}/`) | Rich metrics, documents, sponsor NDA status |
-| **NDA Signing** | `lib/views/sponsor/nda/` | ⚠️ Endpoint defined (`POST /api/v1/projects/{id}/sign-nda/`) | Backend PDF generation / signature verification |
+Comprehensive blueprint covering all screens, navigation flows, and API contracts for the **Investor** module.
 
 ---
 
-## 2. Detailed API Specifications
+## 1. End-to-End Investor Lifecycle Flow (Visual Map)
 
-### 2.1. Promotional Banners API
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Inv as Investor
+    participant Dash as Dashboard & Banner
+    participant Disc as Discover / Saved
+    participant Pub as Project Public View
+    participant Collab as Request Collaboration
+    participant Spons as Sponsor Portal & Chat
+    participant Hist as Investment History
 
-Replaces static banner list in `InvestorDashboardRepositoryImpl.getBanners()`.
+    %% Discovery Phase
+    Inv->>Dash: 1. Opens App (Dashboard / Banners)
+    Dash->>Inv: Displays dynamic Banners, Categories, Featured & Trending Deals
+    Inv->>Disc: 2. Explores deals via Search / Filters / Saved
+    Disc->>Inv: Displays Deal Cards (ROI, Target Raise, MIA)
 
+    %% Evaluation & NDA Phase
+    Inv->>Pub: 3. Taps card -> Opens Project Public View
+    Pub->>Inv: Shows Overview, Timeline, Financials, Team (Docs Locked)
+    opt Sign NDA for Confidential Docs
+        Inv->>Pub: Taps Lock -> Signs NDA (POST /sign-nda/)
+        Pub-->>Inv: Documents Unlocked & PDF Generated
+    end
+
+    %% Collaboration / Investment Proposal Phase
+    Inv->>Collab: 4. Taps "Request Collaboration" (L385-L410)
+    Collab->>Collab: Enters Intended Investment & Note
+    Collab->>Spons: 5. Submits (POST /projects/{id}/requests/)
+
+    %% Next Flow: Negotiation, Approval & Funding
+    Spons->>Spons: 6. Sponsor receives request in Deal Flow
+    Spons->>Inv: 7. Approves Request & Opens Direct Chat Room
+    Inv->>Spons: 8. Chat negotiation & term sheet exchange
+    Inv->>Spons: 9. Wires / Commits Capital
+    Spons->>Spons: 10. Marks Fund Received & Confirms Investor
+    
+    %% Portfolio Monitoring
+    Spons-->>Hist: 11. Deal converted to Active Investment
+    Inv->>Hist: 12. Views Portfolio Overview, Current Value & Realized ROI
+```
+
+---
+
+## 2. Screen-by-Screen API Specifications
+
+---
+
+### 2.1. Investor Dashboard & Banner Carousel
+**Files:**
+- `lib/views/investor/dashboard/screens/investor_dashboard.dart`
+- `lib/views/investor/dashboard/widgets/investor_banner_carousel.dart`
+
+#### A. Promotional Banners API
 - **Method:** `GET`
-- **Endpoint:** `/api/v1/banners/`
-- **Query Params:** `role=investor` (optional)
+- **Endpoint:** `/api/v1/banners/?role=investor`
 - **Auth:** Optional / Bearer Token
 
-#### Response `200 OK`
 ```json
 {
   "success": true,
   "data": [
     {
       "id": "banner_1",
-      "title": "Exclusive Tech Seed Rounds",
+      "title": "Downtown Tech Hub",
+      "location": "United States",
+      "target_raise": "$5.0M",
       "subtitle": "Direct co-investment opportunities with verified lead syndicates.",
       "tag": "High Yield",
-      "bg_gradient": ["#0F1E2E", "#162A3D"],
-      "image_url": "https://example.com/banners/tech_seed.png",
-      "action_text": "Explore Rounds",
-      "action_url": "/discover?category=Tech",
-      "target_project_id": null
+      "image_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600",
+      "action_text": "Request",
+      "action_url": "/public-view",
+      "target_project_id": "proj_downtown_tech"
     },
     {
       "id": "banner_2",
-      "title": "Prime Commercial Real Estate",
-      "subtitle": "Institutional grade assets structured for steady dividend yields.",
+      "title": "Solar Energy Park",
+      "location": "Spain",
+      "target_raise": "$12.5M",
+      "subtitle": "Institutional grade sustainable clean energy utility.",
       "tag": "Featured",
-      "bg_gradient": ["#1E162D", "#2A1C3D"],
-      "image_url": "https://example.com/banners/real_estate.png",
-      "action_text": "View Assets",
-      "action_url": "/discover?category=Real+Estate",
-      "target_project_id": "proj_downtown_tech"
+      "image_url": "https://images.unsplash.com/photo-1785990137771-1cb6d4a63637?q=80&w=600",
+      "action_text": "Request",
+      "action_url": "/public-view",
+      "target_project_id": "proj_solar_park"
     }
   ]
 }
 ```
 
----
-
-### 2.2. Discover Deals & Feed API (Search, Category, Filter, Sort)
-
-Replaces mock list in `DiscoverRepositoryImpl.getDiscoverDeals()`.
-
+#### B. Categories (Industry Filters)
 - **Method:** `GET`
-- **Endpoint:** `/api/v1/projects/discover/` (or `/api/v1/projects/`)
-- **Auth:** Bearer Token required
-- **Query Parameters:**
-  - `category` (string, e.g. `Tech`, `Real Estate`, `Health`, `Energy`, `All`)
-  - `search` (string query)
-  - `min_roi` (number, e.g. `15.0`)
-  - `max_roi` (number)
-  - `min_raise` (number, e.g. `100000`)
-  - `max_raise` (number)
-  - `sort_by` (`highest_roi` | `lowest_roi` | `newest` | `highest_raise` | `lowest_raise` | `closing_soon`)
-  - `page` (int, default `1`)
-  - `page_size` (int, default `20`)
+- **Endpoint:** `/api/v1/profiles/industries/`
 
-#### Response `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    {"id": "ind_1", "name": "Real Estate"},
+    {"id": "ind_2", "name": "Tech"},
+    {"id": "ind_3", "name": "Health"},
+    {"id": "ind_4", "name": "Energy"},
+    {"id": "ind_5", "name": "Agriculture"}
+  ]
+}
+```
+
+#### C. Featured & Trending Opportunities Feed
+- **Method:** `GET`
+- **Endpoint:** `/api/v1/projects/?category={category}&is_featured=true&is_trending=true`
+
 ```json
 {
   "success": true,
   "data": {
-    "count": 42,
-    "next": "/api/v1/projects/discover/?page=2",
-    "previous": null,
-    "results": [
+    "featured": [
       {
         "id": "proj_9876",
         "title": "Downtown Tech Hub",
         "location": "United States",
         "category": "Real Estate",
-        "image_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600&auto=format&fit=crop",
-        "target_raise": "$5,000,000",
-        "raise_value": 5000000,
-        "min_investment": "$1,000",
-        "min_investment_value": 1000,
+        "image_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400",
+        "target_raise": "$5.0M",
         "target_roi": "~ 18%",
-        "roi_value": 18.0,
-        "funded_percent": 0.75,
-        "days_left": 14,
-        "is_saved": false,
-        "sponsor": {
-          "id": "usr_sponsor_1",
-          "name": "Acme Capital",
-          "is_verified": true
-        },
-        "created_at": "2026-10-01T12:00:00.000Z"
+        "funded_percent": 0.75
+      }
+    ],
+    "trending": [
+      {
+        "id": "proj_1122",
+        "title": "BioTech Diagnostics Gene Test",
+        "location": "Switzerland",
+        "category": "Health",
+        "image_url": "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=400",
+        "funded_percent": 0.82,
+        "min_investment": "$10,000",
+        "days_left": 5,
+        "target_roi": "~ 22%"
       }
     ]
   }
@@ -119,119 +152,65 @@ Replaces mock list in `DiscoverRepositoryImpl.getDiscoverDeals()`.
 
 ---
 
-### 2.3. Investor Investment History & Portfolio
+### 2.2. Saved Items & Bookmarks View
+**File:** `lib/views/investor/saved/screens/investor_saved_view.dart`
 
-Replaces mock list in `InvestmentHistoryRepositoryImpl.getInvestmentRecords()`.
-
-#### A. List Investor's Investments
+#### A. Fetch Saved Projects with Stats Header
 - **Method:** `GET`
-- **Endpoint:** `/api/v1/investor/investments/`
-- **Auth:** Bearer Token required
+- **Endpoint:** `/api/v1/projects/saved/`
 - **Query Params:**
-  - `status` (`all` | `active` | `completed` | `pending` | `cancelled`)
-  - `page` (int, default `1`)
-  - `page_size` (int, default `20`)
+  - `filter` (`All` | `Active` | `Pending` | `Newest` | `Highest ROI` | `Closing Soon`)
+  - `page` & `page_size`
+- **Auth:** Bearer Token
 
-#### Response `200 OK`
 ```json
 {
   "success": true,
   "data": {
     "summary": {
-      "total_invested": "$560,000",
-      "total_current_value": "$644,200",
-      "overall_roi": "+15.03%",
-      "active_investments_count": 3
+      "total_committed": "$900k",
+      "active_projects_count": 3,
+      "pending_ndas_count": 1
     },
-    "count": 4,
-    "next": null,
-    "previous": null,
-    "results": [
-      {
-        "id": "inv_rec_101",
-        "project_id": "proj_9876",
-        "title": "Downtown Tech Hub",
-        "category": "Real Estate",
-        "sponsor_name": "Acme Corp",
-        "sponsor_id": "usr_sponsor_1",
-        "investment_date": "2026-03-14T00:00:00.000Z",
-        "formatted_date": "Mar 14, 2026",
-        "status": "Active",
-        "invested_amount": 250000.00,
-        "formatted_invested": "$250,000",
-        "current_value": 288000.00,
-        "formatted_current_value": "$288,000",
-        "roi": "+15.2%",
-        "image_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=300&auto=format&fit=crop"
-      },
-      {
-        "id": "inv_rec_102",
-        "project_id": "proj_5544",
-        "title": "AI Logistics Platform",
-        "category": "Tech",
-        "sponsor_name": "Nexus AI",
-        "sponsor_id": "usr_sponsor_2",
-        "investment_date": "2026-02-22T00:00:00.000Z",
-        "formatted_date": "Feb 22, 2026",
-        "status": "Active",
-        "invested_amount": 150000.00,
-        "formatted_invested": "$150,000",
-        "current_value": 173000.00,
-        "formatted_current_value": "$173,000",
-        "roi": "+15.3%",
-        "image_url": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=300&auto=format&fit=crop"
-      }
-    ]
-  }
-}
-```
-
----
-
-### 2.4. Investor Saved / Bookmarked Projects
-
-Replaces mock list in `InvestorSavedRepositoryImpl.getSavedItems()`.
-
-#### A. Fetch Saved Projects List
-- **Method:** `GET`
-- **Endpoint:** `/api/v1/projects/saved/`
-- **Auth:** Bearer Token required
-- **Query Params:**
-  - `status` (optional filter: `all` | `active` | `pending`)
-  - `page` & `page_size`
-
-#### Response `200 OK`
-```json
-{
-  "success": true,
-  "data": {
     "count": 4,
     "results": [
       {
         "id": "proj_9876",
-        "saved_item_id": "save_rec_01",
+        "saved_item_id": "save_01",
         "title": "Downtown Tech Hub",
         "category": "Real Estate",
-        "saved_date": "2026-02-22T10:00:00.000Z",
+        "saved_date": "2026-02-22T00:00:00.000Z",
         "formatted_date": "Feb 22, 2026",
         "status": "Active",
         "invested": "$250k",
         "value": "$288k",
         "target_roi": "+15.0%",
         "funding_progress": 0.24,
-        "image_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=300&auto=format&fit=crop"
+        "image_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=300"
+      },
+      {
+        "id": "proj_5544",
+        "saved_item_id": "save_02",
+        "title": "AI Logistics Platform",
+        "category": "Tech",
+        "saved_date": "2026-02-22T00:00:00.000Z",
+        "formatted_date": "Feb 22, 2026",
+        "status": "Active",
+        "invested": "$150k",
+        "value": "$173k",
+        "target_roi": "+15.0%",
+        "funding_progress": 0.67,
+        "image_url": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=300"
       }
     ]
   }
 }
 ```
 
-#### B. Toggle Save / Bookmark Project
+#### B. Toggle Save / Bookmark
 - **Method:** `POST`
 - **Endpoint:** `/api/v1/projects/{project_id}/save/`
-- **Auth:** Bearer Token required
 
-#### Response `200 OK`
 ```json
 {
   "success": true,
@@ -242,117 +221,52 @@ Replaces mock list in `InvestorSavedRepositoryImpl.getSavedItems()`.
 
 ---
 
-### 2.5. Submit Collaboration Request (Express Interest / Deal Flow)
+### 2.3. Project Public Deal Room (Investor View) & NDA
+**File:** `lib/views/sponsor/public_view/screens/project_public_view.dart` (L385-L410)
 
-Connects `RequestCollaborationRepositoryImpl.submitCollaborationRequest()`.
-
-- **Method:** `POST`
-- **Endpoint:** `/api/v1/projects/{project_id}/requests/`
-- **Auth:** Bearer Token required
-
-#### Request Body
-```json
-{
-  "proposed_budget": 50000,
-  "message": "We would like to participate in this seed round as a strategic investor."
-}
-```
-
-#### Response `201 Created`
-```json
-{
-  "success": true,
-  "message": "Collaboration request submitted successfully to project sponsor.",
-  "data": {
-    "request_id": "collab_req_8765",
-    "project_id": "proj_9876",
-    "status": "PENDING",
-    "proposed_budget": 50000,
-    "created_at": "2026-10-08T10:15:00.000Z"
-  }
-}
-```
-
----
-
-### 2.6. Investor Chat / Sponsor Direct Messages
-
-Replaces mock list in `InvestorChatRepositoryImpl.getChats()`.
-
-#### A. List Active Investor Chat Threads
+#### A. Fetch Full Public Project Details
 - **Method:** `GET`
-- **Endpoint:** `/api/v1/notifications/chat/conversations/`
-- **Auth:** Bearer Token required
+- **Endpoint:** `/api/v1/projects/{project_id}/`
+- **Auth:** Bearer Token
 
-#### Response `200 OK`
 ```json
 {
   "success": true,
   "data": {
-    "count": 3,
-    "results": [
+    "id": "proj_9876",
+    "title": "Downtown Tech Hub",
+    "sponsor_name": "Acme Capital",
+    "sponsor_id": "usr_sponsor_1",
+    "sponsor_avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150",
+    "location": "United States",
+    "category": "Real Estate",
+    "description": "Prime tech district mixed-use development with high rental yields.",
+    "target_raise": "$5,000,000",
+    "min_contribution": "$1,000",
+    "target_roi": "~ 18%",
+    "projected_duration": "36 Months",
+    "funded_percentage": 0.75,
+    "is_saved": false,
+    "nda_signed": false,
+    "image_urls": [
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600"
+    ],
+    "documents": [
       {
-        "id": "conv_123",
-        "name": "Acme Investments (Lead Sponsor)",
-        "project_id": "proj_9876",
-        "last_message": "The term sheet has been uploaded to the deal room.",
-        "time": "10:42 AM",
-        "last_message_time": "2026-10-08T10:42:00.000Z",
-        "unread_count": 2,
-        "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
-        "is_group_chat": false
-      },
-      {
-        "id": "conv_124",
-        "name": "Downtown Tech Hub Syndicate",
-        "project_id": "proj_9876",
-        "last_message": "Q1 investor call scheduled for this Thursday.",
-        "time": "Yesterday",
-        "last_message_time": "2026-10-07T16:00:00.000Z",
-        "unread_count": 0,
-        "avatar_url": "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=150&auto=format&fit=crop",
-        "is_group_chat": true
+        "id": "doc_01",
+        "name": "Executive Summary & Financial Model.pdf",
+        "is_locked": true,
+        "file_url": null
       }
     ]
   }
 }
 ```
 
-#### B. Start / Open Chat With Project Sponsor
-- **Method:** `POST`
-- **Endpoint:** `/api/v1/notifications/chat/conversations/start/`
-- **Auth:** Bearer Token required
-
-#### Request Body
-```json
-{
-  "sponsor_id": "usr_sponsor_1",
-  "project_id": "proj_9876"
-}
-```
-
-#### Response `200 OK`
-```json
-{
-  "success": true,
-  "data": {
-    "conversation_id": "conv_123",
-    "is_new": false
-  }
-}
-```
-
----
-
-### 2.7. Sign Project NDA (Non-Disclosure Agreement)
-
-Connects `POST /api/v1/projects/{project_id}/sign-nda/`.
-
+#### B. Sign NDA to Unlock Documents
 - **Method:** `POST`
 - **Endpoint:** `/api/v1/projects/{project_id}/sign-nda/`
-- **Auth:** Bearer Token required
-
-#### Request Body
+- **Request:**
 ```json
 {
   "full_name": "John Doe",
@@ -360,53 +274,205 @@ Connects `POST /api/v1/projects/{project_id}/sign-nda/`.
   "accepted_terms": true
 }
 ```
-
-#### Response `200 OK`
+- **Response `200 OK`:**
 ```json
 {
   "success": true,
-  "message": "NDA signed successfully. Full project documents unlocked.",
+  "message": "NDA signed successfully. Documents unlocked.",
   "data": {
-    "nda_id": "nda_sig_54321",
-    "signed_at": "2026-10-08T10:20:00.000Z",
-    "pdf_url": "https://storage.googleapis.com/damini-ai/nda/signed_nda_54321.pdf"
+    "nda_id": "nda_9988",
+    "pdf_url": "https://storage.googleapis.com/damini-ai/nda/nda_9988.pdf",
+    "unlocked_documents": [
+      {
+        "id": "doc_01",
+        "name": "Executive Summary & Financial Model.pdf",
+        "is_locked": false,
+        "file_url": "https://storage.googleapis.com/damini-ai/docs/doc_01.pdf"
+      }
+    ]
   }
 }
 ```
 
 ---
 
-## 3. Dart Model ↔ Backend JSON Key Reference
+### 2.4. Request Collaboration & The Complete Next Flow
+**File:** `lib/views/investor/request_collaboration/screens/request_collaboration_screen.dart`
 
-| Feature | Model Class | Backend JSON Key | Dart Property | Data Type |
-|---|---|---|---|---|
-| **Dashboard** | `InvestorBannerModel` | `title` | `title` | `String` |
-| | | `subtitle` | `subtitle` | `String` |
-| | | `tag` | `tag` | `String` |
-| | | `action_text` | `actionText` | `String` |
-| | `TrendingProjectModel` | `title` | `title` | `String` |
-| | | `funded_percent` | `fundedPercent` | `double` (0.0 - 1.0) |
-| | | `min_investment` | `minInvestment` | `String` |
-| | | `days_left` | `daysLeft` | `int` |
-| **Discover** | `DiscoverDealItem` | `id` | `id` | `String` |
-| | | `category` | `category` | `String` |
-| | | `target_raise` | `targetRaise` | `String` |
-| | | `raise_value` | `raiseValue` | `double` / `int` |
-| | | `target_roi` | `targetRoi` | `String` |
-| | | `roi_value` | `roiValue` | `double` |
-| **History** | `InvestmentRecordModel` | `id` | `id` | `String` |
-| | | `sponsor_name` | `sponsor` | `String` |
-| | | `formatted_date` | `date` | `String` |
-| | | `status` | `status` | `String` (`Active`, `Completed`, `Pending`) |
-| | | `formatted_invested` | `invested` | `String` |
-| | | `formatted_current_value` | `currentValue` | `String` |
-| | | `roi` | `roi` | `String` |
-| **Saved** | `InvestorSavedItemModel` | `id` | `id` | `String` |
-| | | `funding_progress` | `fundingProgress` | `double` (0.0 - 1.0) |
-| | | `status` | `status` | `String` |
-| **Chat** | `InvestorChatItemModel` | `id` | `id` | `String` |
-| | | `name` | `name` | `String` |
-| | | `last_message` | `lastMessage` | `String` |
-| | | `time` | `time` | `String` |
-| | | `unread_count` | `unreadCount` | `int` |
-| | | `is_group_chat` | `isGroupChat` | `bool` |
+#### Step 1: Investor Submits Request
+- **Method:** `POST`
+- **Endpoint:** `/api/v1/projects/{project_id}/requests/`
+- **Request Body:**
+```json
+{
+  "proposed_budget": 250000,
+  "message": "We are ready to participate in this round as a lead investor."
+}
+```
+- **Response `201 Created`:**
+```json
+{
+  "success": true,
+  "message": "Collaboration request submitted successfully.",
+  "data": {
+    "request_id": "collab_req_5544",
+    "project_id": "proj_9876",
+    "investor_id": "usr_inv_99",
+    "status": "PENDING",
+    "proposed_budget": 250000,
+    "message": "We are ready to participate in this round as a lead investor.",
+    "created_at": "2026-10-08T10:50:00.000Z"
+  }
+}
+```
+
+---
+
+### 🔥 NEXT FLOW (What Happens After Request Submission)
+
+#### Step 2: Sponsor Views & Evaluates Request
+- **Method:** `GET`
+- **Endpoint:** `/api/v1/projects/sponsor/requests/` (or `/api/v1/projects/sponsor/{project_id}/requests/`)
+- Returns all incoming investor requests with investor profile, proposed budget, note, and verification badge.
+
+#### Step 3: Sponsor Approves or Rejects
+- **Approve Request:**
+  - **Method:** `POST`
+  - **Endpoint:** `/api/v1/projects/sponsor/requests/{request_id}/approve/`
+  - **Action:** Creates direct chat between Investor and Sponsor. Status changes to `APPROVED`.
+- **Reject Request:**
+  - **Method:** `POST`
+  - **Endpoint:** `/api/v1/projects/sponsor/requests/{request_id}/reject/`
+  - **Request:** `{"reason": "Allocation full"}`
+
+#### Step 4: Sponsor & Investor Direct Chat Room
+- **Method:** `POST`
+- **Endpoint:** `/api/v1/notifications/chat/conversations/start/`
+- **Request Body:** `{"project_id": "proj_9876", "target_user_id": "usr_sponsor_1"}`
+- Opens real-time chat for sharing term sheets, bank transfer details, and syndicate updates.
+
+#### Step 5: Fund Received & Confirm Investors
+- **Mark Funds Received:**
+  - **Method:** `POST`
+  - **Endpoint:** `/api/v1/projects/sponsor/requests/{request_id}/fund-received/`
+- **Confirm Investor in Project Syndicate:**
+  - **Method:** `POST`
+  - **Endpoint:** `/api/v1/projects/{project_id}/confirm-investors/`
+  - **Request:** `{"confirmed_investor_ids": ["usr_inv_99"]}`
+  - **Action:** Triggers addition of project to Investor's **Investment History** as `Active`.
+
+---
+
+### 2.5. Investment History & Portfolio Overview
+**File:** `lib/views/investor/investment_history/screens/investment_history_screen.dart`
+
+#### List Active & Historical Investments with Portfolio Totals
+- **Method:** `GET`
+- **Endpoint:** `/api/v1/investor/investments/`
+- **Query Params:**
+  - `status` (`All` | `Active` | `Completed` | `Pending`)
+  - `page` & `page_size`
+- **Auth:** Bearer Token
+
+#### Response `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "summary": {
+      "total_invested": "$560,000",
+      "total_current_value": "$644,200",
+      "total_profit_loss": "+$84,200",
+      "total_roi_percentage": "+15.0%",
+      "active_deals_count": 4
+    },
+    "count": 4,
+    "results": [
+      {
+        "id": "inv_hist_1",
+        "project_id": "proj_9876",
+        "title": "Downtown Tech Hub",
+        "category": "Real Estate",
+        "sponsor": "Acme Corp",
+        "date": "Mar 14, 2026",
+        "status": "Active",
+        "invested": "$250,000",
+        "current_value": "$288,000",
+        "roi": "+15.2%",
+        "image_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=300"
+      },
+      {
+        "id": "inv_hist_2",
+        "project_id": "proj_5544",
+        "title": "AI Logistics Platform",
+        "category": "Tech",
+        "sponsor": "Nexus AI",
+        "date": "Feb 22, 2026",
+        "status": "Active",
+        "invested": "$150,000",
+        "current_value": "$173,000",
+        "roi": "+15.3%",
+        "image_url": "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=300"
+      },
+      {
+        "id": "inv_hist_3",
+        "project_id": "proj_3322",
+        "title": "EcoTech Solar Farm",
+        "category": "Energy",
+        "sponsor": "Green Grid Ltd",
+        "date": "Jan 10, 2026",
+        "status": "Completed",
+        "invested": "$100,000",
+        "current_value": "$118,500",
+        "roi": "+18.5%",
+        "image_url": "https://images.unsplash.com/photo-1509391365360-2e959784a276?q=80&w=300"
+      },
+      {
+        "id": "inv_hist_4",
+        "project_id": "proj_7788",
+        "title": "AeroDynamics Drone Fleet",
+        "category": "Aviation",
+        "sponsor": "Sky Tech Ventures",
+        "date": "Nov 05, 2025",
+        "status": "Pending",
+        "invested": "$60,000",
+        "current_value": "$64,700",
+        "roi": "+7.8%",
+        "image_url": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?q=80&w=300"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 3. UI Key Mapping Table for All Files
+
+| Screen / Widget | Flutter Field | Backend JSON Field | Type |
+|---|---|---|---|
+| **Banner Carousel** | `item.title` | `title` | `String` |
+| | `item.location` | `location` | `String` |
+| | `item.targetRaise` | `target_raise` | `String` |
+| | `item.imageUrl` | `image_url` | `String` |
+| | *Tap action* | `target_project_id` / `action_url` | `String` |
+| **Saved Items** | `totalCommitted` | `summary.total_committed` | `String` |
+| | `activeProjectsCount` | `summary.active_projects_count` | `int` |
+| | `pendingNdasCount` | `summary.pending_ndas_count` | `int` |
+| | `item.fundingProgress` | `funding_progress` | `double` (0.0 - 1.0) |
+| | `item.targetRoi` | `target_roi` | `String` |
+| **Public View (L385-410)** | `_project.minContribution` | `min_contribution` | `String` |
+| | `_project.targetRoi` | `target_roi` | `String` |
+| | `_project.targetRaise` | `target_raise` | `String` |
+| | `_project.isSaved` | `is_saved` | `bool` |
+| | `_project.ndaSigned` | `nda_signed` | `bool` |
+| **Request Collab** | `amount` | `proposed_budget` | `num` / `String` |
+| | `note` | `message` | `String` |
+| **Investment History** | `summary.totalInvested` | `summary.total_invested` | `String` |
+| | `summary.currentValue` | `summary.total_current_value` | `String` |
+| | `summary.totalProfit` | `summary.total_profit_loss` | `String` |
+| | `summary.activeDeals` | `summary.active_deals_count` | `int` |
+| | `item.invested` | `invested` | `String` |
+| | `item.currentValue` | `current_value` | `String` |
+| | `item.roi` | `roi` | `String` |
+| | `item.status` | `status` (`Active` / `Completed` / `Pending`) | `String` |

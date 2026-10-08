@@ -1,3 +1,6 @@
+import 'dart:convert';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/investor_chat_model.dart';
 
 abstract class InvestorChatRepository {
@@ -5,8 +8,56 @@ abstract class InvestorChatRepository {
 }
 
 class InvestorChatRepositoryImpl implements InvestorChatRepository {
+  final ApiService? _apiService;
+
+  InvestorChatRepositoryImpl([this._apiService]);
+
   @override
   Future<List<InvestorChatItemModel>> getChats() async {
+    if (_apiService != null) {
+      try {
+        final response = await _apiService.get(
+          ApiEndpoints.conversations,
+          requireAuth: true,
+        );
+
+        dynamic data = response.data;
+        if (data is String) {
+          try {
+            data = jsonDecode(data);
+          } catch (_) {}
+        }
+
+        List list = [];
+        if (data is List) {
+          list = data;
+        } else if (data is Map) {
+          final payload = data['data'] is Map ? data['data'] as Map : data;
+          if (payload['results'] is List) {
+            list = payload['results'] as List;
+          } else if (payload['data'] is List) {
+            list = payload['data'] as List;
+          } else if (payload['conversations'] is List) {
+            list = payload['conversations'] as List;
+          }
+        }
+
+        if (list.isNotEmpty) {
+          final chats = <InvestorChatItemModel>[];
+          for (final item in list.whereType<Map>()) {
+            try {
+              chats.add(
+                InvestorChatItemModel.fromJson(Map<String, dynamic>.from(item)),
+              );
+            } catch (_) {}
+          }
+          if (chats.isNotEmpty) {
+            return chats;
+          }
+        }
+      } catch (_) {}
+    }
+
     return const [
       InvestorChatItemModel(
         id: "chat_1",

@@ -75,7 +75,7 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
               SizedBox(height: 10.h),
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                onPressed: () => context.pop(),
+                onPressed: () => context.canPop() ? context.pop() : context.go('/login'),
               ),
               SizedBox(height: 10.h),
               Text(

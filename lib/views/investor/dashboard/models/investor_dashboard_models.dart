@@ -235,19 +235,69 @@ class TrendingProjectModel {
 }
 
 class InvestorBannerModel {
+  final String id;
   final String title;
+  final String location;
+  final String targetRaise;
   final String subtitle;
   final String tag;
   final List<Color> bgGradient;
+  final String imageUrl;
   final String actionText;
+  final String? actionUrl;
+  final String? targetProjectId;
 
   const InvestorBannerModel({
+    this.id = '',
     required this.title,
+    this.location = 'Global',
+    this.targetRaise = 'Target Raise: \$5.0M',
     required this.subtitle,
     required this.tag,
     required this.bgGradient,
+    this.imageUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&auto=format&fit=crop',
     required this.actionText,
+    this.actionUrl,
+    this.targetProjectId,
   });
+
+  factory InvestorBannerModel.fromJson(Map<String, dynamic> json) {
+    final rawImage = json['image_url'] ?? json['imageUrl'] ?? json['image'];
+    String imageUrl =
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&auto=format&fit=crop";
+    if (rawImage != null && rawImage.toString().isNotEmpty) {
+      imageUrl = rawImage.toString();
+    }
+
+    List<Color> gradient = const [Color(0xFF0F1E2E), Color(0xFF162A3D)];
+    final rawGradient = json['bg_gradient'] ?? json['bgGradient'];
+    if (rawGradient is List && rawGradient.isNotEmpty) {
+      gradient = rawGradient.map((c) {
+        if (c is String && c.startsWith('#')) {
+          final hex = c.replaceFirst('#', '');
+          return Color(int.parse('0xFF$hex'));
+        }
+        return const Color(0xFF0F1E2E);
+      }).toList();
+    }
+
+    return InvestorBannerModel(
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? 'Featured Opportunity',
+      location: json['location']?.toString() ?? 'Global',
+      targetRaise: json['target_raise']?.toString() ??
+          (json['targetRaise']?.toString() ?? 'Target Raise: \$5.0M'),
+      subtitle: json['subtitle']?.toString() ?? '',
+      tag: json['tag']?.toString() ?? 'Featured',
+      bgGradient: gradient,
+      imageUrl: imageUrl,
+      actionText: json['action_text']?.toString() ??
+          (json['actionText']?.toString() ?? 'Explore'),
+      actionUrl: json['action_url']?.toString() ?? json['actionUrl']?.toString(),
+      targetProjectId: json['target_project_id']?.toString() ??
+          json['targetProjectId']?.toString(),
+    );
+  }
 }
 
 // ── Formatting Helpers ──────────────────────────────────────────

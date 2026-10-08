@@ -18,6 +18,9 @@ class ApiEndpoints {
   static const String logout = "/api/v1/auth/logout/";
   static const String googleLogin = "/api/v1/auth/google/";
   static const String appleLogin = "/api/v1/auth/apple/";
+  static const String forgotPassword = "/api/v1/auth/forgot-password/";
+  static const String resetPassword = "/api/v1/auth/reset-password/";
+  static const String changePassword = "/api/v1/users/change-password/";
 
   // Onboarding & Profiles
   static const String setRole = "/api/v1/profiles/set-role/";
@@ -53,7 +56,10 @@ class ApiEndpoints {
       "/api/v1/projects/sponsor/requests/$id/reject/";
   static String fundReceivedCollaborationRequest(String id) =>
       "/api/v1/projects/sponsor/requests/$id/fund-received/";
+  static const String banners = "/api/v1/banners/";
   static const String projects = "/api/v1/projects/";
+  static const String discoverProjects = "/api/v1/projects/discover/";
+  static const String investorInvestments = "/api/v1/investor/investments/";
   static String projectDetails(String id) => "/api/v1/projects/$id/";
   static String saveProject(String id) => "/api/v1/projects/$id/save/";
   static String signNda(String id) => "/api/v1/projects/$id/sign-nda/";
@@ -70,6 +76,13 @@ class ApiEndpoints {
       "/api/v1/ai/projects/conversations/$conversationId/messages/";
   static String aiProjectConversation(String conversationId) =>
       "/api/v1/ai/projects/conversations/$conversationId/";
+
+  // AI Investment Copilot Chat
+  static const String aiChatInitial = "/api/v1/ai/chat/initial/";
+  static String aiChatMessages(String conversationId) =>
+      "/api/v1/ai/chat/conversations/$conversationId/messages/";
+  static String aiChatClear(String conversationId) =>
+      "/api/v1/ai/chat/conversations/$conversationId/clear/";
 
   // Chat & Notifications
   static const String startConversation =

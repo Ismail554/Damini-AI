@@ -1,67 +1,27 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_dimens.dart';
 import '../../../../core/utils/app_theme_colors.dart';
+import '../controllers/investor_dashboard_provider.dart';
+import '../models/investor_dashboard_models.dart';
 
-class BannerItem {
-  final String title;
-  final String location;
-  final String targetRaise;
-  final String imageUrl;
-
-  const BannerItem({
-    required this.title,
-    required this.location,
-    required this.targetRaise,
-    required this.imageUrl,
-  });
-}
-
-class InvestorBannerCarousel extends StatefulWidget {
+class InvestorBannerCarousel extends ConsumerStatefulWidget {
   const InvestorBannerCarousel({super.key});
 
   @override
-  State<InvestorBannerCarousel> createState() => _InvestorBannerCarouselState();
+  ConsumerState<InvestorBannerCarousel> createState() =>
+      _InvestorBannerCarouselState();
 }
 
-class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
+class _InvestorBannerCarouselState extends ConsumerState<InvestorBannerCarousel> {
   late final PageController _pageController;
   int _currentIndex = 0;
   Timer? _timer;
-
-  final List<BannerItem> _banners = const [
-    BannerItem(
-      title: "Downtown Tech Hub",
-      location: "United States",
-      targetRaise: "Target Raise: \$5.0M",
-      imageUrl:
-          "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=400&auto=format&fit=crop",
-    ),
-    BannerItem(
-      title: "Solar Energy Park",
-      location: "Spain",
-      targetRaise: "Target Raise: \$12.5M",
-      imageUrl:
-          "https://images.unsplash.com/photo-1785990137771-1cb6d4a63637?q=80&w=1632&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    ),
-    BannerItem(
-      title: "Green Logistics Hub",
-      location: "Germany",
-      targetRaise: "Target Raise: \$8.2M",
-      imageUrl:
-          "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400&auto=format&fit=crop",
-    ),
-    BannerItem(
-      title: "Biotech Center",
-      location: "United Kingdom",
-      targetRaise: "Target Raise: \$15.0M",
-      imageUrl:
-          "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=400&auto=format&fit=crop",
-    ),
-  ];
 
   @override
   void initState() {
@@ -74,8 +34,10 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (!mounted) return;
+      final banners = ref.read(investorDashboardProvider).banners;
+      if (banners.isEmpty) return;
       if (_pageController.hasClients) {
-        final nextPage = (_currentIndex + 1) % _banners.length;
+        final nextPage = (_currentIndex + 1) % banners.length;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 600),
@@ -99,6 +61,11 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
+    final banners = ref.watch(investorDashboardProvider).banners;
+
+    if (banners.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       children: [
@@ -113,7 +80,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
               });
               _resetAutoPlay();
             },
-            itemCount: _banners.length,
+            itemCount: banners.length,
             itemBuilder: (context, index) {
               return AnimatedBuilder(
                 animation: _pageController,
@@ -121,8 +88,10 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                   double value = 1.0;
                   if (_pageController.hasClients &&
                       _pageController.position.haveDimensions) {
-                    final page = _pageController.page ?? _currentIndex.toDouble();
-                    value = (1 - ((page - index).abs() * 0.12)).clamp(0.88, 1.0);
+                    final page =
+                        _pageController.page ?? _currentIndex.toDouble();
+                    value =
+                        (1 - ((page - index).abs() * 0.12)).clamp(0.88, 1.0);
                   }
                   return Transform.scale(
                     scale: value,
@@ -132,7 +101,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                     ),
                   );
                 },
-                child: _buildBannerCard(context, tc, _banners[index]),
+                child: _buildBannerCard(context, tc, banners[index]),
               );
             },
           ),
@@ -140,7 +109,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
         SizedBox(height: AppDimens.spaceMd),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(_banners.length, (idx) {
+          children: List.generate(banners.length, (idx) {
             final isSelected = idx == _currentIndex;
             return GestureDetector(
               onTap: () {
@@ -173,7 +142,7 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
   Widget _buildBannerCard(
     BuildContext context,
     AppThemeColors tc,
-    BannerItem item,
+    InvestorBannerModel item,
   ) {
     return Container(
       width: double.infinity,
@@ -258,7 +227,20 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                       SizedBox(
                         height: 26.h,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if (item.targetProjectId != null &&
+                                item.targetProjectId!.isNotEmpty) {
+                              context.push(
+                                '/public-view',
+                                extra: {'projectId': item.targetProjectId},
+                              );
+                            } else if (item.actionUrl != null &&
+                                item.actionUrl!.isNotEmpty) {
+                              context.push(item.actionUrl!);
+                            } else {
+                              context.push('/discover');
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0052CC),
                             foregroundColor: Colors.white,
@@ -272,7 +254,9 @@ class _InvestorBannerCarouselState extends State<InvestorBannerCarousel> {
                             ),
                           ),
                           child: Text(
-                            "Request",
+                            item.actionText.isNotEmpty
+                                ? item.actionText
+                                : "Request",
                             style: GoogleFonts.outfit(
                               fontSize: 11.sp,
                               fontWeight: FontWeight.bold,
