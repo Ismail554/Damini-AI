@@ -45,11 +45,13 @@ class CompanyVerificationNotifier extends Notifier<CompanyVerificationState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final status = await _repo.getVerificationStatus();
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoading: false,
         verification: status,
       );
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }

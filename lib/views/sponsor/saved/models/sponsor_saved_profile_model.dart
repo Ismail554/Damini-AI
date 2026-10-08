@@ -4,24 +4,28 @@ class SponsorSavedProfileModel {
   final String id;
   final String userId;
   final String name;
+  final String email;
   final String title;
   final String company;
   final String avatarUrl;
   final String location;
   final String role;
   final bool isSaved;
+  final bool isIncompleteProfile;
   final DateTime? createdAt;
 
   const SponsorSavedProfileModel({
     required this.id,
     required this.userId,
     required this.name,
+    this.email = '',
     required this.title,
     required this.company,
     required this.avatarUrl,
     required this.location,
     required this.role,
     this.isSaved = true,
+    this.isIncompleteProfile = false,
     this.createdAt,
   });
 
@@ -50,19 +54,26 @@ class SponsorSavedProfileModel {
         nestedUser['id']?.toString() ??
         id;
 
-    // Name
+    // Name — check root-level first_name/last_name (flat response), then nested
     String name = json['name']?.toString() ??
         json['full_name']?.toString() ??
         '';
-    if (name.trim().isEmpty && nestedUser.isNotEmpty) {
-      final first = nestedUser['first_name']?.toString() ?? '';
-      final last = nestedUser['last_name']?.toString() ?? '';
+    if (name.trim().isEmpty) {
+      final first = json['first_name']?.toString() ??
+          nestedUser['first_name']?.toString() ?? '';
+      final last = json['last_name']?.toString() ??
+          nestedUser['last_name']?.toString() ?? '';
       name = '$first $last'.trim();
-      if (name.isEmpty) {
-        name = nestedUser['name']?.toString() ?? 'Member';
-      }
     }
-    if (name.isEmpty) name = 'Member';
+    if (name.trim().isEmpty && nestedUser.isNotEmpty) {
+      name = nestedUser['name']?.toString() ?? '';
+    }
+    if (name.trim().isEmpty) name = 'Member';
+
+    // Email
+    final email = json['email']?.toString() ??
+        nestedUser['email']?.toString() ??
+        '';
 
     // Title / Designation
     String title = json['title']?.toString() ??
@@ -89,17 +100,17 @@ class SponsorSavedProfileModel {
         location = city.isNotEmpty ? city : country;
       }
     }
-    if (location.isEmpty) location = 'Not specified';
 
     // Role
     String role = json['role']?.toString() ??
         nestedUser['role']?.toString() ??
         'Investor';
 
-    // Avatar URL
+    // Avatar URL — check root-level profile_photo (flat response), then nested
     final rawPhoto = json['avatar_url']?.toString() ??
         json['avatar']?.toString() ??
         json['photo']?.toString() ??
+        json['profile_photo']?.toString() ??
         nestedProfile['profile_photo']?.toString() ??
         nestedUser['avatar']?.toString();
 
@@ -121,6 +132,13 @@ class SponsorSavedProfileModel {
         ? isSavedVal
         : (isSavedVal != null ? isSavedVal.toString().toLowerCase() == 'true' : true);
 
+    // Incomplete profile flag
+    final incompleteVal = json['is_incomplete_profile'] ??
+        nestedUser['is_incomplete_profile'];
+    final isIncompleteProfile = incompleteVal is bool
+        ? incompleteVal
+        : (incompleteVal != null ? incompleteVal.toString().toLowerCase() == 'true' : false);
+
     final createdAtStr = json['created_at']?.toString() ?? json['saved_at']?.toString();
     final createdAt = createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
 
@@ -128,12 +146,14 @@ class SponsorSavedProfileModel {
       id: id,
       userId: userId,
       name: name,
+      email: email,
       title: title,
       company: company,
       avatarUrl: avatarUrl,
       location: location,
       role: role,
       isSaved: isSaved,
+      isIncompleteProfile: isIncompleteProfile,
       createdAt: createdAt,
     );
   }
@@ -142,12 +162,14 @@ class SponsorSavedProfileModel {
     'id': id,
     'user_id': userId,
     'name': name,
+    'email': email,
     'title': title,
     'company': company,
     'avatar_url': avatarUrl,
     'location': location,
     'role': role,
     'is_saved': isSaved,
+    'is_incomplete_profile': isIncompleteProfile,
     'created_at': createdAt?.toIso8601String(),
   };
 
@@ -155,24 +177,28 @@ class SponsorSavedProfileModel {
     String? id,
     String? userId,
     String? name,
+    String? email,
     String? title,
     String? company,
     String? avatarUrl,
     String? location,
     String? role,
     bool? isSaved,
+    bool? isIncompleteProfile,
     DateTime? createdAt,
   }) {
     return SponsorSavedProfileModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
+      email: email ?? this.email,
       title: title ?? this.title,
       company: company ?? this.company,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       location: location ?? this.location,
       role: role ?? this.role,
       isSaved: isSaved ?? this.isSaved,
+      isIncompleteProfile: isIncompleteProfile ?? this.isIncompleteProfile,
       createdAt: createdAt ?? this.createdAt,
     );
   }

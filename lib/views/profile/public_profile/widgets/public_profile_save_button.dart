@@ -45,46 +45,44 @@ class _PublicProfileSaveButtonState
 
     return Padding(
       padding: const EdgeInsets.only(right: 16),
-      child: Center(
-        child: CircleActionButton(
-          icon: isSaved
-              ? Icons.bookmark_rounded
-              : Icons.bookmark_border_rounded,
-          background: tc.cardInner,
-          borderColor: isSaved
-              ? const Color(0xFFE53935).withValues(alpha: 0.3)
-              : tc.borderColor,
-          iconColor: isSaved ? const Color(0xFFE53935) : tc.textPrimary,
-          onTap: () async {
-            if (bookmarkState.isLoading) return;
-            try {
-              final result = await ref
-                  .read(profileBookmarkProvider(widget.userId).notifier)
-                  .toggleBookmark();
+      child: CircleActionButton(
+        icon: isSaved
+            ? Icons.bookmark_rounded
+            : Icons.bookmark_border_rounded,
+        background: tc.cardInner,
+        borderColor: isSaved
+            ? const Color(0xFFE53935).withValues(alpha: 0.3)
+            : tc.borderColor,
+        iconColor: isSaved ? const Color(0xFFE53935) : tc.textPrimary,
+        onTap: () async {
+          if (bookmarkState.isLoading) return;
+          try {
+            final result = await ref
+                .read(profileBookmarkProvider(widget.userId).notifier)
+                .toggleBookmark();
 
-              if (context.mounted) {
-                if (result) {
-                  CustomSnackBar.success(
-                    context,
-                    "Profile saved to bookmarks.",
-                  );
-                } else {
-                  CustomSnackBar.info(
-                    context,
-                    "Profile removed from saved items.",
-                  );
-                }
-              }
-            } catch (e) {
-              if (context.mounted) {
-                final msg = e is AppException
-                    ? e.message
-                    : "Unable to update bookmark. Please try again.";
-                CustomSnackBar.error(context, msg);
+            if (context.mounted) {
+              if (result) {
+                CustomSnackBar.success(
+                  context,
+                  "Profile saved to bookmarks.",
+                );
+              } else {
+                CustomSnackBar.info(
+                  context,
+                  "Profile removed from saved items.",
+                );
               }
             }
-          },
-        ),
+          } catch (e) {
+            if (context.mounted) {
+              final msg = e is AppException
+                  ? e.message
+                  : "Unable to update bookmark. Please try again.";
+              CustomSnackBar.error(context, msg);
+            }
+          }
+        },
       ),
     );
   }

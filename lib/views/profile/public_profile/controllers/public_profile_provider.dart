@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../sponsor/saved/controllers/sponsor_saved_provider.dart';
 import '../../../sponsor/saved/repositories/sponsor_saved_repository.dart';
@@ -71,32 +72,34 @@ class ProfileBookmarkState {
   }
 }
 
-class ProfileBookmarkNotifier extends Notifier<ProfileBookmarkState> {
+class ProfileBookmarkNotifier extends StateNotifier<ProfileBookmarkState> {
   final String userId;
-  ProfileBookmarkNotifier(this.userId);
+  final Ref ref;
 
-  late final SponsorSavedRepository _savedRepo;
+  ProfileBookmarkNotifier(this.userId, this.ref) : super(const ProfileBookmarkState()) {
+    _init();
+  }
 
-  @override
-  ProfileBookmarkState build() {
-    _savedRepo = ref.watch(sponsorSavedRepositoryProvider);
-    final savedState = ref.watch(sponsorSavedProvider);
+  void _init() {
+    final savedState = ref.read(sponsorSavedProvider);
     final isAlreadySaved = savedState.rawProfiles
         .any((p) => p.userId == userId || p.id == userId);
+    state = state.copyWith(isSaved: isAlreadySaved);
 
     // Also fetch live is_saved flag from GET /api/v1/profiles/<userId>/
     Future.microtask(() async {
-      final liveProfile =
-          await ref.read(publicProfileRepositoryProvider).getPublicProfile(userId);
+      final liveProfile = await ref
+          .read(publicProfileRepositoryProvider)
+          .getPublicProfile(userId);
+      if (!mounted) return;
       if (liveProfile.id.isNotEmpty) {
         setInitial(liveProfile.isSaved);
       }
     });
-
-    return ProfileBookmarkState(isSaved: isAlreadySaved);
   }
 
   void setInitial(bool isSaved) {
+    if (!mounted) return;
     if (state.isSaved != isSaved && !state.isLoading) {
       state = state.copyWith(isSaved: isSaved);
     }
@@ -113,7 +116,8 @@ class ProfileBookmarkNotifier extends Notifier<ProfileBookmarkState> {
     state = state.copyWith(isSaved: newSaved, isLoading: true);
 
     try {
-      final backendSaved = await _savedRepo.toggleSaveProfile(targetUserId);
+      final backendSaved = await ref.read(sponsorSavedRepositoryProvider).toggleSaveProfile(targetUserId);
+      if (!mounted) return newSaved;
       final finalSaved = backendSaved ?? newSaved;
 
       state = state.copyWith(isSaved: finalSaved, isLoading: false);
@@ -127,13 +131,15 @@ class ProfileBookmarkNotifier extends Notifier<ProfileBookmarkState> {
       return finalSaved;
     } catch (e) {
       // Revert optimistic update on failure
-      state = state.copyWith(isSaved: previousSaved, isLoading: false);
+      if (mounted) {
+        state = state.copyWith(isSaved: previousSaved, isLoading: false);
+      }
       rethrow;
     }
   }
 }
 
-final profileBookmarkProvider = NotifierProvider.autoDispose
-    .family<ProfileBookmarkNotifier, ProfileBookmarkState, String>(
-  ProfileBookmarkNotifier.new,
-);
+final profileBookmarkProvider = StateNotifierProvider.autoDispose
+    .family<ProfileBookmarkNotifier, ProfileBookmarkState, String>((ref, userId) {
+  return ProfileBookmarkNotifier(userId, ref);
+});

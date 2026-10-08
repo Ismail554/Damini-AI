@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,7 +17,7 @@ class SavedStatsRow extends StatelessWidget {
             label: "Total committed",
           ),
         ),
-        SizedBox(width: 8.w),
+        AppSpacing.w8,
         Expanded(
           child: _buildStatCard(
             icon: Icons.pie_chart_outline_rounded,
@@ -24,7 +25,7 @@ class SavedStatsRow extends StatelessWidget {
             label: "Active projects",
           ),
         ),
-        SizedBox(width: 8.w),
+        AppSpacing.w8,
         Expanded(
           child: _buildStatCard(
             icon: Icons.shield_outlined,
@@ -58,7 +59,7 @@ class SavedStatsRow extends StatelessWidget {
             color: Colors.white,
             size: 20.sp,
           ),
-          SizedBox(height: 8.h),
+          AppSpacing.h8,
           Text(
             value,
             style: GoogleFonts.outfit(
@@ -67,7 +68,7 @@ class SavedStatsRow extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 2.h),
+          AppSpacing.h2,
           Text(
             label,
             style: GoogleFonts.outfit(

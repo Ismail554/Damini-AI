@@ -10,8 +10,11 @@ class TrendingOpportunityCard extends StatelessWidget {
   final String description;
   final String imageUrl;
   final String raisedAmount;
+  final String raisedLabel;
   final String goalAmount;
+  final String goalLabel;
   final double progress;
+  final VoidCallback? onTap;
 
   const TrendingOpportunityCard({
     super.key,
@@ -19,24 +22,32 @@ class TrendingOpportunityCard extends StatelessWidget {
     required this.description,
     required this.imageUrl,
     required this.raisedAmount,
+    this.raisedLabel = "Min Investment",
     required this.goalAmount,
+    this.goalLabel = "Location",
     required this.progress,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: tc.cardBg,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: tc.cardBg,
+            borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+            border: Border.all(color: tc.borderColor, width: AppDimens.borderThin),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           Stack(
             children: [
               ClipRRect(
@@ -129,7 +140,7 @@ class TrendingOpportunityCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Raised",
+                                raisedLabel,
                                 style: GoogleFonts.outfit(
                                   fontSize: 11.sp,
                                   color: tc.textTertiary,
@@ -150,7 +161,7 @@ class TrendingOpportunityCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                "Goal",
+                                goalLabel,
                                 style: GoogleFonts.outfit(
                                   fontSize: 11.sp,
                                   color: tc.textTertiary,
@@ -189,6 +200,8 @@ class TrendingOpportunityCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
   }
 }

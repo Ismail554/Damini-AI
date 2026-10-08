@@ -441,11 +441,31 @@ class AppRouter {
       ),
       GoRoute(
         path: '/discover',
-        pageBuilder: (context, state) => buildNativePage(
-          context: context,
-          state: state,
-          child: const DiscoverScreen(),
-        ),
+        pageBuilder: (context, state) {
+          String? initialCategory;
+          String? initialSort;
+          if (state.extra is Map) {
+            final map = state.extra as Map;
+            initialCategory = map['category']?.toString();
+            initialSort = map['sort']?.toString();
+          } else if (state.extra is String) {
+            initialCategory = state.extra as String;
+          }
+          if (state.uri.queryParameters.containsKey('category')) {
+            initialCategory = state.uri.queryParameters['category'];
+          }
+          if (state.uri.queryParameters.containsKey('sort')) {
+            initialSort = state.uri.queryParameters['sort'];
+          }
+          return buildNativePage(
+            context: context,
+            state: state,
+            child: DiscoverScreen(
+              initialCategory: initialCategory,
+              initialSort: initialSort,
+            ),
+          );
+        },
       ),
       GoRoute(
         path: '/request-collaboration',

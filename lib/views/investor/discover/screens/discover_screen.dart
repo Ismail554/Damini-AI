@@ -13,7 +13,14 @@ import '../controllers/discover_provider.dart';
 import '../models/discover_deal_model.dart';
 
 class DiscoverScreen extends ConsumerStatefulWidget {
-  const DiscoverScreen({super.key});
+  final String? initialCategory;
+  final String? initialSort;
+
+  const DiscoverScreen({
+    super.key,
+    this.initialCategory,
+    this.initialSort,
+  });
 
   @override
   ConsumerState<DiscoverScreen> createState() => _DiscoverScreenState();
@@ -21,6 +28,21 @@ class DiscoverScreen extends ConsumerStatefulWidget {
 
 class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.initialCategory != null && widget.initialCategory!.isNotEmpty) {
+        ref
+            .read(discoverProvider.notifier)
+            .selectCategoryByName(widget.initialCategory!);
+      }
+      if (widget.initialSort != null && widget.initialSort!.isNotEmpty) {
+        ref.read(discoverProvider.notifier).selectSort(widget.initialSort!);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -47,7 +69,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               padding: EdgeInsets.symmetric(
                 horizontal: AppDimens.screenHorizontal,
               ),
-              child: _buildSubHeader(tc, deals.length, discoverState.selectedSort),
+              child: _buildSubHeader(
+                tc,
+                deals.length,
+                discoverState.selectedSort,
+              ),
             ),
             SizedBox(height: 10.h),
             Expanded(
@@ -62,8 +88,8 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       itemCount: deals.length,
                       itemBuilder: (context, index) {
                         final item = deals[index];
-                        final isBookmarked =
-                            discoverState.bookmarkedIds.contains(item.id);
+                        final isBookmarked = discoverState.bookmarkedIds
+                            .contains(item.id);
                         return _buildDealCard(context, tc, item, isBookmarked);
                       },
                     ),
@@ -141,10 +167,10 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             icon: Icon(
               Icons.arrow_back_ios_new_rounded,
               color: tc.textPrimary,
-              size: 20.r,
+              size: 20.sp,
             ),
           ),
-          SizedBox(width: 4.w),
+          AppSpacing.w4,
           Text(
             "Discover",
             style: GoogleFonts.outfit(
@@ -282,6 +308,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               value: "Newest",
               child: Text(
                 "Newest",
+                style: GoogleFonts.outfit(color: tc.textPrimary),
+              ),
+            ),
+            PopupMenuItem(
+              value: "Trending",
+              child: Text(
+                "Trending",
                 style: GoogleFonts.outfit(color: tc.textPrimary),
               ),
             ),

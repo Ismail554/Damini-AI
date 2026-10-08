@@ -107,19 +107,27 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
             SizedBox(height: AppDimens.paddingMd),
             _buildFeaturedList(filteredFeatured),
             SizedBox(height: AppDimens.spaceXxl),
-            _buildTrendingHeader(tc),
+            _buildTrendingHeader(tc, selectedCategory),
             SizedBox(height: AppDimens.paddingMd),
             if (filteredTrending.isNotEmpty)
-              ...filteredTrending.map(
-                (item) => Padding(
-                  padding: EdgeInsets.only(bottom: AppDimens.paddingMd),
-                  child: TrendingOpportunityCard(
-                    title: item.title,
-                    description: "${item.category} • ${item.location} • ${item.daysLeft} days left",
-                    imageUrl: item.imageUrl,
-                    raisedAmount: item.minInvestment,
-                    goalAmount: item.location,
-                    progress: item.fundedPercent,
+              Padding(
+                padding: EdgeInsets.only(bottom: AppDimens.paddingMd),
+                child: TrendingOpportunityCard(
+                  title: filteredTrending.first.title,
+                  description:
+                      "${filteredTrending.first.category} • ${filteredTrending.first.location} • ${filteredTrending.first.daysLeft} days left",
+                  imageUrl: filteredTrending.first.imageUrl,
+                  raisedAmount: filteredTrending.first.minInvestment,
+                  raisedLabel: "Min Investment",
+                  goalAmount: filteredTrending.first.location,
+                  goalLabel: "Location",
+                  progress: filteredTrending.first.fundedPercent,
+                  onTap: () => context.push(
+                    '/discover',
+                    extra: {
+                      'category': selectedCategory,
+                      'sort': 'Trending',
+                    },
                   ),
                 ),
               )
@@ -454,7 +462,7 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
     );
   }
 
-  Widget _buildTrendingHeader(AppThemeColors tc) {
+  Widget _buildTrendingHeader(AppThemeColors tc, [String selectedCategory = "All"]) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -467,7 +475,13 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
           ),
         ),
         GestureDetector(
-          onTap: () => context.push('/discover'),
+          onTap: () => context.push(
+            '/discover',
+            extra: {
+              'category': selectedCategory,
+              'sort': 'Trending',
+            },
+          ),
           child: Text(
             "View All",
             style: GoogleFonts.outfit(

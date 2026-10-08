@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/api_service.dart';
 import '../models/discover_deal_model.dart';
 import '../repositories/discover_repository.dart';
 
 final discoverRepositoryProvider = Provider<DiscoverRepository>((ref) {
-  return DiscoverRepositoryImpl();
+  return DiscoverRepositoryImpl(ref.watch(apiServiceProvider));
 });
 
 class DiscoverState {
@@ -36,7 +37,7 @@ class DiscoverState {
     final cat = selectedCategory;
 
     var deals = allDeals.where((deal) {
-      final matchesCat = cat == "All" || deal.category == cat;
+      final matchesCat = cat == "All" || deal.category.toLowerCase() == cat.toLowerCase();
       final q = searchQuery.trim().toLowerCase();
       final matchesSearch = q.isEmpty ||
           deal.title.toLowerCase().contains(q) ||
@@ -49,6 +50,8 @@ class DiscoverState {
       deals.sort((a, b) => b.roiValue.compareTo(a.roiValue));
     } else if (selectedSort == "Target Raise") {
       deals.sort((a, b) => b.raiseValue.compareTo(a.raiseValue));
+    } else if (selectedSort == "Trending") {
+      deals.sort((a, b) => b.fundedPercent.compareTo(a.fundedPercent));
     } else {
       deals.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     }
@@ -88,20 +91,41 @@ class DiscoverNotifier extends Notifier<DiscoverState> {
     return const DiscoverState(isLoading: true);
   }
 
-  Future<void> loadDeals() async {
+  Future<void> loadDeals({String? initialCategory, String? initialSort}) async {
     final repo = ref.read(discoverRepositoryProvider);
     final categories = await repo.getCategories();
     final deals = await repo.getDiscoverDeals();
+
+    int catIndex = state.selectedCategoryIndex;
+    if (initialCategory != null && initialCategory.isNotEmpty) {
+      final idx = categories.indexWhere(
+        (c) => c.toLowerCase() == initialCategory.toLowerCase(),
+      );
+      if (idx != -1) {
+        catIndex = idx;
+      }
+    }
 
     state = state.copyWith(
       isLoading: false,
       categories: categories,
       allDeals: deals,
+      selectedCategoryIndex: catIndex,
+      selectedSort: initialSort ?? state.selectedSort,
     );
   }
 
   void selectCategory(int index) {
     state = state.copyWith(selectedCategoryIndex: index);
+  }
+
+  void selectCategoryByName(String categoryName) {
+    final index = state.categories.indexWhere(
+      (c) => c.toLowerCase() == categoryName.toLowerCase(),
+    );
+    if (index != -1) {
+      state = state.copyWith(selectedCategoryIndex: index);
+    }
   }
 
   void selectSort(String sort) {
