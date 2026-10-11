@@ -203,10 +203,18 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
   @override
   Future<List<FeaturedOpportunityModel>> getFeaturedOpportunities() async {
     try {
-      final response = await _apiService.get(
-        ApiEndpoints.projects,
-        requireAuth: true,
-      );
+      dynamic response;
+      try {
+        response = await _apiService.get(
+          ApiEndpoints.discoverProjects,
+          requireAuth: true,
+        );
+      } catch (_) {
+        response = await _apiService.get(
+          ApiEndpoints.projects,
+          requireAuth: true,
+        );
+      }
 
       dynamic data = response.data;
       if (data is String) {
@@ -219,7 +227,9 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
       if (data is List) {
         list = data;
       } else if (data is Map) {
-        if (data['results'] is List) {
+        if (data['data'] is Map && (data['data'] as Map)['results'] is List) {
+          list = (data['data'] as Map)['results'] as List;
+        } else if (data['results'] is List) {
           list = data['results'] as List;
         } else if (data['data'] is List) {
           list = data['data'] as List;
@@ -288,10 +298,18 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
   @override
   Future<List<TrendingProjectModel>> getTrendingProjects() async {
     try {
-      final response = await _apiService.get(
-        ApiEndpoints.projects,
-        requireAuth: true,
-      );
+      dynamic response;
+      try {
+        response = await _apiService.get(
+          ApiEndpoints.discoverProjects,
+          requireAuth: true,
+        );
+      } catch (_) {
+        response = await _apiService.get(
+          ApiEndpoints.projects,
+          requireAuth: true,
+        );
+      }
 
       dynamic data = response.data;
       if (data is String) {
@@ -304,7 +322,9 @@ class InvestorDashboardRepositoryImpl implements InvestorDashboardRepository {
       if (data is List) {
         list = data;
       } else if (data is Map) {
-        if (data['results'] is List) {
+        if (data['data'] is Map && (data['data'] as Map)['results'] is List) {
+          list = (data['data'] as Map)['results'] as List;
+        } else if (data['results'] is List) {
           list = data['results'] as List;
         } else if (data['data'] is List) {
           list = data['data'] as List;

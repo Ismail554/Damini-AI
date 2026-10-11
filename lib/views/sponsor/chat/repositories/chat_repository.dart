@@ -31,6 +31,7 @@ class ChatRepository {
       final response = await _api.post(
         ApiEndpoints.startConversation,
         data: {
+          'recipient_id': targetUserId ?? 0,
           'target_user_id': targetUserId ?? 0,
           'project_id': projectId ?? 0,
         },
@@ -267,6 +268,33 @@ class ChatRepository {
       }
 
       return messages;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// POST /api/v1/chat/conversations/{id}/messages/send/
+  Future<Map<String, dynamic>> sendMessageViaRest({
+    required String conversationId,
+    required String content,
+    String messageType = 'text',
+  }) async {
+    try {
+      final response = await _api.post(
+        ApiEndpoints.sendChatMessage(conversationId),
+        data: {
+          'content': content.trim(),
+          'message_type': messageType,
+        },
+        requireAuth: true,
+      );
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
+      }
+      return data is Map ? Map<String, dynamic>.from(data) : {};
     } catch (e) {
       rethrow;
     }

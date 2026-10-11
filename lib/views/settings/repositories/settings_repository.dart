@@ -62,8 +62,12 @@ class SettingsRepositoryImpl implements SettingsRepository {
   @override
   Future<bool> deleteAccount([String? password]) async {
     try {
-      final response = await _apiService.delete(
+      final response = await _apiService.post(
         ApiEndpoints.deleteAccount,
+        data: {
+          if (password != null && password.isNotEmpty) 'password': password,
+          'confirmation': 'DELETE',
+        },
         requireAuth: true,
       );
       return response.statusCode == 200 ||
@@ -72,7 +76,15 @@ class SettingsRepositoryImpl implements SettingsRepository {
               (response.data['status'] == 'success' ||
                   response.data['success'] == true));
     } catch (e) {
-      rethrow;
+      try {
+        final fallback = await _apiService.delete(
+          ApiEndpoints.currentUser,
+          requireAuth: true,
+        );
+        return fallback.statusCode == 200 || fallback.statusCode == 204;
+      } catch (_) {
+        rethrow;
+      }
     }
   }
 }

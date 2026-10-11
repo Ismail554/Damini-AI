@@ -110,21 +110,40 @@ class LoginRepositoryImpl implements LoginRepository {
     if (data is Map) {
       final status = data['status']?.toString().toLowerCase();
       if (status == 'error' || status == 'failed') {
+        final errorMsg = data['message']?.toString() ??
+            (data['data'] is Map
+                ? (data['data'] as Map)['message']?.toString()
+                : null) ??
+            fallbackErrorMessage;
         return LoginResponseModel(
           success: false,
-          message: data['message']?.toString() ?? fallbackErrorMessage,
+          message: errorMsg,
         );
       }
 
-      token = data['access']?.toString();
-      refreshToken = data['refresh']?.toString();
-      message = data['message']?.toString();
+      // Check whether auth tokens and user data are nested under 'data' or present at root
+      final Map payload = (data['data'] is Map) ? data['data'] as Map : data;
 
-      if (data['role'] != null && data['role'].toString().trim().isNotEmpty) {
-        role = data['role'].toString().trim();
+      token = payload['access']?.toString() ??
+          payload['token']?.toString() ??
+          payload['access_token']?.toString() ??
+          data['access']?.toString() ??
+          data['token']?.toString() ??
+          data['access_token']?.toString();
+
+      refreshToken = payload['refresh']?.toString() ??
+          payload['refresh_token']?.toString() ??
+          data['refresh']?.toString() ??
+          data['refresh_token']?.toString();
+
+      message = data['message']?.toString() ?? payload['message']?.toString();
+
+      final rawRole = payload['role'] ?? data['role'];
+      if (rawRole != null && rawRole.toString().trim().isNotEmpty) {
+        role = rawRole.toString().trim();
       }
 
-      final rawUser = data['user'];
+      final rawUser = payload['user'] ?? data['user'];
       if (rawUser is Map) {
         user = UserModel.fromJson(Map<String, dynamic>.from(rawUser));
         if (role == null || role.isEmpty || role.toUpperCase() == 'NONE') {
@@ -156,8 +175,14 @@ class LoginRepositoryImpl implements LoginRepository {
         await StorageService.saveUuid(jwtUid);
       }
     }
-    if (user?.fullName != null && user!.fullName!.trim().isNotEmpty) {
-      await StorageService.saveUserName(user.fullName!.trim());
+    final resolvedName = (user?.fullName != null && user!.fullName!.trim().isNotEmpty)
+        ? user.fullName!.trim()
+        : [user?.firstName, user?.lastName]
+            .where((s) => s != null && s.trim().isNotEmpty)
+            .join(' ')
+            .trim();
+    if (resolvedName.isNotEmpty) {
+      await StorageService.saveUserName(resolvedName);
     }
     await StorageService.saveIsApiConnected(true);
     await StorageService.saveHasSeenOnboarding();

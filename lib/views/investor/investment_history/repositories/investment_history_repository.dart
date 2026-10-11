@@ -31,11 +31,20 @@ class InvestmentHistoryRepositoryImpl implements InvestmentHistoryRepository {
           queryParams['status'] = status;
         }
 
-        final response = await _apiService.get(
-          ApiEndpoints.investorInvestments,
-          queryParameters: queryParams.isNotEmpty ? queryParams : null,
-          requireAuth: true,
-        );
+        dynamic response;
+        try {
+          response = await _apiService.get(
+            ApiEndpoints.investorInvestments,
+            queryParameters: queryParams.isNotEmpty ? queryParams : null,
+            requireAuth: true,
+          );
+        } catch (_) {
+          response = await _apiService.get(
+            "/api/v1/projects/investor/investments/",
+            queryParameters: queryParams.isNotEmpty ? queryParams : null,
+            requireAuth: true,
+          );
+        }
 
         dynamic data = response.data;
         if (data is String) {
@@ -52,6 +61,12 @@ class InvestmentHistoryRepositoryImpl implements InvestmentHistoryRepository {
           if (payload['summary'] is Map) {
             summary = InvestmentPortfolioSummary.fromJson(
               Map<String, dynamic>.from(payload['summary'] as Map),
+            );
+          } else if (payload['total_invested'] != null ||
+              payload['active_deals_count'] != null ||
+              payload['expected_returns'] != null) {
+            summary = InvestmentPortfolioSummary.fromJson(
+              Map<String, dynamic>.from(payload),
             );
           }
 

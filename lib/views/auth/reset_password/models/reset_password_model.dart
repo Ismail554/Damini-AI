@@ -14,6 +14,7 @@ class ResetPasswordRequestModel {
   Map<String, dynamic> toJson() => {
         'email': email,
         'code': code,
+        'otp': code,
         'new_password': newPassword,
         'confirm_password': confirmPassword,
       };

@@ -19,13 +19,14 @@ class RequestCollaborationRepositoryImpl
     CollaborationSubmissionModel submission,
   ) async {
     final cleanBudget = submission.amount.replaceAll(RegExp(r'[^0-9.]'), '');
+    final numBudget = double.tryParse(cleanBudget);
+    final note = submission.note.trim().isNotEmpty
+        ? submission.note.trim()
+        : 'I am interested in collaborating on this project.';
     final payload = {
-      'proposed_budget': cleanBudget.isNotEmpty
-          ? cleanBudget
-          : submission.amount,
-      'message': submission.note.trim().isNotEmpty
-          ? submission.note.trim()
-          : 'I am interested in collaborating on this project.',
+      'proposed_budget': numBudget ?? cleanBudget,
+      'proposal_text': note,
+      'message': note,
     };
 
     final response = await _apiService.post(

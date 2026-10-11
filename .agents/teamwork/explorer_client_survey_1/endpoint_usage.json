@@ -1,0 +1,2339 @@
+[
+  {
+    "kind": "getter",
+    "name": "baseUrl",
+    "value": "https://clubby-andy-irksomely.ngrok-free.dev (or dotenv)",
+    "signature": "static String get baseUrl",
+    "comment": "",
+    "stmt": "static String get baseUrl { if (dotenv.isInitialized) { try { final url = dotenv.env['BASE_URL']; if (url != null && url.isNotEmpty) return url; } catch (_) {} } return \"https://clubby-andy-irksomely.ngrok-free.dev\"; }",
+    "total_usages": 90,
+    "repo_usages_count": 0,
+    "usages": [
+      {
+        "file": "lib\\core\\services\\auth_interceptor.dart",
+        "line": 18,
+        "code": "baseUrl: ApiEndpoints.baseUrl,"
+      },
+      {
+        "file": "lib\\core\\services\\chat_audio_service.dart",
+        "line": 76,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\core\\services\\chat_audio_service.dart",
+        "line": 77,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\core\\services\\chat_audio_service.dart",
+        "line": 78,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\core\\services\\chat_audio_service.dart",
+        "line": 82,
+        "code": "// If backend gave localhost or 127.0.0.1 in the URL, rewrite it to use ApiEndpoints.baseUrl"
+      },
+      {
+        "file": "lib\\core\\services\\chat_audio_service.dart",
+        "line": 85,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\core\\services\\chat_audio_service.dart",
+        "line": 86,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\core\\services\\chat_audio_service.dart",
+        "line": 87,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\core\\services\\dio_service.dart",
+        "line": 18,
+        "code": "baseUrl: ApiEndpoints.baseUrl,"
+      },
+      {
+        "file": "lib\\core\\utils\\external_link_launcher.dart",
+        "line": 19,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\core\\utils\\external_link_launcher.dart",
+        "line": 20,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\core\\utils\\external_link_launcher.dart",
+        "line": 21,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\core\\utils\\file_downloader.dart",
+        "line": 31,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\core\\utils\\file_downloader.dart",
+        "line": 32,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\core\\utils\\file_downloader.dart",
+        "line": 33,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\core\\widgets\\app_avatar.dart",
+        "line": 68,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\core\\widgets\\app_avatar.dart",
+        "line": 69,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\core\\widgets\\app_avatar.dart",
+        "line": 70,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\investor\\chat\\models\\investor_chat_model.dart",
+        "line": 36,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\investor\\chat\\models\\investor_chat_model.dart",
+        "line": 37,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\investor\\chat\\models\\investor_chat_model.dart",
+        "line": 38,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 75,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 76,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 77,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 140,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 141,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 142,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 200,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 201,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\models\\investor_dashboard_models.dart",
+        "line": 202,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\investor\\discover\\models\\discover_deal_model.dart",
+        "line": 48,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\investor\\discover\\models\\discover_deal_model.dart",
+        "line": 49,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\investor\\discover\\models\\discover_deal_model.dart",
+        "line": 50,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\investor\\investment_history\\models\\investment_record_model.dart",
+        "line": 79,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\investor\\investment_history\\models\\investment_record_model.dart",
+        "line": 80,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\investor\\investment_history\\models\\investment_record_model.dart",
+        "line": 81,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\investor\\saved\\models\\investor_saved_item_model.dart",
+        "line": 42,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\investor\\saved\\models\\investor_saved_item_model.dart",
+        "line": 43,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\investor\\saved\\models\\investor_saved_item_model.dart",
+        "line": 44,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\profile\\models\\investor_profile_model.dart",
+        "line": 62,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\profile\\models\\investor_profile_model.dart",
+        "line": 63,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\profile\\models\\investor_profile_model.dart",
+        "line": 64,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\models\\personal_info_model.dart",
+        "line": 83,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\models\\personal_info_model.dart",
+        "line": 84,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\models\\personal_info_model.dart",
+        "line": 85,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\models\\sponsor_edit_profile_model.dart",
+        "line": 71,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\models\\sponsor_edit_profile_model.dart",
+        "line": 72,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\models\\sponsor_edit_profile_model.dart",
+        "line": 73,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\profile\\public_profile\\models\\public_profile_model.dart",
+        "line": 96,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\profile\\public_profile\\models\\public_profile_model.dart",
+        "line": 97,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\profile\\public_profile\\models\\public_profile_model.dart",
+        "line": 98,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\settings\\models\\settings_model.dart",
+        "line": 73,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\settings\\models\\settings_model.dart",
+        "line": 74,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\settings\\models\\settings_model.dart",
+        "line": 75,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\all_projects\\models\\sponsor_project_model.dart",
+        "line": 91,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\all_projects\\models\\sponsor_project_model.dart",
+        "line": 92,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\all_projects\\models\\sponsor_project_model.dart",
+        "line": 93,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\chat\\widgets\\direct_chat_bubble.dart",
+        "line": 379,
+        "code": "return Image.network('${ApiEndpoints.baseUrl}$clean',"
+      },
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\models\\collaboration_request_model.dart",
+        "line": 238,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\models\\collaboration_request_model.dart",
+        "line": 239,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\models\\collaboration_request_model.dart",
+        "line": 240,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 81,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 82,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 83,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 236,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 237,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 238,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 319,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 320,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\models\\sponsor_dashboard_models.dart",
+        "line": 321,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\group_chat\\models\\group_chat_header_model.dart",
+        "line": 75,
+        "code": "final base = ApiEndpoints.baseUrl.replaceAll(RegExp(r'/+$'), '');"
+      },
+      {
+        "file": "lib\\views\\sponsor\\group_chat\\widgets\\group_chat_message_bubble.dart",
+        "line": 498,
+        "code": "final fullUrl = '${ApiEndpoints.baseUrl}$cleanPath';"
+      },
+      {
+        "file": "lib\\views\\sponsor\\profile\\models\\sponsor_profile_model.dart",
+        "line": 62,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\profile\\models\\sponsor_profile_model.dart",
+        "line": 63,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\profile\\models\\sponsor_profile_model.dart",
+        "line": 64,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\project_details\\models\\sponsor_project_details_model.dart",
+        "line": 49,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\project_details\\models\\sponsor_project_details_model.dart",
+        "line": 50,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\project_details\\models\\sponsor_project_details_model.dart",
+        "line": 51,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\project_details\\models\\sponsor_project_details_model.dart",
+        "line": 302,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\project_details\\models\\sponsor_project_details_model.dart",
+        "line": 303,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\project_details\\models\\sponsor_project_details_model.dart",
+        "line": 304,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\public_view\\models\\project_document_model.dart",
+        "line": 31,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\public_view\\models\\project_document_model.dart",
+        "line": 32,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\public_view\\models\\project_document_model.dart",
+        "line": 33,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\models\\sponsor_saved_profile_model.dart",
+        "line": 122,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\models\\sponsor_saved_profile_model.dart",
+        "line": 123,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\models\\sponsor_saved_profile_model.dart",
+        "line": 124,
+        "code": ": ApiEndpoints.baseUrl;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\models\\sponsor_saved_project_model.dart",
+        "line": 160,
+        "code": "final base = ApiEndpoints.baseUrl.endsWith('/')"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\models\\sponsor_saved_project_model.dart",
+        "line": 161,
+        "code": "? ApiEndpoints.baseUrl.substring(0, ApiEndpoints.baseUrl.length - 1)"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\models\\sponsor_saved_project_model.dart",
+        "line": 162,
+        "code": ": ApiEndpoints.baseUrl;"
+      }
+    ],
+    "repo_usages": []
+  },
+  {
+    "kind": "const",
+    "name": "register",
+    "value": "/api/v1/auth/register/",
+    "signature": "static const String register = \"/api/v1/auth/register/\"",
+    "comment": "",
+    "stmt": "static const String register = \"/api/v1/auth/register/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\signup\\repositories\\signup_repository.dart",
+        "line": 44,
+        "code": "ApiEndpoints.register,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\signup\\repositories\\signup_repository.dart",
+        "line": 44,
+        "code": "ApiEndpoints.register,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "verifyOtp",
+    "value": "/api/v1/auth/verify-otp/",
+    "signature": "static const String verifyOtp = \"/api/v1/auth/verify-otp/\"",
+    "comment": "",
+    "stmt": "static const String verifyOtp = \"/api/v1/auth/verify-otp/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\otp\\repositories\\otp_repository.dart",
+        "line": 26,
+        "code": "ApiEndpoints.verifyOtp,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\otp\\repositories\\otp_repository.dart",
+        "line": 26,
+        "code": "ApiEndpoints.verifyOtp,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "resendOtp",
+    "value": "/api/v1/auth/resend-otp/",
+    "signature": "static const String resendOtp = \"/api/v1/auth/resend-otp/\"",
+    "comment": "",
+    "stmt": "static const String resendOtp = \"/api/v1/auth/resend-otp/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\otp\\repositories\\otp_repository.dart",
+        "line": 76,
+        "code": "ApiEndpoints.resendOtp,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\otp\\repositories\\otp_repository.dart",
+        "line": 76,
+        "code": "ApiEndpoints.resendOtp,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "refreshToken",
+    "value": "/api/v1/auth/token/refresh/",
+    "signature": "static const String refreshToken = \"/api/v1/auth/token/refresh/\"",
+    "comment": "",
+    "stmt": "static const String refreshToken = \"/api/v1/auth/token/refresh/\";",
+    "total_usages": 1,
+    "repo_usages_count": 0,
+    "usages": [
+      {
+        "file": "lib\\core\\services\\auth_interceptor.dart",
+        "line": 134,
+        "code": "ApiEndpoints.refreshToken,"
+      }
+    ],
+    "repo_usages": []
+  },
+  {
+    "kind": "const",
+    "name": "login",
+    "value": "/api/v1/auth/login/",
+    "signature": "static const String login = \"/api/v1/auth/login/\"",
+    "comment": "",
+    "stmt": "static const String login = \"/api/v1/auth/login/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\login\\repositories\\login_repository.dart",
+        "line": 30,
+        "code": "ApiEndpoints.login,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\login\\repositories\\login_repository.dart",
+        "line": 30,
+        "code": "ApiEndpoints.login,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "logout",
+    "value": "/api/v1/auth/logout/",
+    "signature": "static const String logout = \"/api/v1/auth/logout/\"",
+    "comment": "",
+    "stmt": "static const String logout = \"/api/v1/auth/logout/\";",
+    "total_usages": 1,
+    "repo_usages_count": 0,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\session\\controllers\\session_provider.dart",
+        "line": 109,
+        "code": "ApiEndpoints.logout,"
+      }
+    ],
+    "repo_usages": []
+  },
+  {
+    "kind": "const",
+    "name": "googleLogin",
+    "value": "/api/v1/auth/google/",
+    "signature": "static const String googleLogin = \"/api/v1/auth/google/\"",
+    "comment": "",
+    "stmt": "static const String googleLogin = \"/api/v1/auth/google/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\login\\repositories\\login_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.googleLogin,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\login\\repositories\\login_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.googleLogin,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "appleLogin",
+    "value": "/api/v1/auth/apple/",
+    "signature": "static const String appleLogin = \"/api/v1/auth/apple/\"",
+    "comment": "",
+    "stmt": "static const String appleLogin = \"/api/v1/auth/apple/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\login\\repositories\\login_repository.dart",
+        "line": 81,
+        "code": "ApiEndpoints.appleLogin,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\login\\repositories\\login_repository.dart",
+        "line": 81,
+        "code": "ApiEndpoints.appleLogin,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "forgotPassword",
+    "value": "/api/v1/auth/forgot-password/",
+    "signature": "static const String forgotPassword = \"/api/v1/auth/forgot-password/\"",
+    "comment": "",
+    "stmt": "static const String forgotPassword = \"/api/v1/auth/forgot-password/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\forgot_password\\repositories\\forgot_password_repository.dart",
+        "line": 17,
+        "code": "ApiEndpoints.forgotPassword,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\forgot_password\\repositories\\forgot_password_repository.dart",
+        "line": 17,
+        "code": "ApiEndpoints.forgotPassword,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "resetPassword",
+    "value": "/api/v1/auth/reset-password/",
+    "signature": "static const String resetPassword = \"/api/v1/auth/reset-password/\"",
+    "comment": "",
+    "stmt": "static const String resetPassword = \"/api/v1/auth/reset-password/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\reset_password\\repositories\\reset_password_repository.dart",
+        "line": 17,
+        "code": "ApiEndpoints.resetPassword,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\reset_password\\repositories\\reset_password_repository.dart",
+        "line": 17,
+        "code": "ApiEndpoints.resetPassword,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "changePassword",
+    "value": "/api/v1/users/change-password/",
+    "signature": "static const String changePassword = \"/api/v1/users/change-password/\"",
+    "comment": "",
+    "stmt": "static const String changePassword = \"/api/v1/users/change-password/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\change_password\\repositories\\change_password_repository.dart",
+        "line": 17,
+        "code": "ApiEndpoints.changePassword,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\change_password\\repositories\\change_password_repository.dart",
+        "line": 17,
+        "code": "ApiEndpoints.changePassword,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "setRole",
+    "value": "/api/v1/profiles/set-role/",
+    "signature": "static const String setRole = \"/api/v1/profiles/set-role/\"",
+    "comment": "// Onboarding & Profiles",
+    "stmt": "static const String setRole = \"/api/v1/profiles/set-role/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.setRole,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.setRole,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "switchRole",
+    "value": "/api/v1/users/switch-role/",
+    "signature": "static const String switchRole = \"/api/v1/users/switch-role/\"",
+    "comment": "",
+    "stmt": "static const String switchRole = \"/api/v1/users/switch-role/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\auth\\session\\repositories\\switch_role_repository.dart",
+        "line": 24,
+        "code": "ApiEndpoints.switchRole,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\auth\\session\\repositories\\switch_role_repository.dart",
+        "line": 24,
+        "code": "ApiEndpoints.switchRole,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "onboarding",
+    "params": "String role",
+    "value": "/api/v1/profiles/${role.toLowerCase()}/onboarding/",
+    "signature": "static String onboarding(String role) => /api/v1/profiles/${role.toLowerCase()}/onboarding/",
+    "comment": "",
+    "stmt": "static String onboarding(String role) => \"/api/v1/profiles/${role.toLowerCase()}/onboarding/\";",
+    "total_usages": 4,
+    "repo_usages_count": 4,
+    "usages": [
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 111,
+        "code": "? ApiEndpoints.onboarding('investor')"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 48,
+        "code": "ApiEndpoints.onboarding(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 96,
+        "code": "ApiEndpoints.onboarding(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 149,
+        "code": "ApiEndpoints.onboarding(role),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 111,
+        "code": "? ApiEndpoints.onboarding('investor')"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 48,
+        "code": "ApiEndpoints.onboarding(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 96,
+        "code": "ApiEndpoints.onboarding(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 149,
+        "code": "ApiEndpoints.onboarding(role),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "verificationDocuments",
+    "value": "/api/v1/profiles/verification-documents/",
+    "signature": "static const String verificationDocuments = \"/api/v1/profiles/verification-documents/\"",
+    "comment": "",
+    "stmt": "static const String verificationDocuments = \"/api/v1/profiles/verification-documents/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\profile\\company_verification\\repositories\\company_verification_repository.dart",
+        "line": 74,
+        "code": "ApiEndpoints.verificationDocuments,"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 180,
+        "code": "ApiEndpoints.verificationDocuments,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\profile\\company_verification\\repositories\\company_verification_repository.dart",
+        "line": 74,
+        "code": "ApiEndpoints.verificationDocuments,"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 180,
+        "code": "ApiEndpoints.verificationDocuments,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "industries",
+    "value": "/api/v1/profiles/industries/",
+    "signature": "static const String industries = \"/api/v1/profiles/industries/\"",
+    "comment": "",
+    "stmt": "static const String industries = \"/api/v1/profiles/industries/\";",
+    "total_usages": 3,
+    "repo_usages_count": 3,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 56,
+        "code": "ApiEndpoints.industries,"
+      },
+      {
+        "file": "lib\\views\\investor\\discover\\repositories\\discover_repository.dart",
+        "line": 21,
+        "code": "ApiEndpoints.industries,"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 118,
+        "code": "ApiEndpoints.industries,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 56,
+        "code": "ApiEndpoints.industries,"
+      },
+      {
+        "file": "lib\\views\\investor\\discover\\repositories\\discover_repository.dart",
+        "line": 21,
+        "code": "ApiEndpoints.industries,"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 118,
+        "code": "ApiEndpoints.industries,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "verificationStatus",
+    "value": "/api/v1/profiles/verification-status/",
+    "signature": "static const String verificationStatus = \"/api/v1/profiles/verification-status/\"",
+    "comment": "",
+    "stmt": "static const String verificationStatus = \"/api/v1/profiles/verification-status/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\profile\\company_verification\\repositories\\company_verification_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.verificationStatus,"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 190,
+        "code": "ApiEndpoints.verificationStatus,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\profile\\company_verification\\repositories\\company_verification_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.verificationStatus,"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 190,
+        "code": "ApiEndpoints.verificationStatus,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "profileByRole",
+    "params": "String role",
+    "value": "/api/v1/profiles/${role.toLowerCase()}/",
+    "signature": "static String profileByRole(String role) => /api/v1/profiles/${role.toLowerCase()}/",
+    "comment": "// Profile GET/PATCH",
+    "stmt": "static String profileByRole(String role) => \"/api/v1/profiles/${role.toLowerCase()}/\";",
+    "total_usages": 5,
+    "repo_usages_count": 5,
+    "usages": [
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 37,
+        "code": "ApiEndpoints.profileByRole('sponsor'),"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 112,
+        "code": ": ApiEndpoints.profileByRole('sponsor');"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 56,
+        "code": "ApiEndpoints.profileByRole(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 104,
+        "code": "ApiEndpoints.profileByRole(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 157,
+        "code": "ApiEndpoints.profileByRole(role),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 37,
+        "code": "ApiEndpoints.profileByRole('sponsor'),"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 112,
+        "code": ": ApiEndpoints.profileByRole('sponsor');"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 56,
+        "code": "ApiEndpoints.profileByRole(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 104,
+        "code": "ApiEndpoints.profileByRole(role),"
+      },
+      {
+        "file": "lib\\views\\role_selection\\repositories\\onboarding_repository.dart",
+        "line": 157,
+        "code": "ApiEndpoints.profileByRole(role),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "currentUser",
+    "value": "/api/v1/users/me/",
+    "signature": "static const String currentUser = \"/api/v1/users/me/\"",
+    "comment": "// User & Projects",
+    "stmt": "static const String currentUser = \"/api/v1/users/me/\";",
+    "total_usages": 10,
+    "repo_usages_count": 10,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 30,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\personal_info_repository.dart",
+        "line": 25,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\personal_info_repository.dart",
+        "line": 71,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 58,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 127,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\repositories\\investor_profile_repository.dart",
+        "line": 25,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\settings\\repositories\\settings_repository.dart",
+        "line": 26,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\settings\\repositories\\settings_repository.dart",
+        "line": 52,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\repositories\\sponsor_dashboard_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\profile\\repositories\\sponsor_profile_repository.dart",
+        "line": 19,
+        "code": "ApiEndpoints.currentUser,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 30,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\personal_info_repository.dart",
+        "line": 25,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\personal_info_repository.dart",
+        "line": 71,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 58,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\personal_info\\repositories\\sponsor_edit_profile_repository.dart",
+        "line": 127,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\profile\\repositories\\investor_profile_repository.dart",
+        "line": 25,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\settings\\repositories\\settings_repository.dart",
+        "line": 26,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\settings\\repositories\\settings_repository.dart",
+        "line": 52,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\repositories\\sponsor_dashboard_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.currentUser,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\profile\\repositories\\sponsor_profile_repository.dart",
+        "line": 19,
+        "code": "ApiEndpoints.currentUser,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "deleteAccount",
+    "value": "/api/v1/users/delete-account/",
+    "signature": "static const String deleteAccount = \"/api/v1/users/delete-account/\"",
+    "comment": "",
+    "stmt": "static const String deleteAccount = \"/api/v1/users/delete-account/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\settings\\repositories\\settings_repository.dart",
+        "line": 66,
+        "code": "ApiEndpoints.deleteAccount,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\settings\\repositories\\settings_repository.dart",
+        "line": 66,
+        "code": "ApiEndpoints.deleteAccount,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "sponsorNda",
+    "value": "/api/v1/profiles/sponsor/nda/",
+    "signature": "static const String sponsorNda = \"/api/v1/profiles/sponsor/nda/\"",
+    "comment": "",
+    "stmt": "static const String sponsorNda = \"/api/v1/profiles/sponsor/nda/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\nda\\repositories\\nda_repository.dart",
+        "line": 21,
+        "code": "ApiEndpoints.sponsorNda,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\nda\\repositories\\nda_repository.dart",
+        "line": 80,
+        "code": "ApiEndpoints.sponsorNda,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\nda\\repositories\\nda_repository.dart",
+        "line": 21,
+        "code": "ApiEndpoints.sponsorNda,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\nda\\repositories\\nda_repository.dart",
+        "line": 80,
+        "code": "ApiEndpoints.sponsorNda,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "sponsorProjects",
+    "value": "/api/v1/projects/sponsor/",
+    "signature": "static const String sponsorProjects = \"/api/v1/projects/sponsor/\"",
+    "comment": "",
+    "stmt": "static const String sponsorProjects = \"/api/v1/projects/sponsor/\";",
+    "total_usages": 3,
+    "repo_usages_count": 3,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\all_projects\\repositories\\sponsor_projects_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.sponsorProjects,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\create_project_repository.dart",
+        "line": 24,
+        "code": "ApiEndpoints.sponsorProjects,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\repositories\\sponsor_dashboard_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.sponsorProjects,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\all_projects\\repositories\\sponsor_projects_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.sponsorProjects,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\create_project_repository.dart",
+        "line": 24,
+        "code": "ApiEndpoints.sponsorProjects,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\repositories\\sponsor_dashboard_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.sponsorProjects,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "savedProjects",
+    "value": "/api/v1/projects/saved/",
+    "signature": "static const String savedProjects = \"/api/v1/projects/saved/\"",
+    "comment": "",
+    "stmt": "static const String savedProjects = \"/api/v1/projects/saved/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\saved\\repositories\\investor_saved_repository.dart",
+        "line": 26,
+        "code": "ApiEndpoints.savedProjects,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 39,
+        "code": "ApiEndpoints.savedProjects,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\saved\\repositories\\investor_saved_repository.dart",
+        "line": 26,
+        "code": "ApiEndpoints.savedProjects,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 39,
+        "code": "ApiEndpoints.savedProjects,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "savedProfiles",
+    "value": "/api/v1/profiles/saved/",
+    "signature": "static const String savedProfiles = \"/api/v1/profiles/saved/\"",
+    "comment": "",
+    "stmt": "static const String savedProfiles = \"/api/v1/profiles/saved/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 139,
+        "code": "ApiEndpoints.savedProfiles,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 139,
+        "code": "ApiEndpoints.savedProfiles,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "saveProfile",
+    "params": "String userId",
+    "value": "/api/v1/profiles/$userId/save/",
+    "signature": "static String saveProfile(String userId) => /api/v1/profiles/$userId/save/",
+    "comment": "",
+    "stmt": "static String saveProfile(String userId) => \"/api/v1/profiles/$userId/save/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 192,
+        "code": "ApiEndpoints.saveProfile(userId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 192,
+        "code": "ApiEndpoints.saveProfile(userId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "userPublicProfile",
+    "params": "String userId",
+    "value": "/api/v1/profiles/$userId/",
+    "signature": "static String userPublicProfile(String userId) => /api/v1/profiles/$userId/",
+    "comment": "",
+    "stmt": "static String userPublicProfile(String userId) => \"/api/v1/profiles/$userId/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\profile\\public_profile\\repositories\\public_profile_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.userPublicProfile(userId.trim()),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\profile\\public_profile\\repositories\\public_profile_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.userPublicProfile(userId.trim()),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "sponsorCollaborationRequests",
+    "value": "/api/v1/projects/sponsor/requests/",
+    "signature": "static const String sponsorCollaborationRequests = \"/api/v1/projects/sponsor/requests/\"",
+    "comment": "",
+    "stmt": "static const String sponsorCollaborationRequests = \"/api/v1/projects/sponsor/requests/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 26,
+        "code": ": ApiEndpoints.sponsorCollaborationRequests;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\repositories\\sponsor_dashboard_repository.dart",
+        "line": 128,
+        "code": "ApiEndpoints.sponsorCollaborationRequests,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 26,
+        "code": ": ApiEndpoints.sponsorCollaborationRequests;"
+      },
+      {
+        "file": "lib\\views\\sponsor\\dashboard\\repositories\\sponsor_dashboard_repository.dart",
+        "line": 128,
+        "code": "ApiEndpoints.sponsorCollaborationRequests,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "sponsorProjectRequests",
+    "params": "String id",
+    "value": "/api/v1/projects/sponsor/$id/requests/",
+    "signature": "static String sponsorProjectRequests(String id) => /api/v1/projects/sponsor/$id/requests/",
+    "comment": "",
+    "stmt": "static String sponsorProjectRequests(String id) => \"/api/v1/projects/sponsor/$id/requests/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 25,
+        "code": "? ApiEndpoints.sponsorProjectRequests(projectId)"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 25,
+        "code": "? ApiEndpoints.sponsorProjectRequests(projectId)"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "approveCollaborationRequest",
+    "params": "String id",
+    "value": "/api/v1/projects/sponsor/requests/$id/approve/",
+    "signature": "static String approveCollaborationRequest(String id) => /api/v1/projects/sponsor/requests/$id/approve/",
+    "comment": "",
+    "stmt": "static String approveCollaborationRequest(String id) => \"/api/v1/projects/sponsor/requests/$id/approve/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 140,
+        "code": "ApiEndpoints.approveCollaborationRequest(id),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 140,
+        "code": "ApiEndpoints.approveCollaborationRequest(id),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "rejectCollaborationRequest",
+    "params": "String id",
+    "value": "/api/v1/projects/sponsor/requests/$id/reject/",
+    "signature": "static String rejectCollaborationRequest(String id) => /api/v1/projects/sponsor/requests/$id/reject/",
+    "comment": "",
+    "stmt": "static String rejectCollaborationRequest(String id) => \"/api/v1/projects/sponsor/requests/$id/reject/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 160,
+        "code": "ApiEndpoints.rejectCollaborationRequest(id),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 160,
+        "code": "ApiEndpoints.rejectCollaborationRequest(id),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "fundReceivedCollaborationRequest",
+    "params": "String id",
+    "value": "/api/v1/projects/sponsor/requests/$id/fund-received/",
+    "signature": "static String fundReceivedCollaborationRequest(String id) => /api/v1/projects/sponsor/requests/$id/fund-received/",
+    "comment": "",
+    "stmt": "static String fundReceivedCollaborationRequest(String id) => \"/api/v1/projects/sponsor/requests/$id/fund-received/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 189,
+        "code": "ApiEndpoints.fundReceivedCollaborationRequest(id),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 189,
+        "code": "ApiEndpoints.fundReceivedCollaborationRequest(id),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "banners",
+    "value": "/api/v1/banners/",
+    "signature": "static const String banners = \"/api/v1/banners/\"",
+    "comment": "",
+    "stmt": "static const String banners = \"/api/v1/banners/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 127,
+        "code": "ApiEndpoints.banners,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 127,
+        "code": "ApiEndpoints.banners,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "projects",
+    "value": "/api/v1/projects/",
+    "signature": "static const String projects = \"/api/v1/projects/\"",
+    "comment": "",
+    "stmt": "static const String projects = \"/api/v1/projects/\";",
+    "total_usages": 3,
+    "repo_usages_count": 3,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 207,
+        "code": "ApiEndpoints.projects,"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 292,
+        "code": "ApiEndpoints.projects,"
+      },
+      {
+        "file": "lib\\views\\investor\\discover\\repositories\\discover_repository.dart",
+        "line": 68,
+        "code": "ApiEndpoints.projects,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 207,
+        "code": "ApiEndpoints.projects,"
+      },
+      {
+        "file": "lib\\views\\investor\\dashboard\\repositories\\investor_dashboard_repository.dart",
+        "line": 292,
+        "code": "ApiEndpoints.projects,"
+      },
+      {
+        "file": "lib\\views\\investor\\discover\\repositories\\discover_repository.dart",
+        "line": 68,
+        "code": "ApiEndpoints.projects,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "discoverProjects",
+    "value": "/api/v1/projects/discover/",
+    "signature": "static const String discoverProjects = \"/api/v1/projects/discover/\"",
+    "comment": "",
+    "stmt": "static const String discoverProjects = \"/api/v1/projects/discover/\";",
+    "total_usages": 0,
+    "repo_usages_count": 0,
+    "usages": [],
+    "repo_usages": []
+  },
+  {
+    "kind": "const",
+    "name": "investorInvestments",
+    "value": "/api/v1/investor/investments/",
+    "signature": "static const String investorInvestments = \"/api/v1/investor/investments/\"",
+    "comment": "",
+    "stmt": "static const String investorInvestments = \"/api/v1/investor/investments/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\investment_history\\repositories\\investment_history_repository.dart",
+        "line": 35,
+        "code": "ApiEndpoints.investorInvestments,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\investment_history\\repositories\\investment_history_repository.dart",
+        "line": 35,
+        "code": "ApiEndpoints.investorInvestments,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "projectDetails",
+    "params": "String id",
+    "value": "/api/v1/projects/$id/",
+    "signature": "static String projectDetails(String id) => /api/v1/projects/$id/",
+    "comment": "",
+    "stmt": "static String projectDetails(String id) => \"/api/v1/projects/$id/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\project_details\\repositories\\sponsor_project_details_repository.dart",
+        "line": 23,
+        "code": "ApiEndpoints.projectDetails(projectId),"
+      },
+      {
+        "file": "lib\\views\\sponsor\\public_view\\repositories\\project_public_repository.dart",
+        "line": 67,
+        "code": "ApiEndpoints.projectDetails(id),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\project_details\\repositories\\sponsor_project_details_repository.dart",
+        "line": 23,
+        "code": "ApiEndpoints.projectDetails(projectId),"
+      },
+      {
+        "file": "lib\\views\\sponsor\\public_view\\repositories\\project_public_repository.dart",
+        "line": 67,
+        "code": "ApiEndpoints.projectDetails(id),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "saveProject",
+    "params": "String id",
+    "value": "/api/v1/projects/$id/save/",
+    "signature": "static String saveProject(String id) => /api/v1/projects/$id/save/",
+    "comment": "",
+    "stmt": "static String saveProject(String id) => \"/api/v1/projects/$id/save/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\public_view\\repositories\\project_public_repository.dart",
+        "line": 23,
+        "code": "ApiEndpoints.saveProject(projectId),"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 92,
+        "code": "ApiEndpoints.saveProject(projectId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\public_view\\repositories\\project_public_repository.dart",
+        "line": 23,
+        "code": "ApiEndpoints.saveProject(projectId),"
+      },
+      {
+        "file": "lib\\views\\sponsor\\saved\\repositories\\sponsor_saved_repository.dart",
+        "line": 92,
+        "code": "ApiEndpoints.saveProject(projectId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "signNda",
+    "params": "String id",
+    "value": "/api/v1/projects/$id/sign-nda/",
+    "signature": "static String signNda(String id) => /api/v1/projects/$id/sign-nda/",
+    "comment": "",
+    "stmt": "static String signNda(String id) => \"/api/v1/projects/$id/sign-nda/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\nda\\repositories\\sign_nda_repository.dart",
+        "line": 49,
+        "code": "ApiEndpoints.signNda(projectId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\nda\\repositories\\sign_nda_repository.dart",
+        "line": 49,
+        "code": "ApiEndpoints.signNda(projectId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "createCollaborationRequest",
+    "params": "String id",
+    "value": "/api/v1/projects/$id/requests/",
+    "signature": "static String createCollaborationRequest(String id) => /api/v1/projects/$id/requests/",
+    "comment": "",
+    "stmt": "static String createCollaborationRequest(String id) => \"/api/v1/projects/$id/requests/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\request_collaboration\\repositories\\request_collaboration_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.createCollaborationRequest(submission.projectId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\request_collaboration\\repositories\\request_collaboration_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.createCollaborationRequest(submission.projectId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "confirmInvestors",
+    "params": "String projectId",
+    "value": "/api/v1/projects/$projectId/confirm-investors/",
+    "signature": "static String confirmInvestors(String projectId) => /api/v1/projects/$projectId/confirm-investors/",
+    "comment": "",
+    "stmt": "static String confirmInvestors(String projectId) => \"/api/v1/projects/$projectId/confirm-investors/\";",
+    "total_usages": 3,
+    "repo_usages_count": 3,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 381,
+        "code": ": ApiEndpoints.confirmInvestors(projectId.toString());"
+      },
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 398,
+        "code": "final fallbackEndpoint = ApiEndpoints.confirmInvestors(projectId.toString());"
+      },
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 114,
+        "code": "ApiEndpoints.confirmInvestors(projectId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 381,
+        "code": ": ApiEndpoints.confirmInvestors(projectId.toString());"
+      },
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 398,
+        "code": "final fallbackEndpoint = ApiEndpoints.confirmInvestors(projectId.toString());"
+      },
+      {
+        "file": "lib\\views\\sponsor\\collaboration_requests\\repositories\\collaboration_requests_repository.dart",
+        "line": 114,
+        "code": "ApiEndpoints.confirmInvestors(projectId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "terminateProject",
+    "params": "String id",
+    "value": "/api/v1/projects/$id/terminate/",
+    "signature": "static String terminateProject(String id) => /api/v1/projects/$id/terminate/",
+    "comment": "",
+    "stmt": "static String terminateProject(String id) => \"/api/v1/projects/$id/terminate/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\project_details\\repositories\\sponsor_project_details_repository.dart",
+        "line": 56,
+        "code": "ApiEndpoints.terminateProject(projectId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\project_details\\repositories\\sponsor_project_details_repository.dart",
+        "line": 56,
+        "code": "ApiEndpoints.terminateProject(projectId),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "aiProjectConversations",
+    "value": "/api/v1/ai/projects/conversations/",
+    "signature": "static const String aiProjectConversations = \"/api/v1/ai/projects/conversations/\"",
+    "comment": "// AI Project Creation (Damini Advisor)",
+    "stmt": "static const String aiProjectConversations = \"/api/v1/ai/projects/conversations/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 30,
+        "code": "ApiEndpoints.aiProjectConversations,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 30,
+        "code": "ApiEndpoints.aiProjectConversations,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "aiProjectMessages",
+    "params": "String conversationId",
+    "value": "/api/v1/ai/projects/conversations/$conversationId/messages/",
+    "signature": "static String aiProjectMessages(String conversationId) => /api/v1/ai/projects/conversations/$conversationId/messages/",
+    "comment": "",
+    "stmt": "static String aiProjectMessages(String conversationId) => \"/api/v1/ai/projects/conversations/$conversationId/messages/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 55,
+        "code": "ApiEndpoints.aiProjectMessages(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 55,
+        "code": "ApiEndpoints.aiProjectMessages(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "aiProjectConversation",
+    "params": "String conversationId",
+    "value": "/api/v1/ai/projects/conversations/$conversationId/",
+    "signature": "static String aiProjectConversation(String conversationId) => /api/v1/ai/projects/conversations/$conversationId/",
+    "comment": "",
+    "stmt": "static String aiProjectConversation(String conversationId) => \"/api/v1/ai/projects/conversations/$conversationId/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 82,
+        "code": "ApiEndpoints.aiProjectConversation(conversationId),"
+      },
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 108,
+        "code": "ApiEndpoints.aiProjectConversation(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 82,
+        "code": "ApiEndpoints.aiProjectConversation(conversationId),"
+      },
+      {
+        "file": "lib\\views\\sponsor\\create_project\\repositories\\ai_project_creation_repository.dart",
+        "line": 108,
+        "code": "ApiEndpoints.aiProjectConversation(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "aiChatInitial",
+    "value": "/api/v1/ai/chat/initial/",
+    "signature": "static const String aiChatInitial = \"/api/v1/ai/chat/initial/\"",
+    "comment": "// AI Investment Copilot Chat",
+    "stmt": "static const String aiChatInitial = \"/api/v1/ai/chat/initial/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.aiChatInitial,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 22,
+        "code": "ApiEndpoints.aiChatInitial,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "aiChatMessages",
+    "params": "String conversationId",
+    "value": "/api/v1/ai/chat/conversations/$conversationId/messages/",
+    "signature": "static String aiChatMessages(String conversationId) => /api/v1/ai/chat/conversations/$conversationId/messages/",
+    "comment": "",
+    "stmt": "static String aiChatMessages(String conversationId) => \"/api/v1/ai/chat/conversations/$conversationId/messages/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.aiChatMessages(conversationId),"
+      },
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 68,
+        "code": "ApiEndpoints.aiChatMessages(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.aiChatMessages(conversationId),"
+      },
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 68,
+        "code": "ApiEndpoints.aiChatMessages(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "aiChatClear",
+    "params": "String conversationId",
+    "value": "/api/v1/ai/chat/conversations/$conversationId/clear/",
+    "signature": "static String aiChatClear(String conversationId) => /api/v1/ai/chat/conversations/$conversationId/clear/",
+    "comment": "",
+    "stmt": "static String aiChatClear(String conversationId) => \"/api/v1/ai/chat/conversations/$conversationId/clear/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 101,
+        "code": "ApiEndpoints.aiChatClear(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\ai_chat\\repositories\\ai_chat_repository.dart",
+        "line": 101,
+        "code": "ApiEndpoints.aiChatClear(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "startConversation",
+    "value": "/api/v1/notifications/chat/conversations/start/",
+    "signature": "static const String startConversation = \"/api/v1/notifications/chat/conversations/start/\"",
+    "comment": "// Chat & Notifications",
+    "stmt": "static const String startConversation = \"/api/v1/notifications/chat/conversations/start/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.startConversation,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 32,
+        "code": "ApiEndpoints.startConversation,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "conversations",
+    "value": "/api/v1/notifications/chat/conversations/",
+    "signature": "static const String conversations = \"/api/v1/notifications/chat/conversations/\"",
+    "comment": "",
+    "stmt": "static const String conversations = \"/api/v1/notifications/chat/conversations/\";",
+    "total_usages": 2,
+    "repo_usages_count": 2,
+    "usages": [
+      {
+        "file": "lib\\views\\investor\\chat\\repositories\\investor_chat_repository.dart",
+        "line": 20,
+        "code": "ApiEndpoints.conversations,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 64,
+        "code": "ApiEndpoints.conversations,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\investor\\chat\\repositories\\investor_chat_repository.dart",
+        "line": 20,
+        "code": "ApiEndpoints.conversations,"
+      },
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 64,
+        "code": "ApiEndpoints.conversations,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "conversationMessages",
+    "params": "String conversationId",
+    "value": "/api/v1/notifications/chat/conversations/$conversationId/messages/",
+    "signature": "static String conversationMessages(String conversationId) => /api/v1/notifications/chat/conversations/$conversationId/messages/",
+    "comment": "",
+    "stmt": "static String conversationMessages(String conversationId) => \"/api/v1/notifications/chat/conversations/$conversationId/messages/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 227,
+        "code": "ApiEndpoints.conversationMessages(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 227,
+        "code": "ApiEndpoints.conversationMessages(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "chatUpload",
+    "value": "/api/v1/notifications/chat/upload/",
+    "signature": "static const String chatUpload = \"/api/v1/notifications/chat/upload/\"",
+    "comment": "",
+    "stmt": "static const String chatUpload = \"/api/v1/notifications/chat/upload/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 292,
+        "code": "ApiEndpoints.chatUpload,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 292,
+        "code": "ApiEndpoints.chatUpload,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "markConversationRead",
+    "params": "String conversationId",
+    "value": "/api/v1/notifications/chat/conversations/$conversationId/read/",
+    "signature": "static String markConversationRead(String conversationId) => /api/v1/notifications/chat/conversations/$conversationId/read/",
+    "comment": "",
+    "stmt": "static String markConversationRead(String conversationId) => \"/api/v1/notifications/chat/conversations/$conversationId/read/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 319,
+        "code": "ApiEndpoints.markConversationRead(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 319,
+        "code": "ApiEndpoints.markConversationRead(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "removeParticipant",
+    "params": "String conversationId, String userId",
+    "value": "/api/v1/notifications/chat/conversations/$conversationId/participants/$userId/",
+    "signature": "static String removeParticipant(String conversationId, String userId) => /api/v1/notifications/chat/conversations/$conversationId/participants/$userId/",
+    "comment": "",
+    "stmt": "static String removeParticipant(String conversationId, String userId) => \"/api/v1/notifications/chat/conversations/$conversationId/participants/$userId/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 336,
+        "code": "ApiEndpoints.removeParticipant(conversationId, userId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 336,
+        "code": "ApiEndpoints.removeParticipant(conversationId, userId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "conversationHeader",
+    "params": "String conversationId",
+    "value": "/api/v1/notifications/chat/conversations/$conversationId/header/",
+    "signature": "static String conversationHeader(String conversationId) => /api/v1/notifications/chat/conversations/$conversationId/header/",
+    "comment": "",
+    "stmt": "static String conversationHeader(String conversationId) => \"/api/v1/notifications/chat/conversations/$conversationId/header/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 350,
+        "code": "ApiEndpoints.conversationHeader(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 350,
+        "code": "ApiEndpoints.conversationHeader(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "conversationConfirmInvestors",
+    "params": "String conversationId",
+    "value": "/api/v1/notifications/chat/conversations/$conversationId/confirm-investors/",
+    "signature": "static String conversationConfirmInvestors(String conversationId) => /api/v1/notifications/chat/conversations/$conversationId/confirm-investors/",
+    "comment": "",
+    "stmt": "static String conversationConfirmInvestors(String conversationId) => \"/api/v1/notifications/chat/conversations/$conversationId/confirm-investors/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 380,
+        "code": "? ApiEndpoints.conversationConfirmInvestors(conversationId.toString())"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 380,
+        "code": "? ApiEndpoints.conversationConfirmInvestors(conversationId.toString())"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "leaveConversation",
+    "params": "String conversationId",
+    "value": "/api/v1/notifications/chat/conversations/$conversationId/leave/",
+    "signature": "static String leaveConversation(String conversationId) => /api/v1/notifications/chat/conversations/$conversationId/leave/",
+    "comment": "",
+    "stmt": "static String leaveConversation(String conversationId) => \"/api/v1/notifications/chat/conversations/$conversationId/leave/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 422,
+        "code": "ApiEndpoints.leaveConversation(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 422,
+        "code": "ApiEndpoints.leaveConversation(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "reportConversation",
+    "params": "String conversationId",
+    "value": "/api/v1/notifications/chat/conversations/$conversationId/report/",
+    "signature": "static String reportConversation(String conversationId) => /api/v1/notifications/chat/conversations/$conversationId/report/",
+    "comment": "",
+    "stmt": "static String reportConversation(String conversationId) => \"/api/v1/notifications/chat/conversations/$conversationId/report/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 447,
+        "code": "ApiEndpoints.reportConversation(conversationId),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\views\\sponsor\\chat\\repositories\\chat_repository.dart",
+        "line": 447,
+        "code": "ApiEndpoints.reportConversation(conversationId),"
+      }
+    ]
+  },
+  {
+    "kind": "block_method",
+    "name": "chatWebSocket",
+    "params": "String conversationId, String token",
+    "value": "$wsBase/ws/chat/$conversationId/?token=$token",
+    "signature": "static String chatWebSocket(String conversationId, String token)",
+    "comment": "",
+    "stmt": "static String chatWebSocket(String conversationId, String token) { final wsBase = baseUrl .replaceFirst(RegExp(r'^http://'), 'ws://') .replaceFirst(RegExp(r'^https://'), 'wss://'); return \"$wsBase/ws/chat/$conversationId/?token=$token\"; }",
+    "total_usages": 1,
+    "repo_usages_count": 0,
+    "usages": [
+      {
+        "file": "lib\\core\\services\\chat_websocket_service.dart",
+        "line": 40,
+        "code": "final wsUrl = ApiEndpoints.chatWebSocket(conversationId, token);"
+      }
+    ],
+    "repo_usages": []
+  },
+  {
+    "kind": "const",
+    "name": "getNotifications",
+    "value": "/api/v1/notifications/",
+    "signature": "static const String getNotifications = \"/api/v1/notifications/\"",
+    "comment": "",
+    "stmt": "static const String getNotifications = \"/api/v1/notifications/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 65,
+        "code": "ApiEndpoints.getNotifications,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 65,
+        "code": "ApiEndpoints.getNotifications,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "markRead",
+    "params": "String id",
+    "value": "/api/v1/notifications/$id/read/",
+    "signature": "static String markRead(String id) => /api/v1/notifications/$id/read/",
+    "comment": "",
+    "stmt": "static String markRead(String id) => \"/api/v1/notifications/$id/read/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 101,
+        "code": "ApiEndpoints.markRead(id),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 101,
+        "code": "ApiEndpoints.markRead(id),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "markAllRead",
+    "value": "/api/v1/notifications/mark-all-read/",
+    "signature": "static const String markAllRead = \"/api/v1/notifications/mark-all-read/\"",
+    "comment": "",
+    "stmt": "static const String markAllRead = \"/api/v1/notifications/mark-all-read/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 115,
+        "code": "ApiEndpoints.markAllRead,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 115,
+        "code": "ApiEndpoints.markAllRead,"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "deviceToken",
+    "value": "/api/v1/notifications/device-token/",
+    "signature": "static const String deviceToken = \"/api/v1/notifications/device-token/\"",
+    "comment": "",
+    "stmt": "static const String deviceToken = \"/api/v1/notifications/device-token/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.deviceToken,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 47,
+        "code": "ApiEndpoints.deviceToken,"
+      }
+    ]
+  },
+  {
+    "kind": "method",
+    "name": "deleteNotification",
+    "params": "String id",
+    "value": "/api/v1/notifications/$id/",
+    "signature": "static String deleteNotification(String id) => /api/v1/notifications/$id/",
+    "comment": "",
+    "stmt": "static String deleteNotification(String id) => \"/api/v1/notifications/$id/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 129,
+        "code": "ApiEndpoints.deleteNotification(id),"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 129,
+        "code": "ApiEndpoints.deleteNotification(id),"
+      }
+    ]
+  },
+  {
+    "kind": "const",
+    "name": "clearAllNotifications",
+    "value": "/api/v1/notifications/clear-all/",
+    "signature": "static const String clearAllNotifications = \"/api/v1/notifications/clear-all/\"",
+    "comment": "",
+    "stmt": "static const String clearAllNotifications = \"/api/v1/notifications/clear-all/\";",
+    "total_usages": 1,
+    "repo_usages_count": 1,
+    "usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 142,
+        "code": "ApiEndpoints.clearAllNotifications,"
+      }
+    ],
+    "repo_usages": [
+      {
+        "file": "lib\\shared\\screens\\notifications\\repositories\\notification_repository.dart",
+        "line": 142,
+        "code": "ApiEndpoints.clearAllNotifications,"
+      }
+    ]
+  }
+]

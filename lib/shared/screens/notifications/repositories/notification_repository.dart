@@ -43,10 +43,15 @@ class NotificationRepository {
         ? deviceName.trim()
         : getDefaultDeviceName();
 
+    final deviceType = Platform.isIOS
+        ? 'ios'
+        : (Platform.isAndroid ? 'android' : 'web');
+
     await _api.post(
       ApiEndpoints.deviceToken,
       data: {
         'token': cleanToken,
+        'device_type': deviceType,
         'device_name': name,
       },
       requireAuth: true,
@@ -135,13 +140,21 @@ class NotificationRepository {
     }
   }
 
-  /// DELETE /api/v1/notifications/clear-all/
+  /// Clear all notifications: DELETE or POST /api/v1/notifications/clear-all/
   Future<bool> clearAllNotifications() async {
     try {
-      await _api.delete(
-        ApiEndpoints.clearAllNotifications,
-        requireAuth: true,
-      );
+      try {
+        await _api.delete(
+          ApiEndpoints.clearAllNotifications,
+          requireAuth: true,
+        );
+      } catch (_) {
+        await _api.post(
+          ApiEndpoints.clearAllNotifications,
+          data: {},
+          requireAuth: true,
+        );
+      }
       return true;
     } catch (_) {
       return false;

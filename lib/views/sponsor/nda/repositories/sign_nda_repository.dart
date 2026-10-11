@@ -36,13 +36,17 @@ class SignNdaRepository {
         final fileName = signatureImagePath.split(RegExp(r'[/\\]')).last;
         payload = FormData.fromMap({
           'digital_signature': digitalSignature,
+          'accepted_terms': true,
           'signature_image': await MultipartFile.fromFile(
             signatureImagePath,
             filename: fileName,
           ),
         });
       } else {
-        payload = {'digital_signature': digitalSignature};
+        payload = {
+          'digital_signature': digitalSignature,
+          'accepted_terms': true,
+        };
       }
 
       final response = await _apiService.post(

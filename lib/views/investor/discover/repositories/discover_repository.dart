@@ -64,10 +64,18 @@ class DiscoverRepositoryImpl implements DiscoverRepository {
   Future<List<DiscoverDealItem>> getDiscoverDeals() async {
     if (_apiService != null) {
       try {
-        final response = await _apiService.get(
-          ApiEndpoints.projects,
-          requireAuth: true,
-        );
+        dynamic response;
+        try {
+          response = await _apiService.get(
+            ApiEndpoints.discoverProjects,
+            requireAuth: true,
+          );
+        } catch (_) {
+          response = await _apiService.get(
+            ApiEndpoints.projects,
+            requireAuth: true,
+          );
+        }
 
         dynamic data = response.data;
         if (data is String) {
@@ -80,10 +88,12 @@ class DiscoverRepositoryImpl implements DiscoverRepository {
         if (data is List) {
           list = data;
         } else if (data is Map) {
-          if (data['results'] is List) {
-            list = data['results'] as List;
+          if (data['data'] is Map && (data['data'] as Map)['results'] is List) {
+            list = (data['data'] as Map)['results'] as List;
           } else if (data['data'] is List) {
             list = data['data'] as List;
+          } else if (data['results'] is List) {
+            list = data['results'] as List;
           }
         }
 

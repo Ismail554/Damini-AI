@@ -1,0 +1,250 @@
+{
+  "banners": {
+    "status_code": 200,
+    "headers": {
+      "Allow": "GET, HEAD, OPTIONS",
+      "Content-Length": "30",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:04 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"success\",\"data\":[]}"
+  },
+  "public_projects": {
+    "status_code": 200,
+    "headers": {
+      "Allow": "GET, HEAD, OPTIONS",
+      "Content-Length": "2949",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:04 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"success\":true,\"links\":{\"next\":null,\"previous\":null},\"count\":4,\"total_pages\":1,\"current_page\":1,\"data\":[{\"id\":4,\"title\":\"test the new project\",\"location\":\"Bengal\",\"country\":\"United Kingdom\",\"short_description\":\"I don't know anything\",\"categories\":[{\"id\":2,\"name\":\"SaaS\"}],\"category\":{\"id\":2,\"name\":\"SaaS\"},\"industry\":\"Technology\",\"status\":\"ACTIVE\",\"funding_goal\":\"5000000.00\",\"funding_stage\":\"Series A\",\"raised_amount\":\"0.00\",\"progress\":0.0,\"minimum_investment\":\"100.00\",\"target_roi\":\"20.00\",\"potential_monthly_revenue\":\"1239.00\",\"hold_period_months\":12,\"timeline_to_operations_months\":34,\"timeline_months\":24,\"cover_image\":\"http://clubby-andy-irksomely.ngrok-free.dev/media/project_images/scaled_1825.jpg\",\"sponsor\":{\"legal_company_name\":\"Global Ventures LLC\",\"is_verified\":true,\"projects_count\":10},\"is_saved\":false,\"created_at\":\"2026-09-29T09:45:47.259655Z\"},{\"id\":3,\"title\":\"Dummy Project 3 by ismail\",\"location\":\"Austin, TX\",\"country\":\"\",\"short_description\":\"An amazing investment opportunity.\",\"categories\":[{\"id\":1,\"name\":\"Commercial\"}],\"category\":{\"id\":1,\"name\":\"Commercial\"},\"industry\":\"Technology\",\"status\":\"ACTIVE\",\"funding_goal\":\"1000000.00\",\"funding_stage\":\"\",\"raised_amount\":\"0.00\",\"progress\":0.0,\"minimum_investment\":\"50000.00\",\"target_roi\":\"15.50\",\"potential_monthly_revenue\":null,\"hold_period_months\":null,\"timeline_to_operations_months\":null,\"timeline_months\":24,\"cover_image\":null,\"sponsor\":{\"legal_company_name\":\"Global Ventures LLC\",\"is_verified\":true,\"projects_count\":10},\"is_saved\":false,\"created_at\":\"2026-09-27T10:04:37.874190Z\"},{\"id\":2,\"title\":\"Dummy Project 2 by ismail\",\"location\":\"Austin, TX\",\"country\":\"\",\"short_description\":\"An amazing investment opportunity.\",\"categories\":[{\"id\":1,\"name\":\"Commercial\"}],\"category\":{\"id\":1,\"name\":\"Commercial\"},\"industry\":\"Real Estate\",\"status\":\"ACTIVE\",\"funding_goal\":\"1000000.00\",\"funding_stage\":\"\",\"raised_amount\":\"0.00\",\"progress\":0.0,\"minimum_investment\":\"50000.00\",\"target_roi\":\"15.50\",\"potential_monthly_revenue\":null,\"hold_period_months\":null,\"timeline_to_operations_months\":null,\"timeline_months\":24,\"cover_image\":null,\"sponsor\":{\"legal_company_name\":\"Global Ventures LLC\",\"is_verified\":true,\"projects_count\":10},\"is_saved\":false,\"created_at\":\"2026-09-27T10:04:37.868638Z\"},{\"id\":1,\"title\":\"Dummy Project 1 by ismail\",\"location\":\"Austin, TX\",\"country\":\"\",\"short_description\":\"An amazing investment opportunity.\",\"categories\":[{\"id\":1,\"name\":\"Commercial\"}],\"category\":{\"id\":1,\"name\":\"Commercial\"},\"industry\":\"Technology\",\"status\":\"ACTIVE\",\"funding_goal\":\"1000000.00\",\"funding_stage\":\"\",\"raised_amount\":\"50000.00\",\"progress\":0.05,\"minimum_investment\":\"50000.00\",\"target_roi\":\"15.50\",\"potential_monthly_revenue\":null,\"hold_period_months\":null,\"timeline_to_operations_months\":null,\"timeline_months\":24,\"cover_image\":null,\"sponsor\":{\"legal_company_name\":\"Global Ventures LLC\",\"is_verified\":true,\"projects_count\":10},\"is_saved\":false,\"created_at\":\"2026-09-27T10:04:37.860650Z\"}]}"
+  },
+  "login": {
+    "status_code": 200,
+    "headers": {
+      "Allow": "POST, OPTIONS",
+      "Content-Length": "716",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Set-Cookie": "csrftoken=IAU84wA1FxAlqJmQGMN0OWsgSWP4Y7gF; expires=Sun, 10 Oct 2027 06:24:04 GMT; Max-Age=31449600; Path=/; SameSite=Lax",
+      "Vary": "Cookie, origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:04 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"access\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzAzNDQ0LCJpYXQiOjE3OTE2OTk4NDQsImp0aSI6ImMyYTE3YjYzNWQwOTQ5ZjY5NmNkMTU2N2FhODhjNGZmIiwidXNlcl9pZCI6IjI4In0.Ve0SaqeFBpz5tjP2lwCirY8RXSmsdpwufPde0Aelxpk\",\"refresh\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MjMwNDY0NCwiaWF0IjoxNzkxNjk5ODQ0LCJqdGkiOiI5MDFhZjRhNGFjYjI0NzZiODEzYmIzNzcwMTI5ZDYwOSIsInVzZXJfaWQiOiIyOCJ9.b4Jtw8XKmDlSkOc6w9ts79Rgozi2mzMdnXRRbryWZiQ\",\"user\":{\"id\":28,\"first_name\":\"ismail\",\"last_name\":\"hosen\",\"full_name\":\"ismail hosen\",\"email\":\"ismailshuvo555@gmail.com\",\"role\":\"INVESTOR\",\"is_email_verified\":true,\"push_notifications_enabled\":true,\"subscription_tier\":\"FREE\"}}"
+  },
+  "issue_1_change_password_500": {
+    "status_code": 400,
+    "headers": {
+      "Allow": "POST, OPTIONS",
+      "Content-Length": "121",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:05 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"error\",\"message\":\"Password change failed.\",\"errors\":{\"current_password\":[\"Current password is not correct.\"]}}"
+  },
+  "issue_2_ai_wizard_500": {
+    "status_code": 201,
+    "headers": {
+      "Allow": "POST, OPTIONS",
+      "Content-Length": "929",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:05 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"success\",\"data\":{\"id\":\"b7e2e6aa-b475-4427-8a06-008eeea8aa90\",\"conversation_id\":\"b7e2e6aa-b475-4427-8a06-008eeea8aa90\",\"step\":\"industry\",\"step_index\":1,\"total_steps\":4,\"step_title\":\"Select Industry\",\"message\":{\"id\":\"cde7e7be-fe19-4c0e-9e08-e9556b7f83f4\",\"role\":\"assistant\",\"content\":\"Hi, I'm Damini Advisor. I can help you create a new project. To get started, what industry is your project in?\",\"suggestions\":[\"Technology\",\"Clean Energy\",\"Real Estate\",\"Healthcare\",\"Fintech\"],\"timestamp\":\"2026-10-11T06:24:05.659222Z\"},\"messages\":[{\"id\":\"cde7e7be-fe19-4c0e-9e08-e9556b7f83f4\",\"role\":\"assistant\",\"content\":\"Hi, I'm Damini Advisor. I can help you create a new project. To get started, what industry is your project in?\",\"suggestions\":[\"Technology\",\"Clean Energy\",\"Real Estate\",\"Healthcare\",\"Fintech\"],\"timestamp\":\"2026-10-11T06:24:05.659222Z\"}],\"extracted_data\":{\"initial_context\":\"Creating tech startup\"},\"draft\":null}}"
+  },
+  "issue_4_investor_investments_declared": {
+    "status_code": 200,
+    "headers": {
+      "Allow": "GET, HEAD, OPTIONS",
+      "Content-Length": "601",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:05 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"success\",\"data\":{\"summary\":{\"total_invested\":\"$50,000\",\"total_current_value\":\"$57,750\",\"overall_roi\":\"+15.50%\",\"active_investments_count\":1},\"count\":1,\"next\":null,\"previous\":null,\"results\":[{\"id\":\"4\",\"project_id\":\"1\",\"title\":\"Dummy Project 1 by ismail\",\"category\":\"Technology\",\"sponsor_name\":\"Global Ventures LLC\",\"sponsor_id\":\"28\",\"investment_date\":\"2026-10-11T05:45:23.780073+00:00\",\"formatted_date\":\"Oct 11, 2026\",\"status\":\"Confirmed\",\"invested_amount\":50000.0,\"formatted_invested\":\"$50,000\",\"current_value\":57750.0,\"formatted_current_value\":\"$57,750\",\"roi\":\"+15.5%\",\"image_url\":null}]}}"
+  },
+  "issue_4_investor_investments_actual": {
+    "status_code": 200,
+    "headers": {
+      "Allow": "GET, HEAD, OPTIONS",
+      "Content-Length": "601",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:06 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"success\",\"data\":{\"summary\":{\"total_invested\":\"$50,000\",\"total_current_value\":\"$57,750\",\"overall_roi\":\"+15.50%\",\"active_investments_count\":1},\"count\":1,\"next\":null,\"previous\":null,\"results\":[{\"id\":\"4\",\"project_id\":\"1\",\"title\":\"Dummy Project 1 by ismail\",\"category\":\"Technology\",\"sponsor_name\":\"Global Ventures LLC\",\"sponsor_id\":\"28\",\"investment_date\":\"2026-10-11T05:45:23.780073+00:00\",\"formatted_date\":\"Oct 11, 2026\",\"status\":\"Confirmed\",\"invested_amount\":50000.0,\"formatted_invested\":\"$50,000\",\"current_value\":57750.0,\"formatted_current_value\":\"$57,750\",\"roi\":\"+15.5%\",\"image_url\":null}]}}"
+  },
+  "issue_6_sponsor_onboarding_declared": {
+    "status_code": 403,
+    "headers": {
+      "Allow": "GET, PATCH, HEAD, OPTIONS",
+      "Content-Length": "75",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:06 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"error\",\"message\":\"This endpoint is available to sponsors only.\"}"
+  },
+  "issue_6_sponsor_profile_actual": {
+    "status_code": 403,
+    "headers": {
+      "Allow": "GET, PATCH, HEAD, OPTIONS",
+      "Content-Length": "75",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:06 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"error\",\"message\":\"This endpoint is available to sponsors only.\"}"
+  },
+  "switch_role_to_sponsor": {
+    "status_code": 200,
+    "headers": {
+      "Allow": "POST, OPTIONS",
+      "Content-Length": "1483",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:06 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"success\",\"message\":\"Switched to SPONSOR mode successfully.\",\"data\":{\"active_role\":\"SPONSOR\",\"is_onboarded\":true,\"verification_status\":\"APPROVED\",\"account_type\":\"COMPANY\",\"access\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzAzNDQ2LCJpYXQiOjE3OTE2OTk4NDYsImp0aSI6ImQ3OWQ2MzYyNTRhZjQyNGJhYWM4M2E1YTcxODY5OGZiIiwidXNlcl9pZCI6IjI4In0.HYPmzzxkn3iUvevFao5qabhL5pxAGvsERBoh9eyIX3U\",\"refresh\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MjMwNDY0NiwiaWF0IjoxNzkxNjk5ODQ2LCJqdGkiOiIzNzMxZmNmNWM4OWU0ZGQ5OGE4OTY4OGI2ZjY2M2M5OSIsInVzZXJfaWQiOiIyOCJ9.I6Zf1lOHRlLGzqTLYl_wwocQdhArlOXhzkVsVwIc_04\",\"user\":{\"id\":28,\"first_name\":\"ismail\",\"last_name\":\"hosen\",\"email\":\"ismailshuvo555@gmail.com\",\"role\":\"SPONSOR\",\"is_email_verified\":true,\"push_notifications_enabled\":true,\"subscription_tier\":\"FREE\",\"profile\":{\"id\":6,\"sponsor_type\":\"COMPANY\",\"first_name\":\"ismail\",\"last_name\":\"hosen\",\"email\":\"ismailshuvo555@gmail.com\",\"legal_company_name\":\"Global Ventures LLC\",\"registration_number\":\"\",\"business_address\":\"\",\"company_website\":\"\",\"phone\":\"01619524736\",\"country\":\"Bangladesh\",\"location\":\"Dhaka\",\"position_title\":\"Executive Director\",\"bio\":\"\",\"profile_photo\":\"/media/profile_photos/sponsors/cropped_profile_1791178537405.png\",\"verification_status\":\"APPROVED\",\"documents\":[],\"created_at\":\"2026-09-24T03:40:10.451320Z\",\"updated_at\":\"2026-10-11T05:49:34.151687Z\"},\"stats\":{\"projects\":10,\"requests\":4,\"funded\":50000.0}}}}"
+  },
+  "switch_role_idempotent": {
+    "status_code": 200,
+    "headers": {
+      "Allow": "POST, OPTIONS",
+      "Content-Length": "1469",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:06 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"success\",\"message\":\"Role is already SPONSOR.\",\"data\":{\"active_role\":\"SPONSOR\",\"is_onboarded\":true,\"verification_status\":\"APPROVED\",\"account_type\":\"COMPANY\",\"access\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzkxNzAzNDQ2LCJpYXQiOjE3OTE2OTk4NDYsImp0aSI6ImU2YzEyOTRjY2FjNDQwZjA4Njk5MzY0NWRjNzc3ZDk2IiwidXNlcl9pZCI6IjI4In0.rFS55-PxjmsighUrRoFecit-iNbOps_SnNdcoJvhLc8\",\"refresh\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc5MjMwNDY0NiwiaWF0IjoxNzkxNjk5ODQ2LCJqdGkiOiI4NmUyYmQ4MGFiZDg0OTU4OTZlM2I4M2FhYTM0M2ZlZCIsInVzZXJfaWQiOiIyOCJ9.Ivi6QnfyqisrA0ABZ30Lq63UrpIk28qsZmFYHNO0oWU\",\"user\":{\"id\":28,\"first_name\":\"ismail\",\"last_name\":\"hosen\",\"email\":\"ismailshuvo555@gmail.com\",\"role\":\"SPONSOR\",\"is_email_verified\":true,\"push_notifications_enabled\":true,\"subscription_tier\":\"FREE\",\"profile\":{\"id\":6,\"sponsor_type\":\"COMPANY\",\"first_name\":\"ismail\",\"last_name\":\"hosen\",\"email\":\"ismailshuvo555@gmail.com\",\"legal_company_name\":\"Global Ventures LLC\",\"registration_number\":\"\",\"business_address\":\"\",\"company_website\":\"\",\"phone\":\"01619524736\",\"country\":\"Bangladesh\",\"location\":\"Dhaka\",\"position_title\":\"Executive Director\",\"bio\":\"\",\"profile_photo\":\"/media/profile_photos/sponsors/cropped_profile_1791178537405.png\",\"verification_status\":\"APPROVED\",\"documents\":[],\"created_at\":\"2026-09-24T03:40:10.451320Z\",\"updated_at\":\"2026-10-11T05:49:34.151687Z\"},\"stats\":{\"projects\":10,\"requests\":4,\"funded\":50000.0}}}}"
+  },
+  "issue_7_project_json_415": {
+    "status_code": 400,
+    "headers": {
+      "Allow": "GET, POST, HEAD, OPTIONS",
+      "Content-Length": "191",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:07 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"error\",\"message\":\"Validation failed.\",\"errors\":{\"location\":[\"This field is required.\"],\"funding_goal\":[\"This field is required.\"],\"minimum_investment\":[\"This field is required.\"]}}"
+  },
+  "sign_nda_json_415": {
+    "status_code": 403,
+    "headers": {
+      "Allow": "POST, OPTIONS",
+      "Content-Length": "76",
+      "Content-Type": "application/json",
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Ngrok-Agent-Ips": "123.0.23.1",
+      "Referrer-Policy": "same-origin",
+      "Server": "daphne",
+      "Vary": "origin",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Date": "Sun, 11 Oct 2026 06:24:07 GMT",
+      "Connection": "close"
+    },
+    "body": "{\"status\":\"error\",\"message\":\"This endpoint is available to investors only.\"}"
+  }
+}

@@ -91,16 +91,24 @@ class AiChatRepository {
     }
   }
 
-  /// DELETE /api/v1/ai/chat/conversations/{conversation_id}/clear/
-  /// Clears chat history and returns a fresh conversation ID / welcome message.
+  /// Clear Copilot Memory: POST (or DELETE) /api/v1/ai/chat/conversations/{conversation_id}/clear/
   Future<AiChatInitialData?> clearChat({
     required String conversationId,
   }) async {
     try {
-      final response = await _apiService.delete(
-        ApiEndpoints.aiChatClear(conversationId),
-        requireAuth: true,
-      );
+      dynamic response;
+      try {
+        response = await _apiService.post(
+          ApiEndpoints.aiChatClear(conversationId),
+          data: {},
+          requireAuth: true,
+        );
+      } catch (_) {
+        response = await _apiService.delete(
+          ApiEndpoints.aiChatClear(conversationId),
+          requireAuth: true,
+        );
+      }
 
       final Map<String, dynamic> data = _normalizeResponseData(response.data);
       if (data.isNotEmpty) {

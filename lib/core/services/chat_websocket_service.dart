@@ -84,6 +84,7 @@ class ChatWebSocketService {
     if (!isConnected) return false;
 
     final payload = {
+      'action': 'send_message',
       'type': 'send_message',
       'message_type': messageType,
       'text': text,
@@ -108,6 +109,7 @@ class ChatWebSocketService {
     if (!isConnected) return;
     try {
       _socket?.add(jsonEncode({
+        'action': 'typing',
         'type': 'typing',
         'is_typing': isTyping,
       }));

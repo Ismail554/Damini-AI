@@ -38,3 +38,53 @@ Generate a detailed action plan and remediation checklist covering code health, 
 - [ ] dart analyze passes with zero fatal errors or unresolved lint warnings.
 - [ ] Automated test suite executed and audited for coverage gaps.
 - [ ] Final executive audit report provided with prioritized remediation steps.
+
+
+## Follow-up — 2026-10-11T05:26:22Z
+
+Perform a comprehensive API and contract audit across all backend endpoints, Flutter client repositories, request payloads, response schemas, and specification documents. Test endpoint behavior with live probes against the running backend and generate an actionable Markdown handover report documenting broken endpoints, contract mismatches, payload discrepancies, and reproduction steps for backend developers.
+
+Working directory: d:\Ismail_flutter\julkar_vai
+Integrity mode: development
+
+## Verification Resources
+- Active backend base URL: `https://clubby-andy-irksomely.ngrok-free.dev` (from `.env`)
+- Flutter endpoints inventory: `lib/core/constants/api_endpoints.dart`
+- Client repositories & payload models: `lib/views/**/repositories/`, `lib/data/repositories/`
+- Backend specification documents: `project_docs/*.md`, `AI_CHAT_API_SPEC.md`, `INVESTOR_API_SPECIFICATION.md`, `INVESTOR_NEXT_FLOW_API_SPEC.md`, `SOCIAL_AUTH_BACKEND_SPEC.md`
+
+## Requirements
+
+### R1. Endpoint Inventory & Contract Mapping
+Catalog every endpoint declared across `lib/core/constants/api_endpoints.dart`, client repository implementations, and backend spec documents in `project_docs/`. For each endpoint, map:
+- HTTP method, URL path, and authentication requirement (public, token auth, role-specific: investor/sponsor)
+- Client-sent payload fields vs backend-documented fields (including case formatting: snake_case vs camelCase)
+- Client-expected response structure vs backend response specification (`status`, `data`, `message`, paginated list, nested objects)
+
+### R2. Live Probing & Error Verification
+Perform live HTTP probing against the running backend (`https://clubby-andy-irksomely.ngrok-free.dev`):
+- Probe public and unauthenticated endpoints (e.g. banners, industries, public projects, auth endpoints)
+- Dynamically register temporary test users or authenticate to test protected endpoints across roles (Investor, Sponsor)
+- Capture exact HTTP status codes, headers, response timing, error payloads (400, 401, 403, 404, 500), and unhandled server exceptions (HTML traceback pages, Daphne connection drops)
+
+### R3. Backend Developer Handover Report (`BACKEND_API_AUDIT_REPORT.md`)
+Synthesize all findings into a structured, developer-ready Markdown report at `d:\Ismail_flutter\julkar_vai\BACKEND_API_AUDIT_REPORT.md` featuring:
+- **Executive Summary & Health Matrix**: Total endpoints tested, count of fully working endpoints, count of broken/failing endpoints, count of contract/schema mismatches
+- **Critical Issues & Blockers**: High-priority bugs blocking Flutter app functionality (e.g. 500 errors, missing routes, unhandled exceptions)
+- **Per-Module Breakdown**: Grouped by domain (Auth, Onboarding & Profiles, Projects & Discovery, Investments, AI Advisor/Copilot, Chat/WebSockets, Notifications):
+  - Endpoint URL & Method
+  - Current Status (Working / Broken / Schema Mismatch / Unimplemented)
+  - Reproduction cURL command with exact headers and payload
+  - Expected Behavior vs Actual Received Response (status code and JSON body)
+  - Specific discrepancy details (e.g. missing fields, type errors, null safety traps)
+  - Recommended backend fix
+- **Payload & Response Schema Diff Table**: Concrete before/after JSON comparisons for any mismatched fields
+
+## Acceptance Criteria
+
+### Audit Scope & Verification
+- [ ] Every endpoint in `ApiEndpoints` is audited and accounted for in the report.
+- [ ] Every failing or mismatched endpoint includes an executable, copy-pasteable reproduction cURL command.
+- [ ] Actual live response bodies and HTTP status codes from `https://clubby-andy-irksomely.ngrok-free.dev` are captured and documented for verified endpoints.
+- [ ] Discrepancies between Flutter repository models and backend specs are explicitly itemized with field-level diffs.
+- [ ] Complete report is saved to `d:\Ismail_flutter\julkar_vai\BACKEND_API_AUDIT_REPORT.md` and formatted cleanly for direct handover to the backend team.

@@ -1,0 +1,593 @@
+{
+  "total_declared": 65,
+  "total_verified": 65,
+  "total_missing": 0,
+  "verdict": "APPROVE",
+  "items": [
+    {
+      "index": 1,
+      "name": "baseUrl",
+      "type": "getter",
+      "url_pattern": "https://clubby-andy-irksomely.ngrok-free.dev",
+      "verified": true,
+      "matches_in_report": 83,
+      "first_ref_line": 13
+    },
+    {
+      "index": 2,
+      "name": "register",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/register/",
+      "verified": true,
+      "matches_in_report": 9,
+      "first_ref_line": 132
+    },
+    {
+      "index": 3,
+      "name": "verifyOtp",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/verify-otp/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 313
+    },
+    {
+      "index": 4,
+      "name": "resendOtp",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/resend-otp/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 334
+    },
+    {
+      "index": 5,
+      "name": "refreshToken",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/token/refresh/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 266
+    },
+    {
+      "index": 6,
+      "name": "login",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/login/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 230
+    },
+    {
+      "index": 7,
+      "name": "logout",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/logout/",
+      "verified": true,
+      "matches_in_report": 3,
+      "first_ref_line": 442
+    },
+    {
+      "index": 8,
+      "name": "googleLogin",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/google/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 400
+    },
+    {
+      "index": 9,
+      "name": "appleLogin",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/apple/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 421
+    },
+    {
+      "index": 10,
+      "name": "forgotPassword",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/forgot-password/",
+      "verified": true,
+      "matches_in_report": 3,
+      "first_ref_line": 355
+    },
+    {
+      "index": 11,
+      "name": "resetPassword",
+      "type": "const",
+      "url_pattern": "/api/v1/auth/reset-password/",
+      "verified": true,
+      "matches_in_report": 6,
+      "first_ref_line": 376
+    },
+    {
+      "index": 12,
+      "name": "changePassword",
+      "type": "const",
+      "url_pattern": "/api/v1/users/change-password/",
+      "verified": true,
+      "matches_in_report": 6,
+      "first_ref_line": 75
+    },
+    {
+      "index": 13,
+      "name": "setRole",
+      "type": "const",
+      "url_pattern": "/api/v1/profiles/set-role/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 614
+    },
+    {
+      "index": 14,
+      "name": "switchRole",
+      "type": "const",
+      "url_pattern": "/api/v1/users/switch-role/",
+      "verified": true,
+      "matches_in_report": 6,
+      "first_ref_line": 68
+    },
+    {
+      "index": 15,
+      "name": "verificationDocuments",
+      "type": "const",
+      "url_pattern": "/api/v1/profiles/verification-documents/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 768
+    },
+    {
+      "index": 16,
+      "name": "industries",
+      "type": "const",
+      "url_pattern": "/api/v1/profiles/industries/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 632
+    },
+    {
+      "index": 17,
+      "name": "verificationStatus",
+      "type": "const",
+      "url_pattern": "/api/v1/profiles/verification-status/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 746
+    },
+    {
+      "index": 18,
+      "name": "currentUser",
+      "type": "const",
+      "url_pattern": "/api/v1/users/me/",
+      "verified": true,
+      "matches_in_report": 4,
+      "first_ref_line": 512
+    },
+    {
+      "index": 19,
+      "name": "deleteAccount",
+      "type": "const",
+      "url_pattern": "/api/v1/users/delete-account/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 486
+    },
+    {
+      "index": 20,
+      "name": "sponsorNda",
+      "type": "const",
+      "url_pattern": "/api/v1/profiles/sponsor/nda/",
+      "verified": true,
+      "matches_in_report": 5,
+      "first_ref_line": 191
+    },
+    {
+      "index": 21,
+      "name": "sponsorProjects",
+      "type": "const",
+      "url_pattern": "/api/v1/projects/sponsor/",
+      "verified": true,
+      "matches_in_report": 20,
+      "first_ref_line": 191
+    },
+    {
+      "index": 22,
+      "name": "savedProjects",
+      "type": "const",
+      "url_pattern": "/api/v1/projects/saved/",
+      "verified": true,
+      "matches_in_report": 1,
+      "first_ref_line": 984
+    },
+    {
+      "index": 23,
+      "name": "savedProfiles",
+      "type": "const",
+      "url_pattern": "/api/v1/profiles/saved/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 812
+    },
+    {
+      "index": 24,
+      "name": "sponsorCollaborationRequests",
+      "type": "const",
+      "url_pattern": "/api/v1/projects/sponsor/requests/",
+      "verified": true,
+      "matches_in_report": 8,
+      "first_ref_line": 1134
+    },
+    {
+      "index": 25,
+      "name": "banners",
+      "type": "const",
+      "url_pattern": "/api/v1/banners/",
+      "verified": true,
+      "matches_in_report": 3,
+      "first_ref_line": 209
+    },
+    {
+      "index": 26,
+      "name": "projects",
+      "type": "const",
+      "url_pattern": "/api/v1/projects/",
+      "verified": true,
+      "matches_in_report": 81,
+      "first_ref_line": 50
+    },
+    {
+      "index": 27,
+      "name": "discoverProjects",
+      "type": "const",
+      "url_pattern": "/api/v1/projects/discover/",
+      "verified": true,
+      "matches_in_report": 3,
+      "first_ref_line": 926
+    },
+    {
+      "index": 28,
+      "name": "investorInvestments",
+      "type": "const",
+      "url_pattern": "/api/v1/investor/investments/",
+      "verified": true,
+      "matches_in_report": 10,
+      "first_ref_line": 125
+    },
+    {
+      "index": 29,
+      "name": "aiProjectConversations",
+      "type": "const",
+      "url_pattern": "/api/v1/ai/projects/conversations/",
+      "verified": true,
+      "matches_in_report": 13,
+      "first_ref_line": 92
+    },
+    {
+      "index": 30,
+      "name": "aiChatInitial",
+      "type": "const",
+      "url_pattern": "/api/v1/ai/chat/initial/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 1309
+    },
+    {
+      "index": 31,
+      "name": "startConversation",
+      "type": "const",
+      "url_pattern": "/api/v1/notifications/chat/conversations/start/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 1567
+    },
+    {
+      "index": 32,
+      "name": "conversations",
+      "type": "const",
+      "url_pattern": "/api/v1/notifications/chat/conversations/",
+      "verified": true,
+      "matches_in_report": 48,
+      "first_ref_line": 53
+    },
+    {
+      "index": 33,
+      "name": "chatUpload",
+      "type": "const",
+      "url_pattern": "/api/v1/notifications/chat/upload/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 1673
+    },
+    {
+      "index": 34,
+      "name": "getNotifications",
+      "type": "const",
+      "url_pattern": "/api/v1/notifications/",
+      "verified": true,
+      "matches_in_report": 36,
+      "first_ref_line": 109
+    },
+    {
+      "index": 35,
+      "name": "markAllRead",
+      "type": "const",
+      "url_pattern": "/api/v1/notifications/mark-all-read/",
+      "verified": true,
+      "matches_in_report": 1,
+      "first_ref_line": 1787
+    },
+    {
+      "index": 36,
+      "name": "deviceToken",
+      "type": "const",
+      "url_pattern": "/api/v1/notifications/device-token/",
+      "verified": true,
+      "matches_in_report": 2,
+      "first_ref_line": 1806
+    },
+    {
+      "index": 37,
+      "name": "clearAllNotifications",
+      "type": "const",
+      "url_pattern": "/api/v1/notifications/clear-all/",
+      "verified": true,
+      "matches_in_report": 1,
+      "first_ref_line": 1792
+    },
+    {
+      "index": 38,
+      "name": "onboarding",
+      "type": "method",
+      "url_pattern": "/api/v1/profiles/${role.toLowerCase()}/onboarding/",
+      "verified": true,
+      "matches_in_report": 42,
+      "first_ref_line": 49
+    },
+    {
+      "index": 39,
+      "name": "profileByRole",
+      "type": "method",
+      "url_pattern": "/api/v1/profiles/${role.toLowerCase()}/",
+      "verified": true,
+      "matches_in_report": 34,
+      "first_ref_line": 171
+    },
+    {
+      "index": 40,
+      "name": "saveProfile",
+      "type": "method",
+      "url_pattern": "/api/v1/profiles/$userId/save/",
+      "verified": true,
+      "matches_in_report": 36,
+      "first_ref_line": 171
+    },
+    {
+      "index": 41,
+      "name": "userPublicProfile",
+      "type": "method",
+      "url_pattern": "/api/v1/profiles/$userId/",
+      "verified": true,
+      "matches_in_report": 34,
+      "first_ref_line": 171
+    },
+    {
+      "index": 42,
+      "name": "sponsorProjectRequests",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/sponsor/$id/requests/",
+      "verified": true,
+      "matches_in_report": 22,
+      "first_ref_line": 191
+    },
+    {
+      "index": 43,
+      "name": "approveCollaborationRequest",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/sponsor/requests/$id/approve/",
+      "verified": true,
+      "matches_in_report": 8,
+      "first_ref_line": 1134
+    },
+    {
+      "index": 44,
+      "name": "rejectCollaborationRequest",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/sponsor/requests/$id/reject/",
+      "verified": true,
+      "matches_in_report": 8,
+      "first_ref_line": 1134
+    },
+    {
+      "index": 45,
+      "name": "fundReceivedCollaborationRequest",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/sponsor/requests/$id/fund-received/",
+      "verified": true,
+      "matches_in_report": 8,
+      "first_ref_line": 1134
+    },
+    {
+      "index": 46,
+      "name": "projectDetails",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/$id/",
+      "verified": true,
+      "matches_in_report": 52,
+      "first_ref_line": 126
+    },
+    {
+      "index": 47,
+      "name": "saveProject",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/$id/save/",
+      "verified": true,
+      "matches_in_report": 54,
+      "first_ref_line": 126
+    },
+    {
+      "index": 48,
+      "name": "signNda",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/$id/sign-nda/",
+      "verified": true,
+      "matches_in_report": 54,
+      "first_ref_line": 51
+    },
+    {
+      "index": 49,
+      "name": "createCollaborationRequest",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/$id/requests/",
+      "verified": true,
+      "matches_in_report": 52,
+      "first_ref_line": 126
+    },
+    {
+      "index": 50,
+      "name": "confirmInvestors",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/$projectId/confirm-investors/",
+      "verified": true,
+      "matches_in_report": 62,
+      "first_ref_line": 53
+    },
+    {
+      "index": 51,
+      "name": "terminateProject",
+      "type": "method",
+      "url_pattern": "/api/v1/projects/$id/terminate/",
+      "verified": true,
+      "matches_in_report": 52,
+      "first_ref_line": 126
+    },
+    {
+      "index": 52,
+      "name": "aiProjectMessages",
+      "type": "method",
+      "url_pattern": "/api/v1/ai/projects/conversations/$conversationId/messages/",
+      "verified": true,
+      "matches_in_report": 23,
+      "first_ref_line": 92
+    },
+    {
+      "index": 53,
+      "name": "aiProjectConversation",
+      "type": "method",
+      "url_pattern": "/api/v1/ai/projects/conversations/$conversationId/",
+      "verified": true,
+      "matches_in_report": 14,
+      "first_ref_line": 92
+    },
+    {
+      "index": 54,
+      "name": "aiChatMessages",
+      "type": "method",
+      "url_pattern": "/api/v1/ai/chat/conversations/$conversationId/messages/",
+      "verified": true,
+      "matches_in_report": 14,
+      "first_ref_line": 95
+    },
+    {
+      "index": 55,
+      "name": "aiChatClear",
+      "type": "method",
+      "url_pattern": "/api/v1/ai/chat/conversations/$conversationId/clear/",
+      "verified": true,
+      "matches_in_report": 6,
+      "first_ref_line": 1346
+    },
+    {
+      "index": 56,
+      "name": "conversationMessages",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/chat/conversations/$conversationId/messages/",
+      "verified": true,
+      "matches_in_report": 30,
+      "first_ref_line": 95
+    },
+    {
+      "index": 57,
+      "name": "markConversationRead",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/chat/conversations/$conversationId/read/",
+      "verified": true,
+      "matches_in_report": 27,
+      "first_ref_line": 54
+    },
+    {
+      "index": 58,
+      "name": "removeParticipant",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/chat/conversations/$conversationId/participants/$userId/",
+      "verified": true,
+      "matches_in_report": 23,
+      "first_ref_line": 109
+    },
+    {
+      "index": 59,
+      "name": "conversationHeader",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/chat/conversations/$conversationId/header/",
+      "verified": true,
+      "matches_in_report": 22,
+      "first_ref_line": 109
+    },
+    {
+      "index": 60,
+      "name": "conversationConfirmInvestors",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/chat/conversations/$conversationId/confirm-investors/",
+      "verified": true,
+      "matches_in_report": 27,
+      "first_ref_line": 53
+    },
+    {
+      "index": 61,
+      "name": "leaveConversation",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/chat/conversations/$conversationId/leave/",
+      "verified": true,
+      "matches_in_report": 22,
+      "first_ref_line": 109
+    },
+    {
+      "index": 62,
+      "name": "reportConversation",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/chat/conversations/$conversationId/report/",
+      "verified": true,
+      "matches_in_report": 22,
+      "first_ref_line": 109
+    },
+    {
+      "index": 63,
+      "name": "chatWebSocket",
+      "type": "method",
+      "url_pattern": "dynamic",
+      "verified": true,
+      "matches_in_report": 3,
+      "first_ref_line": 1689
+    },
+    {
+      "index": 64,
+      "name": "markRead",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/$id/read/",
+      "verified": true,
+      "matches_in_report": 38,
+      "first_ref_line": 54
+    },
+    {
+      "index": 65,
+      "name": "deleteNotification",
+      "type": "method",
+      "url_pattern": "/api/v1/notifications/$id/",
+      "verified": true,
+      "matches_in_report": 37,
+      "first_ref_line": 109
+    }
+  ]
+}

@@ -195,6 +195,41 @@ void main() {
       expect(result.role, "NONE");
     });
 
+    test('loginWithGoogle success parses nested data object from backend', () async {
+      final responsePayload = {
+        "status": "success",
+        "data": {
+          "access": "google_nested_access_jwt",
+          "refresh": "google_nested_refresh_jwt",
+          "role": "NONE",
+          "user": {
+            "id": 37,
+            "first_name": "Test",
+            "last_name": "App",
+            "full_name": "Test App",
+            "email": "testappview4@gmail.com",
+            "role": "NONE",
+            "is_email_verified": true,
+            "push_notifications_enabled": true,
+            "subscription_tier": "FREE",
+          },
+        },
+      };
+
+      final repo = LoginRepositoryImpl(
+        MockLoginApiService(responseData: responsePayload),
+      );
+
+      final result = await repo.loginWithGoogle("valid_google_id_token");
+
+      expect(result.success, true);
+      expect(result.token, "google_nested_access_jwt");
+      expect(result.refreshToken, "google_nested_refresh_jwt");
+      expect(result.user?.id, 37);
+      expect(result.user?.email, "testappview4@gmail.com");
+      expect(result.role, "NONE");
+    });
+
     test('loginWithGoogle handles backend error response', () async {
       final responsePayload = {
         "status": "error",

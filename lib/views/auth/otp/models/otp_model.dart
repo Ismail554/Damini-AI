@@ -13,6 +13,7 @@ class OtpVerificationRequestModel {
     return {
       'email': email.trim(),
       'code': code.trim(),
+      'otp': code.trim(),
     };
   }
 }

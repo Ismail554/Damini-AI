@@ -60,7 +60,13 @@ class ApiEndpoints {
   static const String projects = "/api/v1/projects/";
   static const String discoverProjects = "/api/v1/projects/discover/";
   static const String investorInvestments = "/api/v1/investor/investments/";
+  static const String investorPortfolioSummary =
+      "/api/v1/investor/portfolio-summary/";
+  static const String investorDashboard = "/api/v1/investor/dashboard/";
+  static const String investorMyRequests =
+      "/api/v1/projects/investor/my-requests/";
   static String projectDetails(String id) => "/api/v1/projects/$id/";
+  static String sponsorProject(String id) => "/api/v1/projects/sponsor/$id/";
   static String saveProject(String id) => "/api/v1/projects/$id/save/";
   static String signNda(String id) => "/api/v1/projects/$id/sign-nda/";
   static String createCollaborationRequest(String id) =>
@@ -91,6 +97,8 @@ class ApiEndpoints {
       "/api/v1/notifications/chat/conversations/";
   static String conversationMessages(String conversationId) =>
       "/api/v1/notifications/chat/conversations/$conversationId/messages/";
+  static String sendChatMessage(String conversationId) =>
+      "/api/v1/chat/conversations/$conversationId/messages/send/";
   static const String chatUpload =
       "/api/v1/notifications/chat/upload/";
   static String markConversationRead(String conversationId) =>
