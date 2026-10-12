@@ -94,65 +94,55 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
     if (isAndroid) {
       return _buildAndroidNavBar(context, tc, isDark);
     }
-    return _buildIOSNavBar(context, tc, isDark);
+    return _buildIOSNavBar(tc, isDark);
   }
 
   // ── iOS: Liquid glass nav bar ───────────────────────────────────
-  Widget _buildIOSNavBar(BuildContext context, AppThemeColors tc, bool isDark) {
-    final bottomInset = MediaQuery.of(context).padding.bottom;
-    final bottomMargin = bottomInset > 0 ? (bottomInset + 4.h) : 14.h;
+  Widget _buildIOSNavBar(AppThemeColors tc, bool isDark) {
+    final glassColor = isDark
+        ? const Color(0x730D1F30)
+        : const Color(0x99F5F7FA);
+
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.18)
+        : Colors.white.withValues(alpha: 0.65);
+
+    final glassGlow = isDark
+        ? AppColors.primaryColor.withValues(alpha: 0.25)
+        : AppColors.primaryColor.withValues(alpha: 0.12);
+
+    final pillColor = isDark
+        ? tc.navSelectedPill
+        : AppColors.primaryColor.withValues(alpha: 0.15);
 
     return Container(
-      margin: EdgeInsets.only(
-        left: 16.w,
-        right: 16.w,
-        bottom: bottomMargin,
-        top: 4.h,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppDimens.radiusPill),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
-            blurRadius: 28,
-            spreadRadius: 0,
-            offset: const Offset(0, 10),
-          ),
-          BoxShadow(
-            color: AppColors.primaryColor.withValues(alpha: isDark ? 0.20 : 0.08),
-            blurRadius: 20,
-            spreadRadius: -4,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      margin: EdgeInsets.symmetric(
+        horizontal: AppDimens.navBarMarginH,
+        vertical: AppDimens.navBarMarginV,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppDimens.radiusPill),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
           child: Container(
             height: AppDimens.navBarHeight,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: isDark
-                    ? [
-                        const Color(0xFF132B45).withValues(alpha: 0.70),
-                        const Color(0xFF091624).withValues(alpha: 0.82),
-                      ]
-                    : [
-                        Colors.white.withValues(alpha: 0.85),
-                        const Color(0xFFF1F5F9).withValues(alpha: 0.72),
-                      ],
-              ),
+              color: glassColor,
               borderRadius: BorderRadius.circular(AppDimens.radiusPill),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.20)
-                    : Colors.white.withValues(alpha: 0.85),
-                width: 1.2,
-              ),
+              border: Border.all(color: glassBorder, width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: tc.shadowColor.withValues(alpha: 0.3),
+                  blurRadius: 30,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: glassGlow,
+                  blurRadius: 15,
+                  spreadRadius: -2,
+                ),
+              ],
             ),
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -185,7 +175,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
                       setState(() => _dragX = null),
                   child: Stack(
                     children: [
-                      // Smooth fluid liquid glass capsule indicator slider
                       AnimatedPositioned(
                         duration: dragging
                             ? Duration.zero
@@ -197,39 +186,13 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
                         width: itemWidth - 8.w,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: isDark
-                                  ? [
-                                      AppColors.primaryColor
-                                          .withValues(alpha: 0.32),
-                                      AppColors.primaryDark
-                                          .withValues(alpha: 0.22),
-                                    ]
-                                  : [
-                                      AppColors.primaryColor
-                                          .withValues(alpha: 0.16),
-                                      AppColors.primaryColor
-                                          .withValues(alpha: 0.08),
-                                    ],
-                            ),
+                            color: pillColor,
                             borderRadius: BorderRadius.circular(24.r),
                             border: Border.all(
-                              color: AppColors.primaryColor.withValues(
-                                alpha: isDark ? 0.45 : 0.30,
-                              ),
+                              color: AppColors.primaryColor
+                                  .withValues(alpha: 0.35),
                               width: 1,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primaryColor.withValues(
-                                  alpha: isDark ? 0.25 : 0.10,
-                                ),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                           ),
                         ),
                       ),
@@ -238,7 +201,6 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
                           widget.items.length,
                           (i) => _buildIOSItem(
                             tc,
-                            isDark,
                             widget.items[i],
                             i == activeIndex,
                           ),
@@ -255,30 +217,19 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
     );
   }
 
-  Widget _buildIOSItem(
-    AppThemeColors tc,
-    bool isDark,
-    CustomNavItemData item,
-    bool sel,
-  ) {
+  Widget _buildIOSItem(AppThemeColors tc, CustomNavItemData item, bool sel) {
     final iconData =
         (sel && item.activeIcon != null) ? item.activeIcon! : item.icon;
-    final activeColor =
-        isDark ? AppColors.activeBlue : AppColors.primaryColor;
-    final inactiveColor =
-        isDark ? Colors.white.withValues(alpha: 0.50) : const Color(0xFF64748B);
-
     return Expanded(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedScale(
             duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutBack,
             scale: sel ? 1.15 : 1.0,
             child: Icon(
               iconData,
-              color: sel ? activeColor : inactiveColor,
+              color: sel ? tc.navSelectedIcon : tc.navIcon.withValues(alpha: 0.7),
               size: 22.r,
             ),
           ),
@@ -287,7 +238,9 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar>
             item.label,
             style: GoogleFonts.outfit(
               fontSize: 10.sp,
-              color: sel ? activeColor : inactiveColor,
+              color: sel
+                  ? tc.navSelectedText
+                  : tc.navIcon.withValues(alpha: 0.7),
               fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
             ),
             maxLines: 1,

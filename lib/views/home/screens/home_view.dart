@@ -1,4 +1,5 @@
 import 'package:Braintech/core/utils/app_spacing.dart';
+import 'package:cupertino_native/cupertino_native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:Braintech/views/auth/session/controllers/session_provider.dart';
+import 'package:Braintech/core/utils/app_colors.dart';
 import 'package:Braintech/core/utils/app_dimens.dart';
 import 'package:Braintech/core/utils/app_theme_colors.dart';
 import 'package:Braintech/core/utils/platform_utils.dart';
@@ -65,6 +67,26 @@ class _HomeViewState extends ConsumerState<HomeView> {
     //   icon: CupertinoIcons.person,
     //   activeIcon: CupertinoIcons.person_fill,
     // ),
+  ];
+
+  static const _sponsorCNItems = [
+    CNTabBarItem(label: "Dashboard", icon: CNSymbol("house.fill")),
+    CNTabBarItem(label: "Saved", icon: CNSymbol("heart.fill")),
+    CNTabBarItem(
+      label: "Chat",
+      icon: CNSymbol("bubble.left.and.bubble.right.fill"),
+    ),
+    CNTabBarItem(label: "Profile", icon: CNSymbol("person.fill")),
+  ];
+
+  static const _investorCNItems = [
+    CNTabBarItem(label: "Explore", icon: CNSymbol("compass.drawing")),
+    CNTabBarItem(label: "Saved", icon: CNSymbol("heart.fill")),
+    CNTabBarItem(
+      label: "Chat",
+      icon: CNSymbol("bubble.left.and.bubble.right.fill"),
+    ),
+    CNTabBarItem(label: "Profile", icon: CNSymbol("person.fill")),
   ];
 
   Widget _buildBody(bool isSponsor, int currentIndex) {
@@ -136,6 +158,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final currentIndex = homeState.currentIndex;
     final isSponsor = auth.userRole == GlobalKeys.sponsorRole;
     final navItems = isSponsor ? _sponsorNavItems : _investorNavItems;
+    final cnItems = isSponsor ? _sponsorCNItems : _investorCNItems;
     final isIOS = PlatformUtils.isIOS;
 
     final bottomInset = MediaQuery.of(context).padding.bottom;
@@ -262,17 +285,28 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
               ),
 
-              // Bottom Navigation Bar (Liquid Glass UI on iOS, Material 3 floating on Android)
+              // Bottom Navigation Bar (Native Liquid Glass on iOS, Material 3 floating on Android)
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: CustomBottomNavBar(
-                  currentIndex: currentIndex,
-                  items: navItems,
-                  onTap: (index) =>
-                      ref.read(homeProvider.notifier).setTabIndex(index),
-                ),
+                child: isIOS
+                    ? Padding(
+                        padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 10.h),
+                        child: CNTabBar(
+                          items: cnItems,
+                          currentIndex: currentIndex,
+                          tint: AppColors.primaryColor,
+                          onTap: (index) =>
+                              ref.read(homeProvider.notifier).setTabIndex(index),
+                        ),
+                      )
+                    : CustomBottomNavBar(
+                        currentIndex: currentIndex,
+                        items: navItems,
+                        onTap: (index) =>
+                            ref.read(homeProvider.notifier).setTabIndex(index),
+                      ),
               ),
             ],
           ),
