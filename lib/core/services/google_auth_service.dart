@@ -104,31 +104,46 @@ class GoogleAuthService {
     return null;
   }
 
-  Future<void> _ensureInitialized([String? explicitClientId]) async {
-    final targetClientId = explicitClientId ?? _resolveServerClientId();
-
-    if (_isGoogleSignInInitialized && _lastInitializedClientId == targetClientId) {
-      return;
+  String? _resolveIosClientId() {
+    if (dotenv.isInitialized) {
+      try {
+        final envVal = dotenv.env['GOOGLE_IOS_CLIENT_ID'];
+        if (envVal != null && envVal.trim().isNotEmpty) {
+          return envVal.trim();
+        }
+      } catch (_) {}
     }
+    return null;
+  }
 
-    final isPlaceholder = isPlaceholderClientId(targetClientId);
-    if (isPlaceholder) {
+  Future<void> _ensureInitialized([String? explicitClientId]) async {
+    final targetServerClientId = explicitClientId ?? _resolveServerClientId();
+    final targetIosClientId = _resolveIosClientId();
+
+    final isServerPlaceholder = isPlaceholderClientId(targetServerClientId);
+    if (isServerPlaceholder) {
       debugPrint(
-        "GoogleAuthService WARNING: GOOGLE_SERVER_CLIENT_ID appears to be a placeholder ('$targetClientId'). "
+        "GoogleAuthService WARNING: GOOGLE_SERVER_CLIENT_ID appears to be a placeholder ('$targetServerClientId'). "
         "It will not be passed to GoogleSignIn SDK to prevent Credential Manager failures. "
         "Obtain the actual Web Client ID from Firebase Console / Google Cloud Credentials.",
       );
     }
 
-    // Only pass serverClientId to the SDK if it is a real, non-placeholder value.
-    final effectiveClientId = (!isPlaceholder) ? targetClientId : null;
+    final effectiveServerClientId = (!isServerPlaceholder) ? targetServerClientId : null;
+    final effectiveIosClientId = (!isPlaceholderClientId(targetIosClientId)) ? targetIosClientId : null;
+    final initKey = '${effectiveServerClientId}_$effectiveIosClientId';
+
+    if (_isGoogleSignInInitialized && _lastInitializedClientId == initKey) {
+      return;
+    }
 
     try {
       await _googleSignIn.initialize(
-        serverClientId: effectiveClientId,
+        clientId: (defaultTargetPlatform == TargetPlatform.iOS) ? effectiveIosClientId : null,
+        serverClientId: effectiveServerClientId,
       );
       _isGoogleSignInInitialized = true;
-      _lastInitializedClientId = effectiveClientId;
+      _lastInitializedClientId = initKey;
     } catch (e) {
       debugPrint("GoogleAuthService: initialize warning: $e");
     }

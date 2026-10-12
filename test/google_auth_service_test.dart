@@ -1,5 +1,6 @@
 import 'package:Braintech/core/services/api_error_handler.dart';
 import 'package:Braintech/core/services/google_auth_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class MockGoogleSignIn extends Fake implements GoogleSignIn {
   bool initializeCalled = false;
+  String? passedClientId;
   String? passedServerClientId;
   Object? errorToThrowOnAuthenticate;
   GoogleSignInAccount? accountToReturn;
@@ -20,6 +22,7 @@ class MockGoogleSignIn extends Fake implements GoogleSignIn {
     String? hostedDomain,
   }) async {
     initializeCalled = true;
+    passedClientId = clientId;
     passedServerClientId = serverClientId;
   }
 
@@ -406,6 +409,33 @@ void main() {
         equals(
             '641571105178-r41vi2rtd4furjp43b12b1b22a9571sl.apps.googleusercontent.com'),
       );
+    });
+
+    test('passes iOS client ID on iOS platform if configured in .env', () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        dotenv.loadFromString(
+          envString:
+              'GOOGLE_SERVER_CLIENT_ID=1003008036989-vtiu7c5gn3936pj7jn5mg3nn5ao2k9bd.apps.googleusercontent.com\n'
+              'GOOGLE_IOS_CLIENT_ID=1003008036989-pei20lpe6ngj908p6vnphjj4qpk3r7if.apps.googleusercontent.com',
+        );
+
+        final mock = MockGoogleSignIn();
+        final service = GoogleAuthService(googleSignIn: mock);
+        await service.ensureInitializedForTesting();
+
+        expect(mock.initializeCalled, isTrue);
+        expect(
+          mock.passedClientId,
+          equals('1003008036989-pei20lpe6ngj908p6vnphjj4qpk3r7if.apps.googleusercontent.com'),
+        );
+        expect(
+          mock.passedServerClientId,
+          equals('1003008036989-vtiu7c5gn3936pj7jn5mg3nn5ao2k9bd.apps.googleusercontent.com'),
+        );
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
     });
 
     test('serverClientId constructor override is prioritized over .env',
