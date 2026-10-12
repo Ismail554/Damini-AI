@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -171,8 +173,8 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
 
     _selectedIndustry = d?.industry;
     _selectedCountry = d?.country;
-    _selectedFundingStage = d?.fundingStage ?? 'Seed';
-    _selectedTimeline = d?.timeline ?? '36 months';
+    _selectedFundingStage = _normalizeFundingStage(d?.fundingStage);
+    _selectedTimeline = _normalizeTimeline(d?.timeline);
     _coverImagePath = d?.coverImagePath;
 
     if (d != null) {
@@ -185,6 +187,39 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
         }
       });
     }
+  }
+
+  String _normalizeFundingStage(String? stage) {
+    if (stage == null || stage.trim().isEmpty) return 'Seed';
+    final trimmed = stage.trim();
+    final lower = trimmed.toLowerCase();
+    if (lower == 'pre-seed' || lower.contains('pre-seed') || lower.contains('pre seed')) {
+      return 'Pre-Seed';
+    }
+    if (lower == 'seed' || lower.contains('seed')) {
+      return 'Seed';
+    }
+    if (lower.contains('series a')) {
+      return 'Series A';
+    }
+    if (lower.contains('series b')) {
+      return 'Series B';
+    }
+    if (lower.contains('growth')) {
+      return 'Growth';
+    }
+    return trimmed;
+  }
+
+  String _normalizeTimeline(String? timeline) {
+    if (timeline == null || timeline.trim().isEmpty) return '36 months';
+    final trimmed = timeline.trim();
+    final lower = trimmed.toLowerCase();
+    if (lower.contains('12')) return '12 months';
+    if (lower.contains('24')) return '24 months';
+    if (lower.contains('36')) return '36 months';
+    if (lower.contains('48')) return '48 months';
+    return trimmed;
   }
 
 
@@ -306,20 +341,34 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     final rawStatus = (personal.verificationStatus ?? dashboardProfile?.verificationStatus ?? 'PENDING').trim().toUpperCase();
 
     if (rawStatus != 'APPROVED') {
-      final msg = rawStatus == 'REJECTED'
-          ? "Your verification documents were rejected. Please update your documents to publish projects."
-          : "Your verification is currently pending. A Sponsor cannot publish projects until status hits APPROVED.";
-      CustomSnackBar.error(context, msg);
-      return;
+      if (kDebugMode) {
+        debugPrint('⚠️ [DEBUG] Sponsor verification status is "$rawStatus". Proceeding with publish in debug mode...');
+      } else {
+        final msg = rawStatus == 'REJECTED'
+            ? "Your verification documents were rejected. Please update your documents to publish projects."
+            : "Your verification is currently pending. A Sponsor cannot publish projects until status hits APPROVED.";
+        CustomSnackBar.error(context, msg);
+        return;
+      }
     }
 
     final title = _titleController.text.trim();
     if (title.isEmpty) {
+      if (kDebugMode) {
+        debugPrint('╔═══════════════════════════════════════════════════════════');
+        debugPrint('║ ❌ VALIDATION FAILED: Title is required');
+        debugPrint('╚═══════════════════════════════════════════════════════════');
+      }
       CustomSnackBar.error(context, "Please enter a project title");
       return;
     }
     final fundingGoal = _parseNumber(_fundingGoalController.text);
     if (fundingGoal <= 0) {
+      if (kDebugMode) {
+        debugPrint('╔═══════════════════════════════════════════════════════════');
+        debugPrint('║ ❌ VALIDATION FAILED: Funding goal must be > 0');
+        debugPrint('╚═══════════════════════════════════════════════════════════');
+      }
       CustomSnackBar.error(context, "Please enter a valid funding goal");
       return;
     }
@@ -396,17 +445,49 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       status: 'ACTIVE',
     );
 
+    // Print API call specifications and full body payload
+    if (kDebugMode) {
+      final payloadMap = request.toMap();
+      final prettyJson = const JsonEncoder.withIndent('  ').convert(payloadMap);
+
+      debugPrint('╔═══════════════════════════════════════════════════════════');
+      debugPrint('║ 🚀 PUBLISH PROJECT — API REQUEST SPECIFICATION');
+      debugPrint('╠═══════════════════════════════════════════════════════════');
+      debugPrint('║ Method        : POST');
+      debugPrint('║ Endpoint      : /api/v1/projects/sponsor/');
+      debugPrint('║ Content-Type  : multipart/form-data');
+      debugPrint('║ Auth Required : Yes (Bearer Token)');
+      debugPrint('║ Verification  : $rawStatus');
+      debugPrint('╠═══════════════════════════════════════════════════════════');
+      debugPrint('║ Body Payload (Map / Form Fields):');
+      for (final line in prettyJson.split('\n')) {
+        debugPrint('║   $line');
+      }
+      if (_coverImagePath != null && _coverImagePath!.isNotEmpty) {
+        debugPrint('║ Files         : cover_image -> $_coverImagePath');
+      } else {
+        debugPrint('║ Files         : cover_image -> None');
+      }
+      debugPrint('╚═══════════════════════════════════════════════════════════');
+    }
+
     final result =
         await ref.read(createProjectProvider.notifier).submitProject(request);
 
     if (!mounted) return;
 
     if (result.success) {
+      if (kDebugMode) {
+        debugPrint('✅ [PUBLISH PROJECT] Success! Created Project ID: ${result.projectId}');
+      }
       await ref.read(projectDraftProvider.notifier).deleteDraftIfExists(_draftId);
       if (!mounted) return;
       CustomSnackBar.success(context, "Project published successfully!");
       context.pop();
     } else {
+      if (kDebugMode) {
+        debugPrint('❌ [PUBLISH PROJECT] Failed: ${result.message}');
+      }
       CustomSnackBar.error(context, result.message);
     }
   }

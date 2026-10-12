@@ -1,3 +1,4 @@
+import 'dart:convert';
 import '../../../ai_chat/models/ai_chat_message_model.dart';
 import 'project_draft_model.dart';
 
@@ -64,6 +65,22 @@ class AiProjectConversationData {
       parsedDraft = ProjectDraftModel.fromMap(
         json['draft'] as Map<String, dynamic>,
       );
+    } else if (json['draft'] is Map) {
+      parsedDraft = ProjectDraftModel.fromMap(
+        Map<String, dynamic>.from(json['draft'] as Map),
+      );
+    } else if (json['draft'] is String &&
+        (json['draft'] as String).trim().startsWith('{')) {
+      try {
+        final decoded = jsonDecode(json['draft'] as String);
+        if (decoded is Map<String, dynamic>) {
+          parsedDraft = ProjectDraftModel.fromMap(decoded);
+        } else if (decoded is Map) {
+          parsedDraft = ProjectDraftModel.fromMap(
+            Map<String, dynamic>.from(decoded),
+          );
+        }
+      } catch (_) {}
     }
 
     Map<String, dynamic>? extracted;

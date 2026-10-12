@@ -120,6 +120,7 @@ class ProjectCreationAiState {
     int? customTotalSteps,
     String? customStepTitle,
     List<String>? customSuggestions,
+    bool clearSuggestions = false,
     String? industry,
     String? description,
     String? fundingGoal,
@@ -139,7 +140,9 @@ class ProjectCreationAiState {
       customStepIndex: customStepIndex ?? this.customStepIndex,
       customTotalSteps: customTotalSteps ?? this.customTotalSteps,
       customStepTitle: customStepTitle ?? this.customStepTitle,
-      customSuggestions: customSuggestions ?? this.customSuggestions,
+      customSuggestions: clearSuggestions
+          ? null
+          : (customSuggestions ?? this.customSuggestions),
       industry: industry ?? this.industry,
       description: description ?? this.description,
       fundingGoal: fundingGoal ?? this.fundingGoal,
@@ -221,6 +224,8 @@ class ProjectCreationAiNotifier extends Notifier<ProjectCreationAiState> {
 
       final nextStep = _mapStep(data.step);
 
+      final newSuggestions = welcomeMessage?.suggestions;
+
       state = state.copyWith(
         conversationId: data.conversationId,
         isInitializing: false,
@@ -229,7 +234,8 @@ class ProjectCreationAiNotifier extends Notifier<ProjectCreationAiState> {
         customStepIndex: data.stepIndex,
         customTotalSteps: data.totalSteps,
         customStepTitle: data.stepTitle,
-        customSuggestions: welcomeMessage?.suggestions,
+        customSuggestions: newSuggestions,
+        clearSuggestions: newSuggestions == null,
         generatedDraft: data.draft,
         clearError: true,
       );
@@ -300,6 +306,8 @@ class ProjectCreationAiNotifier extends Notifier<ProjectCreationAiState> {
       }
 
       final nextStep = _mapStep(data.step);
+      final newSuggestions = data.message?.suggestions;
+      final stepChanged = nextStep != state.currentStep;
 
       state = state.copyWith(
         messages: newMessages,
@@ -308,7 +316,8 @@ class ProjectCreationAiNotifier extends Notifier<ProjectCreationAiState> {
         customStepIndex: data.stepIndex,
         customTotalSteps: data.totalSteps,
         customStepTitle: data.stepTitle,
-        customSuggestions: data.message?.suggestions,
+        customSuggestions: newSuggestions,
+        clearSuggestions: newSuggestions == null && stepChanged,
         generatedDraft: data.draft ?? state.generatedDraft,
         clearError: true,
       );

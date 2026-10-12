@@ -103,8 +103,12 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
         if (businessAddress != null && businessAddress.isNotEmpty) {
           fields['business_address'] = businessAddress;
         }
-        if (companyWebsite != null && companyWebsite.isNotEmpty) {
-          fields['company_website'] = companyWebsite;
+        if (companyWebsite != null && companyWebsite.trim().isNotEmpty) {
+          var url = companyWebsite.trim();
+          if (!url.startsWith(RegExp(r'https?:\/\/', caseSensitive: false))) {
+            url = 'https://$url';
+          }
+          fields['company_website'] = url;
         }
       }
 

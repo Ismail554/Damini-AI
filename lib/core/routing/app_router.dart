@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../views/splash/splash_view.dart';
@@ -174,11 +175,51 @@ class AppRouter {
       GoRoute(
         path: '/create-project',
         pageBuilder: (context, state) {
-          final draft = state.extra is ProjectDraftModel
-              ? state.extra as ProjectDraftModel
-              : (state.extra is Map
-                  ? (state.extra as Map)['draft'] as ProjectDraftModel?
-                  : null);
+          ProjectDraftModel? draft;
+          final extra = state.extra;
+
+          if (extra is ProjectDraftModel) {
+            draft = extra;
+          } else if (extra is Map) {
+            final draftVal = extra['draft'];
+            if (draftVal is ProjectDraftModel) {
+              draft = draftVal;
+            } else if (draftVal is Map<String, dynamic>) {
+              draft = ProjectDraftModel.fromMap(draftVal);
+            } else if (draftVal is Map) {
+              draft = ProjectDraftModel.fromMap(
+                Map<String, dynamic>.from(draftVal),
+              );
+            } else if (draftVal is String && draftVal.trim().startsWith('{')) {
+              try {
+                final decoded = jsonDecode(draftVal);
+                if (decoded is Map<String, dynamic>) {
+                  draft = ProjectDraftModel.fromMap(decoded);
+                } else if (decoded is Map) {
+                  draft = ProjectDraftModel.fromMap(
+                    Map<String, dynamic>.from(decoded),
+                  );
+                }
+              } catch (_) {}
+            } else if (extra['title'] != null ||
+                extra['industry'] != null ||
+                extra['id'] != null) {
+              draft = ProjectDraftModel.fromMap(
+                Map<String, dynamic>.from(extra),
+              );
+            }
+          } else if (extra is String && extra.trim().startsWith('{')) {
+            try {
+              final decoded = jsonDecode(extra);
+              if (decoded is Map<String, dynamic>) {
+                draft = ProjectDraftModel.fromMap(decoded);
+              } else if (decoded is Map) {
+                draft = ProjectDraftModel.fromMap(
+                  Map<String, dynamic>.from(decoded),
+                );
+              }
+            } catch (_) {}
+          }
 
           return buildNativePage(
             context: context,

@@ -166,7 +166,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         fields['business_address'] = _addressCtrl.text.trim();
       }
       if (_websiteCtrl.text.trim().isNotEmpty) {
-        fields['company_website'] = _websiteCtrl.text.trim();
+        var website = _websiteCtrl.text.trim();
+        if (!website.startsWith(RegExp(r'https?:\/\/', caseSensitive: false))) {
+          website = 'https://$website';
+        }
+        fields['company_website'] = website;
       }
       if (_positionCtrl.text.trim().isNotEmpty) {
         fields['position_title'] = _positionCtrl.text.trim();
@@ -255,6 +259,18 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       keyboardType: TextInputType.url,
                       prefixIcon: const Icon(Icons.language_rounded, color: AppColors.grey, size: 20),
                       textInputAction: TextInputAction.next,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return null;
+                        final trimmed = v.trim();
+                        final normalized = trimmed.startsWith(RegExp(r'https?:\/\/', caseSensitive: false))
+                            ? trimmed
+                            : 'https://$trimmed';
+                        final uri = Uri.tryParse(normalized);
+                        if (uri == null || !uri.hasAuthority || !uri.host.contains('.')) {
+                          return "Enter a valid website URL (e.g. https://example.com)";
+                        }
+                        return null;
+                      },
                     ),
                     SizedBox(height: 16.h),
                     LabeledTextField(

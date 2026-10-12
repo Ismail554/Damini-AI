@@ -89,7 +89,13 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
           isCompany ? _registrationNumberController.text.trim() : null,
       businessAddress:
           isCompany ? _businessAddressController.text.trim() : null,
-      companyWebsite: isCompany ? _websiteController.text.trim() : null,
+      companyWebsite: isCompany
+          ? (_websiteController.text.trim().isNotEmpty
+              ? (_websiteController.text.trim().startsWith(RegExp(r'https?:\/\/', caseSensitive: false))
+                  ? _websiteController.text.trim()
+                  : 'https://${_websiteController.text.trim()}')
+              : null)
+          : null,
     );
 
     final success =

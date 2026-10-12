@@ -114,6 +114,6 @@ class ApiLoggerInterceptor extends Interceptor {
         str = data.toString();
       }
     }
-    return str.length > 800 ? '${str.substring(0, 800)}…' : str;
+    return str.length > 4000 ? '${str.substring(0, 4000)}…' : str;
   }
 }

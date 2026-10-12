@@ -25,6 +25,37 @@ class ProjectDropdownField extends StatelessWidget {
   Widget build(BuildContext context) {
     final tc = AppThemeColors.of(context);
 
+    // Deduplicate items while preserving order
+    final seen = <String>{};
+    final effectiveItems = <String>[];
+    for (final item in items) {
+      final trimmed = item.trim();
+      if (trimmed.isNotEmpty && seen.add(trimmed.toLowerCase())) {
+        effectiveItems.add(trimmed);
+      }
+    }
+
+    String? effectiveValue = (value != null && value!.trim().isNotEmpty)
+        ? value!.trim()
+        : null;
+
+    if (effectiveValue != null) {
+      final exactMatch = effectiveItems.contains(effectiveValue);
+      if (!exactMatch) {
+        // Try case-insensitive matching
+        final caseMatch = effectiveItems.firstWhere(
+          (i) => i.toLowerCase() == effectiveValue!.toLowerCase(),
+          orElse: () => '',
+        );
+        if (caseMatch.isNotEmpty) {
+          effectiveValue = caseMatch;
+        } else {
+          // If value is not in items, insert it so DropdownButton never asserts
+          effectiveItems.insert(0, effectiveValue);
+        }
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,7 +69,7 @@ class ProjectDropdownField extends StatelessWidget {
         ),
         SizedBox(height: AppDimens.spaceXxs),
         DropdownButtonFormField<String>(
-          initialValue: value,
+          value: effectiveValue,
           onChanged: onChanged,
           dropdownColor: tc.cardBg,
           icon: Icon(
@@ -78,7 +109,7 @@ class ProjectDropdownField extends StatelessWidget {
               ),
             ),
           ),
-          items: items.map((item) {
+          items: effectiveItems.map((item) {
             return DropdownMenuItem<String>(
               value: item,
               child: Text(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/widgets/custom_snackbar.dart';
 import '../../views/role_selection/models/onboarding_models.dart';
 import '../../views/role_selection/provider/onboarding_provider.dart';
 
@@ -10,6 +11,8 @@ class InterestsScreen extends ConsumerStatefulWidget {
   final ValueChanged<List<int>> onNext;
   final VoidCallback onBack;
   final bool isLoading;
+  final int step;
+  final int totalSteps;
 
   const InterestsScreen({
     super.key,
@@ -17,6 +20,8 @@ class InterestsScreen extends ConsumerStatefulWidget {
     required this.onNext,
     required this.onBack,
     this.isLoading = false,
+    this.step = 4,
+    this.totalSteps = 4,
   });
 
   @override
@@ -26,25 +31,73 @@ class InterestsScreen extends ConsumerStatefulWidget {
 class _InterestsScreenState extends ConsumerState<InterestsScreen> {
   final Set<int> _selectedIds = {};
 
-  static const List<Map<String, dynamic>> _fallbackIndustries = [
-    {'id': 1, 'name': 'Technology', 'icon': Icons.memory_rounded},
-    {'id': 2, 'name': 'Real Estate', 'icon': Icons.home_work_outlined},
-    {'id': 3, 'name': 'Healthcare', 'icon': Icons.favorite_outline_rounded},
-    {'id': 4, 'name': 'Clean Energy', 'icon': Icons.bolt_rounded},
-    {'id': 5, 'name': 'Agriculture', 'icon': Icons.eco_outlined},
-    {'id': 6, 'name': 'Infrastructure', 'icon': Icons.location_city_outlined},
+  static const List<Map<String, dynamic>> _staticIndustries = [
+    {'id': 1, 'name': 'Real Estate'},
+    {'id': 2, 'name': 'Agriculture & Agri-processing'},
+    {'id': 3, 'name': 'Technology & AI'},
+    {'id': 4, 'name': 'Fintech & Financial Services'},
+    {'id': 5, 'name': 'Renewable Energy & Climate Tech'},
+    {'id': 6, 'name': 'Mining & Minerals'},
+    {'id': 7, 'name': 'Healthcare & Healthtech'},
+    {'id': 8, 'name': 'Tourism & Hospitality'},
+    {'id': 9, 'name': 'Manufacturing & Industrial'},
+    {'id': 10, 'name': 'TV & Film'},
+    {'id': 11, 'name': 'Infrastructure & Logistics'},
+    {'id': 12, 'name': 'Food & Beverage'},
+    {'id': 13, 'name': 'Cannabis & Hemp'},
+    {'id': 14, 'name': 'Retail & E-commerce'},
+    {'id': 15, 'name': 'Water & Sanitation'},
+    {'id': 16, 'name': 'Transportation'},
+    {'id': 17, 'name': 'General/Other'},
   ];
 
-  IconData _getIconForIndustry(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('tech')) return Icons.memory_rounded;
-    if (lower.contains('estate') || lower.contains('property')) return Icons.home_work_outlined;
-    if (lower.contains('health') || lower.contains('bio')) return Icons.favorite_outline_rounded;
-    if (lower.contains('energy') || lower.contains('power')) return Icons.bolt_rounded;
-    if (lower.contains('agri') || lower.contains('food')) return Icons.eco_outlined;
-    if (lower.contains('infra') || lower.contains('construct')) return Icons.location_city_outlined;
-    if (lower.contains('fin')) return Icons.account_balance_rounded;
-    return Icons.domain_rounded;
+  List<IndustryModel> _mergeIndustries(List<IndustryModel> apiIndustries) {
+    final result = <IndustryModel>[];
+    final matchedApiIds = <int>{};
+
+    for (final staticItem in _staticIndustries) {
+      final sId = staticItem['id'] as int;
+      final sName = staticItem['name'] as String;
+
+      final match = apiIndustries.firstWhere(
+        (api) {
+          final apiLower = api.name.trim().toLowerCase();
+          final staticLower = sName.trim().toLowerCase();
+          return apiLower == staticLower ||
+              (apiLower.isNotEmpty && staticLower.contains(apiLower)) ||
+              (staticLower.isNotEmpty && apiLower.contains(staticLower));
+        },
+        orElse: () => const IndustryModel(id: -1, name: ''),
+      );
+
+      if (match.id != -1) {
+        result.add(IndustryModel(id: match.id, name: sName));
+        matchedApiIds.add(match.id);
+      } else {
+        result.add(IndustryModel(id: sId, name: sName));
+      }
+    }
+
+    for (final api in apiIndustries) {
+      if (!matchedApiIds.contains(api.id) &&
+          !result.any((r) => r.id == api.id || r.name.toLowerCase() == api.name.toLowerCase())) {
+        result.add(api);
+      }
+    }
+
+    return result;
+  }
+
+  void _handleContinue() {
+    if (_selectedIds.isEmpty) {
+      CustomSnackBar.show(
+        context,
+        "Please select at least one interest to continue.",
+        isError: true,
+      );
+      return;
+    }
+    widget.onNext(_selectedIds.toList());
   }
 
   @override
@@ -56,95 +109,162 @@ class _InterestsScreenState extends ConsumerState<InterestsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            onPressed: widget.onBack,
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          // Step & Navigation header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: widget.onBack,
+                behavior: HitTestBehavior.opaque,
+                child: Text(
+                  "Back",
+                  style: GoogleFonts.outfit(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Text(
+                "Step ${widget.step} of ${widget.totalSteps}",
+                style: GoogleFonts.outfit(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 16.h),
-          Text(
-            "Select Interests",
-            style: GoogleFonts.outfit(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            "Choose sectors you want to explore or fund.",
-            style: GoogleFonts.outfit(
-              fontSize: 14.sp,
-              color: Colors.white.withValues(alpha: 0.6),
-            ),
+          SizedBox(height: 12.h),
+
+          // Segmented progress bars
+          Row(
+            children: List.generate(widget.totalSteps, (index) {
+              final isFilled = index < widget.step;
+              return Expanded(
+                child: Container(
+                  height: 4.h,
+                  margin: EdgeInsets.only(
+                    right: index < widget.totalSteps - 1 ? 6.w : 0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isFilled
+                        ? const Color(0xFF006EDB)
+                        : Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+              );
+            }),
           ),
           SizedBox(height: 24.h),
+
+          // Scrollable content area: Headings and Wrap pills
           Expanded(
-            child: industriesAsync.when(
-              data: (industries) {
-                final list = industries.isNotEmpty
-                    ? industries
-                    : _fallbackIndustries
-                        .map((m) => IndustryModel(id: m['id'] as int, name: m['name'] as String))
-                        .toList();
-                return _buildGrid(list);
-              },
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: Color(0xFF006EDB)),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "What industries interest you?",
+                    style: GoogleFonts.outfit(
+                      fontSize: 26.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.25,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    "Pick as many as you like we'll tailor your feed.",
+                    style: GoogleFonts.outfit(
+                      fontSize: 14.sp,
+                      color: Colors.white.withValues(alpha: 0.65),
+                      height: 1.4,
+                    ),
+                  ),
+                  SizedBox(height: 22.h),
+
+                  industriesAsync.when(
+                    data: (apiIndustries) {
+                      final items = _mergeIndustries(apiIndustries);
+                      return _buildPillWrap(items);
+                    },
+                    loading: () {
+                      final items = _staticIndustries
+                          .map((m) => IndustryModel(id: m['id'] as int, name: m['name'] as String))
+                          .toList();
+                      return _buildPillWrap(items);
+                    },
+                    error: (_, _) {
+                      final items = _staticIndustries
+                          .map((m) => IndustryModel(id: m['id'] as int, name: m['name'] as String))
+                          .toList();
+                      return _buildPillWrap(items);
+                    },
+                  ),
+                  SizedBox(height: 20.h),
+                ],
               ),
-              error: (error, stack) {
-                final fallbackList = _fallbackIndustries
-                    .map((m) => IndustryModel(id: m['id'] as int, name: m['name'] as String))
-                    .toList();
-                return _buildGrid(fallbackList);
-              },
             ),
           ),
+
+          // Bottom counter and Finish & continue button
+          Text(
+            "${_selectedIds.length} selected",
+            style: GoogleFonts.outfit(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w400,
+              color: Colors.white.withValues(alpha: 0.7),
+            ),
+          ),
+          SizedBox(height: 16.h),
+
           SizedBox(
             width: double.infinity,
             height: 52.h,
             child: ElevatedButton(
-              onPressed: (_selectedIds.isNotEmpty && !widget.isLoading)
-                  ? () => widget.onNext(_selectedIds.toList())
-                  : null,
+              onPressed: widget.isLoading ? null : _handleContinue,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF006EDB),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26.r)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(26.r),
+                ),
+                elevation: 0,
               ),
               child: widget.isLoading
                   ? SizedBox(
                       width: 22.r,
                       height: 22.r,
-                      child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
                     )
                   : Text(
-                      _selectedIds.isNotEmpty
-                          ? "Continue (${_selectedIds.length})"
-                          : "Select Interests to Continue",
-                      style: GoogleFonts.outfit(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                      "Finish & continue",
+                      style: GoogleFonts.outfit(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
         ],
       ),
     );
   }
 
-  Widget _buildGrid(List<IndustryModel> items) {
-    return GridView.builder(
-      physics: const BouncingScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 14.w,
-        mainAxisSpacing: 14.h,
-        childAspectRatio: 1.3,
-      ),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
+  Widget _buildPillWrap(List<IndustryModel> items) {
+    return Wrap(
+      spacing: 10.w,
+      runSpacing: 12.h,
+      children: items.map((item) {
         final isSelected = _selectedIds.contains(item.id);
-        final icon = _getIconForIndustry(item.name);
 
         return GestureDetector(
           onTap: () {
@@ -157,45 +277,31 @@ class _InterestsScreenState extends ConsumerState<InterestsScreen> {
             });
           },
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: EdgeInsets.all(16.r),
+            duration: const Duration(milliseconds: 180),
+            padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 11.h),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF006EDB) : const Color(0xFF0C1B2C).withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(20.r),
+              color: isSelected
+                  ? const Color(0xFF006EDB)
+                  : const Color(0xFF0C1B2C).withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(30.r),
               border: Border.all(
-                color: isSelected ? Colors.white.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.08),
+                color: isSelected
+                    ? const Color(0xFF006EDB)
+                    : Colors.white.withValues(alpha: 0.25),
                 width: 1.w,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, color: Colors.white, size: 28.r),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.outfit(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    if (isSelected)
-                      Icon(Icons.check_circle_rounded, color: Colors.white, size: 18.r),
-                  ],
-                ),
-              ],
+            child: Text(
+              item.name,
+              style: GoogleFonts.outfit(
+                fontSize: 14.sp,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: Colors.white,
+              ),
             ),
           ),
         );
-      },
+      }).toList(),
     );
   }
 }

@@ -112,7 +112,7 @@ class _ProjectCreationAiChatViewState
                       onApply: () {
                         context.pushReplacement(
                           '/create-project',
-                          extra: {'draft': state.generatedDraft},
+                          extra: state.generatedDraft,
                         );
                       },
                     );
@@ -127,7 +127,7 @@ class _ProjectCreationAiChatViewState
                         if (state.generatedDraft != null) {
                           context.pushReplacement(
                             '/create-project',
-                            extra: {'draft': state.generatedDraft},
+                            extra: state.generatedDraft,
                           );
                         }
                       } else {
@@ -147,7 +147,7 @@ class _ProjectCreationAiChatViewState
                   if (state.generatedDraft != null) {
                     context.pushReplacement(
                       '/create-project',
-                      extra: {'draft': state.generatedDraft},
+                      extra: state.generatedDraft,
                     );
                   }
                 } else {

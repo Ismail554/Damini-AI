@@ -51,6 +51,52 @@ class CreateProjectRequestModel {
     this.status = 'ACTIVE',
   });
 
+  Map<String, dynamic> toMap() {
+    final Map<String, dynamic> map = {
+      'title': title.trim(),
+      'short_description': shortDescription.trim(),
+      'business_description': businessDescription.trim(),
+      'funding_goal': fundingGoal.toStringAsFixed(2),
+      'minimum_investment': minimumInvestment.toStringAsFixed(2),
+      'target_roi': targetRoi.toStringAsFixed(2),
+      'target_return': targetRoi.toStringAsFixed(2),
+      'country': country.trim(),
+      'location': location.trim(),
+      'funding_stage': fundingStage.trim(),
+      'timeline_months': timelineMonths.toString(),
+      'project_duration_months': timelineMonths.toString(),
+      'current_status': currentStatus.trim(),
+      'next_milestones': nextMilestones.trim(),
+      'use_of_funds': useOfFunds.trim(),
+      'skin_in_the_game': skinInTheGame.toStringAsFixed(2),
+      'potential_monthly_revenue': potentialMonthlyRevenue.toStringAsFixed(2),
+      'hold_period_months': holdPeriodMonths.toString(),
+      'timeline_to_operations_months': timelineToOperationsMonths.toString(),
+      'team_members_text': teamMembersText.trim(),
+      'confidentiality_agreement_text': confidentialityAgreementText.trim(),
+      'status': status.toUpperCase(),
+    };
+
+    if (industry != null && industry!.trim().isNotEmpty) {
+      final parsedId = int.tryParse(industry!.trim());
+      if (parsedId != null && parsedId > 0) {
+        map['industry'] = parsedId.toString();
+      }
+    }
+
+    if (categoryIds != null && categoryIds!.isNotEmpty) {
+      for (var i = 0; i < categoryIds!.length; i++) {
+        map['category_ids[$i]'] = categoryIds![i].toString();
+      }
+    }
+
+    if (coverImagePath != null && coverImagePath!.trim().isNotEmpty) {
+      map['cover_image'] = coverImagePath;
+    }
+
+    return map;
+  }
+
   Future<FormData> toFormData() async {
     final Map<String, dynamic> map = {
       'title': title.trim(),

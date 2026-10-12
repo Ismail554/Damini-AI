@@ -142,7 +142,11 @@ class SponsorEditProfileModel {
           map['business_address'] = businessAddress!.trim();
         }
         if (companyWebsite != null && companyWebsite!.trim().isNotEmpty) {
-          map['company_website'] = companyWebsite!.trim();
+          var url = companyWebsite!.trim();
+          if (!url.startsWith(RegExp(r'https?:\/\/', caseSensitive: false))) {
+            url = 'https://$url';
+          }
+          map['company_website'] = url;
         }
       }
     }

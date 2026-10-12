@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -178,7 +179,7 @@ class _DaminiBlueprintCardState extends State<DaminiBlueprintCard>
                           ),
                         ],
                       ),
-                      SizedBox(height: 16.h),
+                      AppSpacing.h16,
 
                       // Action Button
                       SizedBox(
@@ -186,11 +187,11 @@ class _DaminiBlueprintCardState extends State<DaminiBlueprintCard>
                         height: 44.h,
                         child: ElevatedButton.icon(
                           onPressed: widget.onApply,
-                          icon: Icon(Icons.bolt_rounded, color: Colors.white, size: 18.r),
+                          icon: Icon(Icons.bolt_rounded, color: Colors.white, size: 18.sp),
                           label: Text(
-                            "Apply Blueprint to Project",
+                            "Apply Blueprint to Create & Edit Project",
                             style: GoogleFonts.outfit(
-                              fontSize: 14.sp,
+                              fontSize: 13.5.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -235,8 +236,8 @@ class _DaminiBlueprintCardState extends State<DaminiBlueprintCard>
         ),
         child: Column(
           children: [
-            Icon(icon, size: 16.r, color: const Color(0xFFC026D3)),
-            SizedBox(height: 4.h),
+            Icon(icon, size: 16.sp, color: const Color(0xFFC026D3)),
+            AppSpacing.h4, 
             Text(
               value,
               maxLines: 1,

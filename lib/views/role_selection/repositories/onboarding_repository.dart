@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/services/api_error_handler.dart';
 import '../../../../core/services/api_service.dart';
 import '../models/onboarding_models.dart';
 
@@ -50,17 +51,16 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         requireAuth: true,
       );
       return response.statusCode == 200 || response.statusCode == 201;
-    } catch (_) {
-      try {
+    } catch (e) {
+      if (e is ApiException && e.statusCode == 404) {
         final fallback = await apiService.patch(
           ApiEndpoints.profileByRole(role),
           data: payload,
           requireAuth: true,
         );
         return fallback.statusCode == 200 || fallback.statusCode == 201;
-      } catch (e) {
-        rethrow;
       }
+      rethrow;
     }
   }
 
@@ -75,40 +75,48 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
       final v = entry.value;
       if (v == null) continue;
       if (v is String && v.trim().isEmpty) continue;
-      cleanFields[entry.key] = v is String ? v.trim() : v;
+      var val = v is String ? v.trim() : v;
+      if (entry.key == 'company_website' && val is String && val.isNotEmpty) {
+        if (!val.startsWith(RegExp(r'https?:\/\/', caseSensitive: false))) {
+          val = 'https://$val';
+        }
+      }
+      cleanFields[entry.key] = val;
     }
 
-    dynamic data;
-    if (photoPath != null && photoPath.isNotEmpty) {
-      final fileName = photoPath.split(RegExp(r'[\\/]')).last;
-      final map = Map<String, dynamic>.from(cleanFields);
-      map['profile_photo'] = await MultipartFile.fromFile(
-        photoPath,
-        filename: fileName,
-      );
-      data = FormData.fromMap(map);
-    } else {
-      data = cleanFields;
+    Future<dynamic> buildPayload() async {
+      if (photoPath != null && photoPath.isNotEmpty) {
+        final fileName = photoPath.split(RegExp(r'[\\/]')).last;
+        final map = Map<String, dynamic>.from(cleanFields);
+        map['profile_photo'] = await MultipartFile.fromFile(
+          photoPath,
+          filename: fileName,
+        );
+        return FormData.fromMap(map);
+      }
+      return cleanFields;
     }
 
     try {
+      final data = await buildPayload();
       final response = await apiService.patch(
         ApiEndpoints.onboarding(role),
         data: data,
         requireAuth: true,
       );
       return response.statusCode == 200 || response.statusCode == 201;
-    } catch (_) {
-      try {
+    } catch (e) {
+      // Only fallback to alternate endpoint if onboarding endpoint is 404 (Not Found)
+      if (e is ApiException && e.statusCode == 404) {
+        final fallbackData = await buildPayload();
         final fallback = await apiService.patch(
           ApiEndpoints.profileByRole(role),
-          data: data,
+          data: fallbackData,
           requireAuth: true,
         );
         return fallback.statusCode == 200 || fallback.statusCode == 201;
-      } catch (e) {
-        rethrow;
       }
+      rethrow;
     }
   }
 
@@ -151,17 +159,16 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         requireAuth: true,
       );
       return response.statusCode == 200 || response.statusCode == 201;
-    } catch (_) {
-      try {
+    } catch (e) {
+      if (e is ApiException && e.statusCode == 404) {
         final fallback = await apiService.patch(
           ApiEndpoints.profileByRole(role),
           data: {'industries': industryIds},
           requireAuth: true,
         );
         return fallback.statusCode == 200 || fallback.statusCode == 201;
-      } catch (e) {
-        rethrow;
       }
+      rethrow;
     }
   }
 
