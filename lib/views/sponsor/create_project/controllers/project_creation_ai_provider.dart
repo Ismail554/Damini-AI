@@ -224,7 +224,7 @@ class ProjectCreationAiNotifier extends Notifier<ProjectCreationAiState> {
 
       final nextStep = _mapStep(data.step);
 
-      final newSuggestions = welcomeMessage?.suggestions;
+      final newSuggestions = data.suggestions ?? welcomeMessage?.suggestions;
 
       state = state.copyWith(
         conversationId: data.conversationId,
@@ -306,7 +306,7 @@ class ProjectCreationAiNotifier extends Notifier<ProjectCreationAiState> {
       }
 
       final nextStep = _mapStep(data.step);
-      final newSuggestions = data.message?.suggestions;
+      final newSuggestions = data.suggestions ?? data.message?.suggestions;
       final stepChanged = nextStep != state.currentStep;
 
       state = state.copyWith(

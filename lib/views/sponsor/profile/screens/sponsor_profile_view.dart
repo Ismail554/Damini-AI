@@ -28,37 +28,103 @@ class SponsorProfileView extends ConsumerWidget {
     final profile = profileState.profile;
     final personal = ref.watch(personalInfoProvider).info;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppDimens.screenHorizontal,
-        vertical: AppDimens.screenVertical,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Sponsor Profile",
-                style: GoogleFonts.outfit(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                  color: tc.textPrimary,
+    final topInset = MediaQuery.of(context).padding.top;
+    final headerBgHeight = topInset > 0 ? (topInset + 130.h) : 175.h;
+
+    return Stack(
+      children: [
+        // Top Background Gradient Container (matching previous UI implementation & theme)
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: headerBgHeight,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: tc.isDark
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF0B3A82),
+                        Color(0xFF052152),
+                      ],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFFFFFF),
+                        Color(0xFFF1F5F9),
+                      ],
+                    ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24.r),
+                bottomRight: Radius.circular(24.r),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: tc.borderColor,
+                  width: 1,
                 ),
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.settings_outlined,
-                  color: tc.textPrimary,
-                  size: AppDimens.iconLg,
+              boxShadow: [
+                BoxShadow(
+                  color: tc.shadowColor,
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
                 ),
-                onPressed: () => context.push('/settings'),
-              ),
-            ],
+              ],
+            ),
           ),
-          SizedBox(height: AppDimens.spaceLg),
+        ),
+
+        // Scrollable Profile Content
+        RefreshIndicator(
+          onRefresh: () => ref.read(sponsorProfileProvider.notifier).refresh(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: EdgeInsets.fromLTRB(
+              AppDimens.screenHorizontal,
+              topInset + 12.h,
+              AppDimens.screenHorizontal,
+              AppDimens.screenVertical,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "Profile",
+                  style: GoogleFonts.outfit(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: tc.textPrimary,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => context.push('/settings'),
+                  behavior: HitTestBehavior.opaque,
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.h,
+                    child: Center(
+                      child: Icon(
+                        Icons.settings_outlined,
+                        color: tc.textPrimary,
+                        size: 24.sp,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
 
           ProfileHeroCard(
             name: (profile?.name != null &&
@@ -185,6 +251,9 @@ class SponsorProfileView extends ConsumerWidget {
           SizedBox(height: 90.h),
         ],
       ),
-    );
+      ),
+    ),
+  ],
+);
   }
 }

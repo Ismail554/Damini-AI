@@ -11,6 +11,7 @@ class AiProjectConversationData {
   final String stepTitle;
   final AiChatMessageModel? message;
   final List<AiChatMessageModel> messages;
+  final List<String>? suggestions;
   final Map<String, dynamic>? extractedData;
   final ProjectDraftModel? draft;
 
@@ -22,6 +23,7 @@ class AiProjectConversationData {
     required this.stepTitle,
     this.message,
     this.messages = const [],
+    this.suggestions,
     this.extractedData,
     this.draft,
   });
@@ -44,6 +46,24 @@ class AiProjectConversationData {
     AiChatMessageModel? singleMsg;
     if (json['message'] is Map<String, dynamic>) {
       singleMsg = parseBackendMessage(json['message'] as Map<String, dynamic>);
+    }
+
+    // Parse suggestions (at envelope level or message level)
+    List<String>? parsedSuggestions;
+    if (json['suggestions'] is List) {
+      parsedSuggestions = (json['suggestions'] as List)
+          .map((e) => e.toString())
+          .where((e) => e.trim().isNotEmpty)
+          .toList();
+    } else if (singleMsg?.suggestions != null) {
+      parsedSuggestions = singleMsg?.suggestions;
+    }
+
+    // Attach envelope suggestions to singleMsg if missing
+    if (singleMsg != null &&
+        (singleMsg.suggestions == null || singleMsg.suggestions!.isEmpty) &&
+        parsedSuggestions != null) {
+      singleMsg = singleMsg.copyWith(suggestions: parsedSuggestions);
     }
 
     // Parse message list (GET history endpoint)
@@ -96,6 +116,7 @@ class AiProjectConversationData {
       stepTitle: title,
       message: singleMsg,
       messages: msgList,
+      suggestions: parsedSuggestions,
       extractedData: extracted,
       draft: parsedDraft,
     );

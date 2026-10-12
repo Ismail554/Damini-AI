@@ -33,9 +33,7 @@ class AiProjectCreationRepository {
       );
 
       final Map<String, dynamic> data = _normalizeResponseData(response.data);
-      final conversationPayload = data['data'] is Map<String, dynamic>
-          ? data['data'] as Map<String, dynamic>
-          : data;
+      final conversationPayload = _extractPayload(data);
 
       final parsed = AiProjectConversationData.fromJson(conversationPayload);
       return AiProjectConversationResult.success(parsed);
@@ -58,9 +56,7 @@ class AiProjectCreationRepository {
       );
 
       final Map<String, dynamic> data = _normalizeResponseData(response.data);
-      final conversationPayload = data['data'] is Map<String, dynamic>
-          ? data['data'] as Map<String, dynamic>
-          : data;
+      final conversationPayload = _extractPayload(data);
 
       final parsed = AiProjectConversationData.fromJson(
         conversationPayload,
@@ -84,9 +80,7 @@ class AiProjectCreationRepository {
       );
 
       final Map<String, dynamic> data = _normalizeResponseData(response.data);
-      final conversationPayload = data['data'] is Map<String, dynamic>
-          ? data['data'] as Map<String, dynamic>
-          : data;
+      final conversationPayload = _extractPayload(data);
 
       final parsed = AiProjectConversationData.fromJson(
         conversationPayload,
@@ -125,6 +119,16 @@ class AiProjectCreationRepository {
       } catch (_) {}
     }
     return <String, dynamic>{};
+  }
+
+  Map<String, dynamic> _extractPayload(Map<String, dynamic> data) {
+    final Map<String, dynamic> payload = Map<String, dynamic>.from(data);
+    if (data['data'] is Map<String, dynamic>) {
+      payload.addAll(data['data'] as Map<String, dynamic>);
+    } else if (data['data'] is Map) {
+      payload.addAll(Map<String, dynamic>.from(data['data'] as Map));
+    }
+    return payload;
   }
 
   AiProjectConversationResult _handleError(dynamic e, String defaultMessage) {

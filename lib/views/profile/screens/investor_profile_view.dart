@@ -26,40 +26,104 @@ class InvestorProfileView extends ConsumerWidget {
     final profile = ref.watch(investorProfileProvider).profile;
     final personalInfo = ref.watch(personalInfoProvider).info;
 
-    return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(investorProfileProvider.notifier).refreshProfile(),
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(
-          parent: BouncingScrollPhysics(),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row: Profile Title & Settings Icon
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Profile",
-                style: GoogleFonts.outfit(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                  color: tc.textPrimary,
+    final topInset = MediaQuery.of(context).padding.top;
+    final headerBgHeight = topInset > 0 ? (topInset + 130.h) : 175.h;
+
+    return Stack(
+      children: [
+        // Top Background Gradient Container (matching previous UI implementation & theme)
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: headerBgHeight,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: tc.isDark
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF0B3A82),
+                        Color(0xFF052152),
+                      ],
+                    )
+                  : const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFFFFFF),
+                        Color(0xFFF1F5F9),
+                      ],
+                    ),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24.r),
+                bottomRight: Radius.circular(24.r),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: tc.borderColor,
+                  width: 1,
                 ),
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.settings_outlined,
-                  color: tc.textPrimary,
-                  size: 22.r,
+              boxShadow: [
+                BoxShadow(
+                  color: tc.shadowColor,
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
                 ),
-                onPressed: () => context.push('/settings'),
-              ),
-            ],
+              ],
+            ),
           ),
-          SizedBox(height: 16.h),
+        ),
+
+        // Scrollable Profile Content
+        RefreshIndicator(
+          onRefresh: () =>
+              ref.read(investorProfileProvider.notifier).refreshProfile(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: EdgeInsets.fromLTRB(
+              20.w,
+              topInset + 12.h,
+              20.w,
+              16.h,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+            // Header Row: Profile Title & Settings Icon
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Profile",
+                  style: GoogleFonts.outfit(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: tc.textPrimary,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => context.push('/settings'),
+                  behavior: HitTestBehavior.opaque,
+                  child: SizedBox(
+                    width: 24.r,
+                    height: 24.r,
+                    child: Center(
+                      child: Icon(
+                        Icons.settings_outlined,
+                        color: tc.textPrimary,
+                        size: 24.r,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
 
           // Profile Hero Card
           ProfileHeroCard(
@@ -184,6 +248,8 @@ class InvestorProfileView extends ConsumerWidget {
         ],
       ),
     ),
-  );
+  ),
+  ],
+);
   }
 }
