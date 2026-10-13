@@ -480,7 +480,7 @@ class SponsorSavedView extends ConsumerWidget {
           actionLabel: state.searchQuery.isNotEmpty ? "Clear Search" : "Explore Projects",
           onAction: state.searchQuery.isNotEmpty
               ? () => ref.read(sponsorSavedProvider.notifier).clearSearch()
-              : () => context.push('/all-projects'),
+              : () => context.push('/sponsor-projects'),
         );
       }
 

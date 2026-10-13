@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,7 +58,7 @@ class UploadBox extends StatelessWidget {
             color: tc.textPrimary,
           ),
         ),
-        SizedBox(height: AppDimens.spaceXxs),
+        SizedBox(height: AppDimens.spaceSm),
         GestureDetector(
           onTap: onTap,
           child: AnimatedContainer(
@@ -70,9 +71,7 @@ class UploadBox extends StatelessWidget {
               color: tc.cardInner,
               borderRadius: BorderRadius.circular(AppDimens.radiusMd),
               border: Border.all(
-                color: _hasFile
-                    ? const Color(0xFF006EDB)
-                    : tc.borderColor,
+                color: _hasFile ? const Color(0xFF006EDB) : tc.borderColor,
                 width: _hasFile ? 1.5 : 1.2,
               ),
             ),
@@ -97,13 +96,9 @@ class UploadBox extends StatelessWidget {
               width: AppDimens.borderThin,
             ),
           ),
-          child: Icon(
-            icon,
-            color: tc.textSecondary,
-            size: 24.r,
-          ),
+          child: Icon(icon, color: tc.textSecondary, size: 24.sp),
         ),
-        SizedBox(height: 10.h),
+        AppSpacing.h10,
         Text(
           title,
           style: GoogleFonts.outfit(
@@ -113,13 +108,10 @@ class UploadBox extends StatelessWidget {
           ),
         ),
         if (subtitle != null) ...[
-          SizedBox(height: 4.h),
+          AppSpacing.h4,
           Text(
             subtitle!,
-            style: GoogleFonts.outfit(
-              fontSize: 11.sp,
-              color: tc.textTertiary,
-            ),
+            style: GoogleFonts.outfit(fontSize: 11.sp, color: tc.textTertiary),
           ),
         ],
       ],
@@ -130,7 +122,9 @@ class UploadBox extends StatelessWidget {
     final path = selectedFilePath ?? '';
     final isAsset = path.startsWith('assets/');
     final file = File(path);
-    final fileName = selectedFileName ?? (path.isNotEmpty ? path.split('/').last : 'Uploaded File');
+    final fileName =
+        selectedFileName ??
+        (path.isNotEmpty ? path.split('/').last : 'Uploaded File');
 
     if (_isImage) {
       return Stack(
@@ -143,16 +137,20 @@ class UploadBox extends StatelessWidget {
               child: isAsset
                   ? Image.asset(path, fit: BoxFit.cover)
                   : (file.existsSync()
-                      ? Image.file(file, fit: BoxFit.cover)
-                      : Container(
-                          color: Colors.black26,
-                          child: Icon(Icons.image, color: Colors.white, size: 40.r),
-                        )),
+                        ? Image.file(file, fit: BoxFit.cover)
+                        : Container(
+                            color: Colors.black26,
+                            child: Icon(
+                              Icons.image,
+                              color: Colors.white,
+                              size: 40.sp,
+                            ),
+                          )),
             ),
           ),
           Positioned(
-            top: 8.r,
-            right: 8.r,
+            top: 8.h,
+            right: 8.w,
             child: Row(
               children: [
                 GestureDetector(
@@ -163,11 +161,15 @@ class UploadBox extends StatelessWidget {
                       color: Color(0xCC000000),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.edit_rounded, color: Colors.white, size: 16.r),
+                    child: Icon(
+                      Icons.edit_rounded,
+                      color: Colors.white,
+                      size: 16.sp,
+                    ),
                   ),
                 ),
                 if (onRemove != null) ...[
-                  SizedBox(width: 8.w),
+                  AppSpacing.w8,
                   GestureDetector(
                     onTap: onRemove,
                     child: Container(
@@ -176,7 +178,11 @@ class UploadBox extends StatelessWidget {
                         color: Color(0xCCEF4444),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.close_rounded, color: Colors.white, size: 16.r),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: Colors.white,
+                        size: 16.sp,
+                      ),
                     ),
                   ),
                 ],
@@ -199,10 +205,10 @@ class UploadBox extends StatelessWidget {
           child: Icon(
             Icons.insert_drive_file_rounded,
             color: const Color(0xFF006EDB),
-            size: 24.r,
+            size: 24.sp,
           ),
         ),
-        SizedBox(width: 12.w),
+        AppSpacing.w12,
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +224,7 @@ class UploadBox extends StatelessWidget {
                   color: tc.textPrimary,
                 ),
               ),
-              SizedBox(height: 2.h),
+              AppSpacing.h2,
               Text(
                 "Tap box to replace file",
                 style: GoogleFonts.outfit(
@@ -231,7 +237,11 @@ class UploadBox extends StatelessWidget {
         ),
         if (onRemove != null)
           IconButton(
-            icon: Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20.r),
+            icon: Icon(
+              Icons.delete_outline_rounded,
+              color: Colors.redAccent,
+              size: 20.sp,
+            ),
             onPressed: onRemove,
           ),
       ],

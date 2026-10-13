@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -128,7 +129,7 @@ class SponsorActiveProjectCard extends StatelessWidget {
                               ),
                             ),
                             if (category != null && category!.isNotEmpty) ...[
-                              SizedBox(width: 6.w),
+                              AppSpacing.w6, 
                               Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 10.w,
@@ -232,7 +233,7 @@ class SponsorActiveProjectCard extends StatelessWidget {
                             ),
                           ),
                           if (category != null && category!.isNotEmpty) ...[
-                            SizedBox(width: 6.w),
+                            AppSpacing.w6,
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 10.w,
@@ -362,7 +363,7 @@ class SponsorActiveProjectCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10.h),
+          AppSpacing.h10,
           ClipRRect(
             borderRadius: BorderRadius.circular(4.r),
             child: LinearProgressIndicator(

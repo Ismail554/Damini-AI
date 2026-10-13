@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,7 +81,7 @@ class SponsorDraftCard extends StatelessWidget {
                 icon: Icon(
                   Icons.delete_outline_rounded,
                   color: Colors.redAccent.withValues(alpha: 0.8),
-                  size: 20.r,
+                  size: 20.sp,
                 ),
                 onPressed: onDelete,
                 tooltip: 'Delete Draft',
@@ -116,11 +117,11 @@ class SponsorDraftCard extends StatelessWidget {
                 fontSize: 14.sp,
               ),
             ),
-            SizedBox(width: 8.w),
+            AppSpacing.w8,
             Icon(
               Icons.delete_forever_rounded,
               color: Colors.white,
-              size: 24.r,
+              size: 24.sp,
             ),
           ],
         ),

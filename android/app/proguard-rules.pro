@@ -6,6 +6,9 @@
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
 
+# Google Play Core (Deferred Components in Flutter embedding)
+-dontwarn com.google.android.play.core.**
+
 # Firebase & Google Play Services / Identity / Credential Manager
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }

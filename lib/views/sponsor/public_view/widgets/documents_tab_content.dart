@@ -150,42 +150,9 @@ class DocumentsTabContent extends StatelessWidget {
                   ),
                   if (onRefresh != null) ...[
                     SizedBox(height: AppDimens.spaceMd),
-                    InkWell(
-                      onTap: onRefresh,
-                      borderRadius: BorderRadius.circular(20.r),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 8.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: tc.cardInner,
-                          borderRadius: BorderRadius.circular(20.r),
-                          border: Border.all(
-                            color: tc.borderColor,
-                            width: AppDimens.borderThin,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.refresh_rounded,
-                              size: 14.r,
-                              color: tc.textPrimary,
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(
-                              "Refresh",
-                              style: GoogleFonts.outfit(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: tc.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    _InteractiveRefreshButton(
+                      onRefresh: onRefresh,
+                      isRefreshing: isRefreshingDocs,
                     ),
                   ],
                 ],
@@ -206,6 +173,119 @@ class DocumentsTabContent extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _InteractiveRefreshButton extends StatefulWidget {
+  final VoidCallback? onRefresh;
+  final bool isRefreshing;
+
+  const _InteractiveRefreshButton({
+    required this.onRefresh,
+    this.isRefreshing = false,
+  });
+
+  @override
+  State<_InteractiveRefreshButton> createState() =>
+      _InteractiveRefreshButtonState();
+}
+
+class _InteractiveRefreshButtonState extends State<_InteractiveRefreshButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    if (widget.isRefreshing) {
+      _animController.repeat();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _InteractiveRefreshButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isRefreshing && !_animController.isAnimating) {
+      _animController.repeat();
+    } else if (!widget.isRefreshing && _animController.isAnimating) {
+      _animController.stop();
+      _animController.reset();
+    }
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    if (widget.isRefreshing) return;
+    _animController.forward(from: 0.0);
+    widget.onRefresh?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tc = AppThemeColors.of(context);
+
+    return AnimatedScale(
+      scale: _isPressed ? 0.94 : 1.0,
+      duration: const Duration(milliseconds: 100),
+      child: Material(
+        color: tc.cardInner,
+        borderRadius: BorderRadius.circular(20.r),
+        child: InkWell(
+          onTap: _handleTap,
+          onTapDown: (_) => setState(() => _isPressed = true),
+          onTapUp: (_) => setState(() => _isPressed = false),
+          onTapCancel: () => setState(() => _isPressed = false),
+          borderRadius: BorderRadius.circular(20.r),
+          splashColor: const Color(0xFF0066FF).withValues(alpha: 0.15),
+          highlightColor: const Color(0xFF0066FF).withValues(alpha: 0.08),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 14.w,
+              vertical: 8.h,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(
+                color: tc.borderColor,
+                width: AppDimens.borderThin,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RotationTransition(
+                  turns: _animController,
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    size: 14.r,
+                    color: tc.textPrimary,
+                  ),
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  widget.isRefreshing ? "Refreshing..." : "Refresh",
+                  style: GoogleFonts.outfit(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    color: tc.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:Braintech/core/utils/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -125,10 +126,10 @@ class _InteractiveChipItemState extends State<_InteractiveChipItem> {
             children: [
               Icon(
                 isApply ? Icons.bolt_rounded : Icons.auto_awesome_rounded,
-                size: 14.r,
+                size: 14.sp,
                 color: isApply ? Colors.white : const Color(0xFFC026D3),
               ),
-              SizedBox(width: 6.w),
+              AppSpacing.w6,
               Text(
                 widget.text,
                 style: GoogleFonts.outfit(

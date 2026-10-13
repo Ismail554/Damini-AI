@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/chat_audio_service.dart';
 import '../../chat/models/chat_message_model.dart';
+import '../../../../core/utils/file_downloader.dart';
 import '../models/group_chat_model.dart';
 
 class GroupChatMessageBubble extends StatefulWidget {
@@ -386,9 +387,36 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble>
         mediaLower.contains('.webp');
 
     if (isImage) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
-        child: _buildImageWidget(),
+      final heroTag =
+          'chat_img_${widget.message.id}_${widget.message.mediaUrl}';
+      return GestureDetector(
+        onTap: () => _openFullScreenImage(context, heroTag: heroTag),
+        behavior: HitTestBehavior.opaque,
+        child: Hero(
+          tag: heroTag,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                _buildImageWidget(),
+                Container(
+                  margin: EdgeInsets.all(6.r),
+                  padding: EdgeInsets.all(4.r),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Icon(
+                    Icons.fullscreen_rounded,
+                    size: 16.r,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -532,6 +560,25 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble>
     );
   }
 
+  void _openFullScreenImage(BuildContext context, {String? heroTag}) {
+    final rawPath = widget.message.mediaUrl ?? '';
+    if (rawPath.isEmpty) return;
+
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: true,
+        barrierColor: Colors.transparent,
+        pageBuilder: (ctx, a1, a2) => _FullScreenImageViewerDialog(
+          rawPath: rawPath,
+          title: widget.message.senderName,
+          subtitle: widget.message.time,
+          heroTag: heroTag,
+        ),
+      ),
+    );
+  }
+
   Widget _buildWaveformUI(bool isMe) {
     final baseHeights = [
       10.h,
@@ -625,6 +672,366 @@ class _GroupChatMessageBubbleState extends State<GroupChatMessageBubble>
             fontSize: 9.5.sp,
             fontWeight: FontWeight.bold,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FullScreenImageViewerDialog extends StatefulWidget {
+  final String rawPath;
+  final String title;
+  final String subtitle;
+  final String? heroTag;
+
+  const _FullScreenImageViewerDialog({
+    required this.rawPath,
+    required this.title,
+    required this.subtitle,
+    this.heroTag,
+  });
+
+  @override
+  State<_FullScreenImageViewerDialog> createState() =>
+      _FullScreenImageViewerDialogState();
+}
+
+class _FullScreenImageViewerDialogState
+    extends State<_FullScreenImageViewerDialog> with TickerProviderStateMixin {
+  final TransformationController _transformationController =
+      TransformationController();
+  late final AnimationController _zoomAnimController;
+  late final AnimationController _dragResetController;
+  Animation<double>? _dragResetAnimation;
+
+  double _dragOffset = 0.0;
+  bool _isDragging = false;
+  bool _showControls = true;
+  bool _isDownloading = false;
+  TapDownDetails? _doubleTapDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    _zoomAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    _dragResetController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    _zoomAnimController.dispose();
+    _dragResetController.dispose();
+    super.dispose();
+  }
+
+  bool get _isZoomed {
+    return _transformationController.value.getMaxScaleOnAxis() > 1.05;
+  }
+
+  void _handleDoubleTap() {
+    final startMatrix = _transformationController.value;
+    final Matrix4 endMatrix;
+
+    if (_isZoomed) {
+      endMatrix = Matrix4.identity();
+    } else {
+      final pos = _doubleTapDetails?.localPosition ?? Offset.zero;
+      final x = -pos.dx * 1.5;
+      final y = -pos.dy * 1.5;
+      endMatrix = Matrix4.identity()
+        ..setTranslationRaw(x, y, 0.0)
+        ..setEntry(0, 0, 2.5)
+        ..setEntry(1, 1, 2.5);
+    }
+
+    final anim = Matrix4Tween(begin: startMatrix, end: endMatrix).animate(
+      CurvedAnimation(parent: _zoomAnimController, curve: Curves.easeInOut),
+    );
+
+    anim.addListener(() {
+      _transformationController.value = anim.value;
+    });
+
+    _zoomAnimController.forward(from: 0.0);
+  }
+
+  void _onVerticalDragUpdate(DragUpdateDetails details) {
+    if (_isZoomed) return;
+    if (details.primaryDelta != null &&
+        (_dragOffset > 0 || details.primaryDelta! > 0)) {
+      setState(() {
+        _isDragging = true;
+        _dragOffset += details.primaryDelta!;
+        if (_dragOffset < 0) _dragOffset = 0;
+      });
+    }
+  }
+
+  void _onVerticalDragEnd(DragEndDetails details) {
+    if (_isZoomed || !_isDragging) return;
+    if (_dragOffset > 100 ||
+        (details.primaryVelocity != null && details.primaryVelocity! > 500)) {
+      Navigator.of(context).pop();
+    } else {
+      final start = _dragOffset;
+      _dragResetAnimation = Tween<double>(begin: start, end: 0.0).animate(
+        CurvedAnimation(parent: _dragResetController, curve: Curves.easeOut),
+      )..addListener(() {
+          setState(() {
+            _dragOffset = _dragResetAnimation!.value;
+          });
+        });
+      _dragResetController.forward(from: 0.0).then((_) {
+        setState(() {
+          _isDragging = false;
+          _dragOffset = 0;
+        });
+      });
+    }
+  }
+
+  Future<void> _handleDownload() async {
+    if (_isDownloading) return;
+    setState(() => _isDownloading = true);
+
+    String downloadUrl = widget.rawPath;
+    if (downloadUrl.startsWith('/media/') || downloadUrl.startsWith('media/')) {
+      final clean = downloadUrl.startsWith('/') ? downloadUrl : '/$downloadUrl';
+      downloadUrl = '${ApiEndpoints.baseUrl}$clean';
+    }
+
+    final ext = downloadUrl.split('.').last.split('?').first.toLowerCase();
+    await FileDownloader.downloadFile(
+      context,
+      url: downloadUrl,
+      suggestedName: 'image_${DateTime.now().millisecondsSinceEpoch}',
+      extension: ext.isNotEmpty ? ext : 'jpg',
+    );
+
+    if (mounted) {
+      setState(() => _isDownloading = false);
+    }
+  }
+
+  Widget _buildImage() {
+    final rawPath = widget.rawPath;
+    if (rawPath.startsWith('assets/')) {
+      return Image.asset(rawPath, fit: BoxFit.contain);
+    }
+    if (rawPath.startsWith('http://') || rawPath.startsWith('https://')) {
+      return Image.network(
+        rawPath,
+        fit: BoxFit.contain,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => const Center(
+          child: Icon(
+            Icons.broken_image_rounded,
+            color: Colors.white54,
+            size: 48,
+          ),
+        ),
+      );
+    }
+    if (rawPath.startsWith('/media/') || rawPath.startsWith('media/')) {
+      final cleanPath = rawPath.startsWith('/') ? rawPath : '/$rawPath';
+      final fullUrl = '${ApiEndpoints.baseUrl}$cleanPath';
+      return Image.network(
+        fullUrl,
+        fit: BoxFit.contain,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => const Center(
+          child: Icon(
+            Icons.broken_image_rounded,
+            color: Colors.white54,
+            size: 48,
+          ),
+        ),
+      );
+    }
+    final file = File(rawPath);
+    if (file.existsSync()) {
+      return Image.file(file, fit: BoxFit.contain);
+    }
+    return const Center(
+      child: Icon(
+        Icons.broken_image_rounded,
+        color: Colors.white54,
+        size: 48,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bgAlpha = ((1.0 - (_dragOffset / 300)).clamp(0.0, 1.0) * 0.95);
+
+    return Scaffold(
+      backgroundColor: Colors.black.withValues(alpha: bgAlpha),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Center Image with Interactive Zoom and Drag Dismiss
+            Center(
+              child: GestureDetector(
+                onTap: () => setState(() => _showControls = !_showControls),
+                onDoubleTapDown: (d) => _doubleTapDetails = d,
+                onDoubleTap: _handleDoubleTap,
+                onVerticalDragUpdate: _onVerticalDragUpdate,
+                onVerticalDragEnd: _onVerticalDragEnd,
+                child: Transform.translate(
+                  offset: Offset(0, _dragOffset),
+                  child: InteractiveViewer(
+                    transformationController: _transformationController,
+                    minScale: 0.8,
+                    maxScale: 5.0,
+                    child: widget.heroTag != null
+                        ? Hero(
+                            tag: widget.heroTag!,
+                            child: _buildImage(),
+                          )
+                        : _buildImage(),
+                  ),
+                ),
+              ),
+            ),
+
+            // Top Bar
+            Positioned(
+              top: 8.h,
+              left: 16.w,
+              right: 16.w,
+              child: AnimatedOpacity(
+                opacity: _showControls ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (widget.subtitle.isNotEmpty)
+                            Text(
+                              widget.subtitle,
+                              style: GoogleFonts.outfit(
+                                color: Colors.white70,
+                                fontSize: 12.sp,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    // Download Button
+                    if (widget.rawPath.startsWith('http') ||
+                        widget.rawPath.contains('media'))
+                      Padding(
+                        padding: EdgeInsets.only(right: 8.w),
+                        child: GestureDetector(
+                          onTap: _handleDownload,
+                          child: Container(
+                            padding: EdgeInsets.all(8.r),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: _isDownloading
+                                ? SizedBox(
+                                    width: 20.r,
+                                    height: 20.r,
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.download_rounded,
+                                    color: Colors.white,
+                                    size: 20.r,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    // Close Button
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: EdgeInsets.all(8.r),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.close_rounded,
+                          color: Colors.white,
+                          size: 20.r,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom Hint
+            Positioned(
+              bottom: 16.h,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity: _showControls ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: Center(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 14.w,
+                      vertical: 6.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.65),
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.12),
+                      ),
+                    ),
+                    child: Text(
+                      "Pinch to zoom • Swipe down to dismiss",
+                      style: GoogleFonts.outfit(
+                        color: Colors.white70,
+                        fontSize: 11.5.sp,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

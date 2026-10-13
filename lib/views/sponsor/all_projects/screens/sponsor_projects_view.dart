@@ -117,8 +117,8 @@ class _SponsorProjectsViewState extends ConsumerState<SponsorProjectsView> {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Container(
-                width: 40.r,
-                height: 40.r,
+                width: 40.w,
+                height: 40.h,
                 decoration: BoxDecoration(
                   color: tc.buttonSecondary,
                   shape: BoxShape.circle,

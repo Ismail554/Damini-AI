@@ -10,6 +10,7 @@ class ProjectDetailsSection extends StatelessWidget {
   final TextEditingController milestonesController;
   final TextEditingController useOfFundsController;
   final TextEditingController sponsorInvestmentController;
+  final String? Function(String?)? sponsorInvestmentValidator;
 
   const ProjectDetailsSection({
     super.key,
@@ -17,6 +18,7 @@ class ProjectDetailsSection extends StatelessWidget {
     required this.milestonesController,
     required this.useOfFundsController,
     required this.sponsorInvestmentController,
+    this.sponsorInvestmentValidator,
   });
 
   @override
@@ -70,6 +72,7 @@ class ProjectDetailsSection extends StatelessWidget {
             hint: "e.g. \$250,000",
             controller: sponsorInvestmentController,
             keyboardType: TextInputType.number,
+            validator: sponsorInvestmentValidator,
           ),
         ],
       ),

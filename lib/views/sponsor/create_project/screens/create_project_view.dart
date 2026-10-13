@@ -131,7 +131,8 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     _draftId = d?.id;
 
     _titleController = TextEditingController(text: d?.title ?? '');
-    _shortDescController = TextEditingController(text: d?.shortDesc ?? '');
+    _shortDescController =
+        TextEditingController(text: _sanitizeShortDesc(d?.shortDesc));
     _fullDescController = TextEditingController(text: d?.fullDesc ?? '');
     _minInvestmentController = TextEditingController(
       text: d?.minInvestment ?? '',
@@ -139,7 +140,8 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     _fundingGoalController = TextEditingController(
       text: d?.fundingGoal ?? '5000000',
     );
-    _targetRoiController = TextEditingController(text: d?.targetRoi ?? '18');
+    _targetRoiController =
+        TextEditingController(text: _sanitizeRoi(d?.targetRoi));
     final initialCountry = d?.country;
     _locationController = TextEditingController(
       text: (d?.location != null && d!.location.isNotEmpty)
@@ -222,6 +224,32 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
     return trimmed;
   }
 
+  String _sanitizeShortDesc(String? text) {
+    if (text == null) return '';
+    final trimmed = text.trim();
+    if (trimmed.length <= 120) return trimmed;
+    final cut = trimmed.substring(0, 120);
+    final lastSpace = cut.lastIndexOf(' ');
+    if (lastSpace > 80) {
+      return cut.substring(0, lastSpace).trim();
+    }
+    return cut.trim();
+  }
+
+  String _sanitizeRoi(String? text) {
+    if (text == null || text.trim().isEmpty) return '18';
+    final clean = text.replaceAll(RegExp(r'[^0-9.]'), '');
+    final val = double.tryParse(clean);
+    if (val == null) return '18';
+    // Max 5 digits total for DRF DecimalField(max_digits=5, decimal_places=2) -> max 999.99
+    if (val > 999.99) {
+      if (val >= 1000 && val <= 9999) {
+        return (val / 100.0).toStringAsFixed(2);
+      }
+      return '99.0';
+    }
+    return clean;
+  }
 
   @override
   void dispose() {
@@ -352,6 +380,14 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       }
     }
 
+    if (_formKey.currentState != null && !_formKey.currentState!.validate()) {
+      CustomSnackBar.error(
+        context,
+        "Please correct the highlighted form errors before publishing.",
+      );
+      return;
+    }
+
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       if (kDebugMode) {
@@ -362,6 +398,43 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
       CustomSnackBar.error(context, "Please enter a project title");
       return;
     }
+
+    final shortDesc = _shortDescController.text.trim();
+    if (shortDesc.length > 120) {
+      CustomSnackBar.error(
+        context,
+        "Short description must be 120 characters or fewer (${shortDesc.length}/120).",
+      );
+      return;
+    }
+
+    final targetRoi = _parseNumber(_targetRoiController.text, 18.0);
+    final targetRoiDigits = targetRoi
+        .toStringAsFixed(2)
+        .replaceAll(RegExp(r'[^0-9]'), '')
+        .length;
+    if (targetRoi <= 0 || targetRoi > 999.99 || targetRoiDigits > 5) {
+      CustomSnackBar.error(
+        context,
+        "Target ROI must be between 0.01% and 999.99% (max 5 digits total).",
+      );
+      return;
+    }
+
+    final monthlyRevenue =
+        _parseNumber(_monthlyRevenueController.text, 0.0);
+    final monthlyRevDigits = monthlyRevenue
+        .toStringAsFixed(2)
+        .replaceAll(RegExp(r'[^0-9]'), '')
+        .length;
+    if (monthlyRevDigits > 12 || monthlyRevenue >= 10000000000) {
+      CustomSnackBar.error(
+        context,
+        "Potential monthly revenue must have 12 digits or fewer.",
+      );
+      return;
+    }
+
     final fundingGoal = _parseNumber(_fundingGoalController.text);
     if (fundingGoal <= 0) {
       if (kDebugMode) {
@@ -537,12 +610,24 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
                         label: "Project Title",
                         hint: "e.g. Downtown Tech Hub",
                         controller: _titleController,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? "Project title is required"
+                            : null,
                       ),
                       SizedBox(height: AppDimens.spaceMd),
                       ProjectFormField(
                         label: "Short Description",
                         hint: "One-line pitch (max 120 chars)",
                         controller: _shortDescController,
+                        maxLength: 120,
+                        validator: (v) {
+                          final t = v?.trim() ?? '';
+                          if (t.isEmpty) return "Short description is required";
+                          if (t.length > 120) {
+                            return "Must be 120 characters or fewer (${t.length}/120)";
+                          }
+                          return null;
+                        },
                       ),
                       SizedBox(height: AppDimens.spaceMd),
                       ProjectFormField(
@@ -557,6 +642,20 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
                         hint: "e.g. 1000",
                         controller: _minInvestmentController,
                         keyboardType: TextInputType.number,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) return null;
+                          final n = double.tryParse(
+                              v.replaceAll(RegExp(r'[^0-9.]'), ''));
+                          if (n != null &&
+                              n
+                                      .toStringAsFixed(2)
+                                      .replaceAll(RegExp(r'[^0-9]'), '')
+                                      .length >
+                                  12) {
+                            return "Must have 12 digits or fewer";
+                          }
+                          return null;
+                        },
                       ),
                       ProjectFormField(
                         label: "Location (City, State)",
@@ -577,6 +676,20 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
                         useOfFundsController: _useOfFundsController,
                         sponsorInvestmentController:
                             _sponsorInvestmentController,
+                        sponsorInvestmentValidator: (v) {
+                          if (v == null || v.trim().isEmpty) return null;
+                          final n = double.tryParse(
+                              v.replaceAll(RegExp(r'[^0-9.]'), ''));
+                          if (n != null &&
+                              n
+                                      .toStringAsFixed(2)
+                                      .replaceAll(RegExp(r'[^0-9]'), '')
+                                      .length >
+                                  12) {
+                            return "Must have 12 digits or fewer";
+                          }
+                          return null;
+                        },
                       ),
                       SizedBox(height: AppDimens.spaceLg),
                       FinancialsSection(
@@ -585,6 +698,50 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
                         monthlyRevenueController: _monthlyRevenueController,
                         holdPeriodController: _holdPeriodController,
                         timelineOpsController: _timelineOpsController,
+                        minContributionValidator: (v) {
+                          if (v == null || v.trim().isEmpty) return null;
+                          final n = double.tryParse(
+                              v.replaceAll(RegExp(r'[^0-9.]'), ''));
+                          if (n != null &&
+                              n
+                                      .toStringAsFixed(2)
+                                      .replaceAll(RegExp(r'[^0-9]'), '')
+                                      .length >
+                                  12) {
+                            return "Must have 12 digits or fewer";
+                          }
+                          return null;
+                        },
+                        expectedRoiValidator: (v) {
+                          if (v == null || v.trim().isEmpty) return null;
+                          final n = double.tryParse(
+                              v.replaceAll(RegExp(r'[^0-9.]'), ''));
+                          if (n != null &&
+                              (n > 999.99 ||
+                                  n
+                                          .toStringAsFixed(2)
+                                          .replaceAll(RegExp(r'[^0-9]'), '')
+                                          .length >
+                                      5)) {
+                            return "ROI must be ≤ 999.99% (max 5 digits)";
+                          }
+                          return null;
+                        },
+                        monthlyRevenueValidator: (v) {
+                          if (v == null || v.trim().isEmpty) return null;
+                          final n = double.tryParse(
+                              v.replaceAll(RegExp(r'[^0-9.]'), ''));
+                          if (n != null &&
+                              (n > 9999999999.99 ||
+                                  n
+                                          .toStringAsFixed(2)
+                                          .replaceAll(RegExp(r'[^0-9]'), '')
+                                          .length >
+                                      12)) {
+                            return "Revenue must have 12 digits or fewer";
+                          }
+                          return null;
+                        },
                       ),
                       SizedBox(height: AppDimens.spaceLg),
                       ProjectFormField(
@@ -717,6 +874,7 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
 
   Widget _buildGoalRoiRow() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: ProjectFormField(
@@ -724,6 +882,21 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
             hint: "5000000",
             controller: _fundingGoalController,
             keyboardType: TextInputType.number,
+            labelHeight: 20.h,
+            validator: (v) {
+              final t = v?.trim() ?? '';
+              if (t.isEmpty) return "Funding goal is required";
+              final n = double.tryParse(t.replaceAll(RegExp(r'[^0-9.]'), ''));
+              if (n == null || n <= 0) return "Enter valid goal (> 0)";
+              if (n
+                      .toStringAsFixed(2)
+                      .replaceAll(RegExp(r'[^0-9]'), '')
+                      .length >
+                  12) {
+                return "Must have 12 digits or fewer";
+              }
+              return null;
+            },
           ),
         ),
         SizedBox(width: AppDimens.spaceSm),
@@ -733,6 +906,22 @@ class _CreateProjectViewState extends ConsumerState<CreateProjectView> {
             hint: "18",
             controller: _targetRoiController,
             keyboardType: TextInputType.number,
+            labelHeight: 20.h,
+            validator: (v) {
+              final t = v?.trim() ?? '';
+              if (t.isEmpty) return "Target ROI is required";
+              final n = double.tryParse(t.replaceAll(RegExp(r'[^0-9.]'), ''));
+              if (n == null || n <= 0) return "Enter valid ROI (> 0)";
+              if (n > 999.99 ||
+                  n
+                          .toStringAsFixed(2)
+                          .replaceAll(RegExp(r'[^0-9]'), '')
+                          .length >
+                      5) {
+                return "ROI must be ≤ 999.99% (max 5 digits)";
+              }
+              return null;
+            },
           ),
         ),
       ],

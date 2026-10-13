@@ -94,7 +94,7 @@ class SponsorDashboard extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "My Projects",
+                  "Projects",
                   style: GoogleFonts.outfit(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
@@ -154,7 +154,7 @@ class SponsorDashboard extends ConsumerWidget {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12.h),
                 child: const AppEmptyView(
-                  message: "No projects created yet",
+                  message: "Create your first project.",
                   icon: Icons.folder_open_rounded,
                 ),
               ),
