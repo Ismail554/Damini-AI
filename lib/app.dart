@@ -29,7 +29,7 @@ class MyApp extends ConsumerWidget {
           return MaterialApp.router(
             scaffoldMessengerKey: AppRouter.scaffoldMessengerKey,
             debugShowCheckedModeBanner: false,
-            title: 'Damini AI',
+            title: 'Damani AI',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeMode,

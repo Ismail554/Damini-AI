@@ -55,7 +55,7 @@ class AllContributorsView extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      "${contributions.length} Investors • ${project.raisedAmount} Raised",
+                      "${contributions.length} Investors • ${project.raisedAmount} Committed",
                       style: GoogleFonts.outfit(
                         fontSize: 10.5.sp,
                         color: const Color(0xFF6B8A9D),

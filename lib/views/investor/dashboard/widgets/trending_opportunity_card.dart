@@ -22,7 +22,7 @@ class TrendingOpportunityCard extends StatelessWidget {
     required this.description,
     required this.imageUrl,
     required this.raisedAmount,
-    this.raisedLabel = "Min Investment",
+    this.raisedLabel = "Min Indicative Amt",
     required this.goalAmount,
     this.goalLabel = "Location",
     required this.progress,

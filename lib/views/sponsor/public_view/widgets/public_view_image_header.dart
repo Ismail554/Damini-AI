@@ -18,6 +18,7 @@ class PublicViewImageHeader extends ConsumerStatefulWidget {
   final List<String>? imageUrls;
   final bool isBookmarked;
   final VoidCallback? onBookmarkTap;
+  final VoidCallback? onReportTap;
 
   const PublicViewImageHeader({
     super.key,
@@ -25,6 +26,7 @@ class PublicViewImageHeader extends ConsumerStatefulWidget {
     this.imageUrls,
     this.isBookmarked = false,
     this.onBookmarkTap,
+    this.onReportTap,
   });
 
   @override
@@ -181,17 +183,31 @@ class _PublicViewImageHeaderState extends ConsumerState<PublicViewImageHeader> {
             ),
           ),
 
-          // Floating Save / Bookmark Button (Top Right)
+          // Floating Actions (Top Right)
           Positioned(
             top: topPadding + 12.h,
             right: AppDimens.screenHorizontal,
-            child: _buildGlassIconButton(
-              tc: tc,
-              icon: isBookmarked
-                  ? Icons.bookmark_rounded
-                  : Icons.bookmark_border_rounded,
-              iconColor: isBookmarked ? AppColors.accentRed : Colors.white,
-              onTap: _handleBookmarkTap,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.onReportTap != null) ...[
+                  _buildGlassIconButton(
+                    tc: tc,
+                    icon: Icons.flag_outlined,
+                    iconColor: Colors.white,
+                    onTap: widget.onReportTap!,
+                  ),
+                  SizedBox(width: 8.w),
+                ],
+                _buildGlassIconButton(
+                  tc: tc,
+                  icon: isBookmarked
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                  iconColor: isBookmarked ? AppColors.accentRed : Colors.white,
+                  onTap: _handleBookmarkTap,
+                ),
+              ],
             ),
           ),
 

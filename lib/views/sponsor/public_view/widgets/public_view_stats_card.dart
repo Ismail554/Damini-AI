@@ -108,7 +108,7 @@ class PublicViewStatsCard extends StatelessWidget {
             Expanded(
               child: _buildHighlightBox(
                 tc: tc,
-                label: "Target Raise",
+                label: "Capital Requested",
                 value: targetRaise,
                 valueColor: tc.textPrimary,
               ),

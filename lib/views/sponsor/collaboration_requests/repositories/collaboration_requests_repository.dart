@@ -80,25 +80,17 @@ class CollaborationRequestsRepository {
 
   Future<List<CollaborationRequestModel>> fetchPendingRequests() async {
     final all = await fetchCollaborationRequests();
-    return all.where((r) => r.status.toUpperCase() == 'PENDING').toList();
+    return all.where((r) => r.isInterested).toList();
   }
 
   Future<List<CollaborationRequestModel>> fetchApprovedRequests() async {
     final all = await fetchCollaborationRequests();
-    return all
-        .where((r) =>
-            r.status.toUpperCase() == 'APPROVED' ||
-            r.status.toUpperCase() == 'ACCEPTED')
-        .toList();
+    return all.where((r) => r.isAgreedToProceed || r.isRoadmapSent).toList();
   }
 
   Future<List<CollaborationRequestModel>> fetchConfirmationRequests() async {
     final all = await fetchCollaborationRequests();
-    return all
-        .where((r) =>
-            r.status.toUpperCase() == 'CONFIRMED' ||
-            r.status.toUpperCase() == 'RECEIVED')
-        .toList();
+    return all.where((r) => r.isClosedOffPlatform).toList();
   }
 
   /// POST /api/v1/projects/{projectId}/confirm-investors/

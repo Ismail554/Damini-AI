@@ -14,6 +14,7 @@ import '../widgets/group_chat_app_bar.dart';
 import '../widgets/group_chat_message_bubble.dart';
 import '../widgets/group_member_card.dart';
 import '../../../auth/session/controllers/session_provider.dart';
+import '../../../../shared/widgets/app_report_bottom_sheet.dart';
 import '../widgets/remove_participant_modal.dart';
 
 class GroupChatView extends ConsumerStatefulWidget {
@@ -255,156 +256,10 @@ class _GroupChatViewState extends ConsumerState<GroupChatView> {
   }
 
   void _openReportModal(BuildContext context) {
-    String selectedReason = 'SPAM';
-    final descController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (dialogCtx) => StatefulBuilder(
-        builder: (dialogCtx, setDialogState) => AlertDialog(
-          backgroundColor: const Color(0xFF0F1E2E),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
-          ),
-          title: Text(
-            "Report Group Chat",
-            style: GoogleFonts.outfit(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18.sp,
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Select a reason for reporting:",
-                  style: GoogleFonts.outfit(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 13.sp,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF16253C),
-                    borderRadius: BorderRadius.circular(10.r),
-                    border:
-                        Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: selectedReason,
-                      isExpanded: true,
-                      dropdownColor: const Color(0xFF16253C),
-                      style: GoogleFonts.outfit(
-                          color: Colors.white, fontSize: 13.sp),
-                      items: const [
-                        DropdownMenuItem(value: 'SPAM', child: Text('Spam')),
-                        DropdownMenuItem(
-                            value: 'HARASSMENT', child: Text('Harassment')),
-                        DropdownMenuItem(
-                            value: 'SUSPICIOUS_ACTIVITY',
-                            child: Text('Suspicious Activity')),
-                        DropdownMenuItem(
-                            value: 'FRAUD', child: Text('Fraud / Scam')),
-                        DropdownMenuItem(value: 'OTHER', child: Text('Other')),
-                      ],
-                      onChanged: (val) {
-                        if (val != null) {
-                          setDialogState(() => selectedReason = val);
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(height: 14.h),
-                Text(
-                  "Description (optional):",
-                  style: GoogleFonts.outfit(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 13.sp,
-                  ),
-                ),
-                SizedBox(height: 6.h),
-                TextField(
-                  controller: descController,
-                  maxLines: 3,
-                  style:
-                      GoogleFonts.outfit(color: Colors.white, fontSize: 13.sp),
-                  decoration: InputDecoration(
-                    hintText: "Add details about the issue...",
-                    hintStyle: GoogleFonts.outfit(
-                        color: const Color(0xFF6B8A9D), fontSize: 12.sp),
-                    filled: true,
-                    fillColor: const Color(0xFF16253C),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                      borderSide: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.1)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                      borderSide: BorderSide(
-                          color: Colors.white.withValues(alpha: 0.1)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                      borderSide: const BorderSide(color: Color(0xFF006EDB)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogCtx),
-              child:
-                  Text("Cancel", style: GoogleFonts.outfit(color: Colors.grey)),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final reason = selectedReason;
-                final desc = descController.text.trim();
-                Navigator.pop(dialogCtx);
-                try {
-                  await ref
-                      .read(groupChatProvider.notifier)
-                      .reportConversation(
-                        reason: reason,
-                        description: desc.isNotEmpty ? desc : null,
-                      );
-                  if (context.mounted) {
-                    CustomSnackBar.success(
-                      context,
-                      "Report submitted successfully. Our team will review this chat.",
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    CustomSnackBar.error(
-                      context,
-                      _extractErrorMessage(e) ?? "Failed to submit report.",
-                    );
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amberAccent,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r)),
-              ),
-              child: Text("Report",
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
+    AppReportBottomSheet.show(
+      context,
+      title: "Report Group Chat",
+      reportedProjectId: widget.projectId,
     );
   }
 

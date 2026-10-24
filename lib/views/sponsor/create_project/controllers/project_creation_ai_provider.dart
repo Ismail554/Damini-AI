@@ -177,7 +177,7 @@ class ProjectCreationAiNotifier extends Notifier<ProjectCreationAiState> {
         AiChatMessageModel(
           id: "msg_welcome",
           text:
-              "Hi, I'm Damini Advisor. I can help you with creating a new project. To get started, what industry is your project in?",
+              "Hi, I'm Damani Advisor. I can help you with creating a new project. To get started, what industry is your project in?",
           isUser: false,
           timestamp: DateTime.now(),
           suggestions: const [

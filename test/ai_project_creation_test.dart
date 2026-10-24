@@ -13,7 +13,7 @@ void main() {
         "message": {
           "id": "msg_001",
           "role": "assistant",
-          "content": "Hi, I'm Damini Advisor. I can help you create a new project. To get started, what industry is your project in?",
+          "content": "Hi, I'm Damani Advisor. I can help you create a new project. To get started, what industry is your project in?",
           "timestamp": "2026-10-07T09:00:00Z",
           "suggestions": ["Technology", "Clean Energy", "Real Estate", "Healthcare", "Fintech"]
         }
@@ -27,7 +27,7 @@ void main() {
       expect(data.totalSteps, 4);
       expect(data.stepTitle, "Select Industry");
       expect(data.message, isNotNull);
-      expect(data.message!.text, contains("Damini Advisor"));
+      expect(data.message!.text, contains("Damani Advisor"));
       expect(data.message!.isUser, isFalse);
       expect(data.message!.suggestions, contains("Technology"));
       expect(data.draft, isNull);
@@ -114,7 +114,7 @@ void main() {
           {
             "id": "msg_001",
             "role": "assistant",
-            "content": "Hi, I'm Damini...",
+            "content": "Hi, I'm Damani...",
             "timestamp": "2026-10-07T09:00:00Z",
             "suggestions": ["Technology"]
           },

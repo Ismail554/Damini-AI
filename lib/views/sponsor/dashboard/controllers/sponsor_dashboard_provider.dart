@@ -69,7 +69,7 @@ class SponsorDashboardNotifier extends Notifier<SponsorDashboardState> {
       isLoading: true,
       metrics: [
         SponsorDashboardMetric(
-          label: "Total Raised",
+          label: "Indicative Commitments",
           value: "\$0.00",
           icon: Icons.monetization_on_outlined,
         ),

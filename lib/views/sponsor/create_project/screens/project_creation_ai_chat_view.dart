@@ -256,7 +256,7 @@ class _ProjectCreationAiChatViewState
                 ),
                 SizedBox(width: 8.w),
                 Text(
-                  "Damini Advisor is analyzing & drafting...",
+                  "Damani Advisor is analyzing & drafting...",
                   style: GoogleFonts.outfit(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,

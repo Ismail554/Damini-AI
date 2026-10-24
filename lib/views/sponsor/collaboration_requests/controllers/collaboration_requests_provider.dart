@@ -72,18 +72,12 @@ class CollaborationRequestsNotifier
       final all =
           await _repository.fetchCollaborationRequests(projectId: _projectId);
 
-      final pending =
-          all.where((r) => r.status.toUpperCase() == 'PENDING').toList();
+      final pending = all.where((r) => r.isInterested).toList();
       final approved = all
-          .where((r) =>
-              r.status.toUpperCase() == 'APPROVED' ||
-              r.status.toUpperCase() == 'ACCEPTED')
+          .where((r) => r.isAgreedToProceed || r.isRoadmapSent)
           .toList();
-      final confirmations = all
-          .where((r) =>
-              r.status.toUpperCase() == 'CONFIRMED' ||
-              r.status.toUpperCase() == 'RECEIVED')
-          .toList();
+      final confirmations =
+          all.where((r) => r.isClosedOffPlatform).toList();
 
       state = state.copyWith(
         isLoading: false,

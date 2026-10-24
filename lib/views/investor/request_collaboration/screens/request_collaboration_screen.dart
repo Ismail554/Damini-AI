@@ -47,7 +47,7 @@ class _RequestCollaborationScreenState
     if (_amountController.text.trim().isEmpty) {
       CustomSnackBar.error(
         context,
-        "Please enter your intended investment amount.",
+        "Please enter your indicative amount.",
       );
       return;
     }
@@ -127,7 +127,7 @@ class _RequestCollaborationScreenState
                       _buildProjectCard(tc),
                       SizedBox(height: 24.h),
                       Text(
-                        "How much are you willing to invest into this project?",
+                        "Indicative Amount (non-binding)",
                         style: GoogleFonts.outfit(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.bold,
@@ -293,7 +293,7 @@ class _RequestCollaborationScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Target Raise",
+                    "Capital Requested",
                     style: GoogleFonts.outfit(
                       fontSize: 11.sp,
                       color: Colors.white.withValues(alpha: 0.6),
@@ -413,7 +413,7 @@ class _RequestCollaborationScreenState
           fontSize: 14.sp,
         ),
         decoration: InputDecoration(
-          hintText: "Briefly describe your investment thesis for this project...",
+          hintText: "Briefly describe your interest in this project...",
           hintStyle: GoogleFonts.outfit(
             color: Colors.white.withValues(alpha: 0.4),
             fontSize: 14.sp,

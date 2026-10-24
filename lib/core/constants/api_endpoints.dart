@@ -8,7 +8,7 @@ class ApiEndpoints {
         if (url != null && url.isNotEmpty) return url;
       } catch (_) {}
     }
-    return "https://clubby-andy-irksomely.ngrok-free.dev";
+    return "https://api.damani.app";
   }
   static const String register = "/api/v1/auth/register/";
   static const String verifyOtp = "/api/v1/auth/verify-otp/";
@@ -40,6 +40,7 @@ class ApiEndpoints {
   // User & Projects
   static const String currentUser = "/api/v1/users/me/";
   static const String deleteAccount = "/api/v1/users/delete-account/";
+  static const String reports = "/api/v1/core/reports/";
   static const String sponsorNda = "/api/v1/profiles/sponsor/nda/";
   static const String sponsorProjects = "/api/v1/projects/sponsor/";
   static const String savedProjects = "/api/v1/projects/saved/";
@@ -75,7 +76,7 @@ class ApiEndpoints {
       "/api/v1/projects/$projectId/confirm-investors/";
   static String terminateProject(String id) => "/api/v1/projects/$id/terminate/";
 
-  // AI Project Creation (Damini Advisor)
+  // AI Project Creation (Damani Advisor)
   static const String aiProjectConversations =
       "/api/v1/ai/projects/conversations/";
   static String aiProjectMessages(String conversationId) =>

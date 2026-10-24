@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/app_theme_colors.dart';
+import '../../../../shared/widgets/app_report_bottom_sheet.dart';
 import '../models/chat_item_model.dart';
 
 class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -122,12 +123,51 @@ class DirectChatAppBar extends StatelessWidget implements PreferredSizeWidget {
             size: 22.r,
           ),
           color: tc.cardHero,
+          onSelected: (val) {
+            if (val == 'info') {
+              context.push(
+                '/public-profile',
+                extra: {
+                  'userId': chatItem.otherUserId,
+                  'name': chatItem.name,
+                  'avatarUrl': chatItem.avatarUrl,
+                },
+              );
+            } else if (val == 'report') {
+              final userId = int.tryParse(chatItem.otherUserId ?? '');
+              AppReportBottomSheet.show(
+                context,
+                title: 'Report User / Chat',
+                reportedUserId: userId,
+              );
+            }
+          },
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'info',
               child: Text(
                 'View Info',
                 style: GoogleFonts.outfit(color: tc.textPrimary),
+              ),
+            ),
+            PopupMenuItem(
+              value: 'report',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.flag_outlined,
+                    color: const Color(0xFFEF4444),
+                    size: 18.r,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Report User',
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFFEF4444),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
             PopupMenuItem(

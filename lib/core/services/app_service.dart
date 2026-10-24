@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../firebase_options.dart';
 import 'cache_service.dart';
 import 'notification_service.dart';
+import 'revenue_cat_service.dart';
 import 'storage_service.dart';
 import 'theme_service.dart';
 
@@ -33,6 +34,12 @@ class AppService {
       }
     } catch (e) {
       log('Firebase initialization error: $e');
+    }
+
+    try {
+      await RevenueCatService.init();
+    } catch (e) {
+      log('RevenueCat initialization error: $e');
     }
   }
 

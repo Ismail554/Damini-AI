@@ -88,7 +88,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
             ),
             SizedBox(height: 10.h),
             Text(
-              "Are you sure you want to delete your account? All your data will be permanently removed. Enter your password to confirm.",
+              "Are you sure you want to delete your account? Your personal profile and data will be permanently purged in accordance with our 90-day retention schedule. Enter your password to confirm.",
               style: GoogleFonts.outfit(
                 fontSize: 14.sp,
                 color: tc.textSecondary,

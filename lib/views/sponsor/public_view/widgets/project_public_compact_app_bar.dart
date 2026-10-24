@@ -15,6 +15,7 @@ class ProjectPublicCompactAppBar extends StatelessWidget {
   final bool isBookmarked;
   final VoidCallback onBackTap;
   final VoidCallback onBookmarkTap;
+  final VoidCallback? onReportTap;
 
   const ProjectPublicCompactAppBar({
     super.key,
@@ -25,6 +26,7 @@ class ProjectPublicCompactAppBar extends StatelessWidget {
     this.isBookmarked = false,
     required this.onBackTap,
     required this.onBookmarkTap,
+    this.onReportTap,
   });
 
   @override
@@ -80,6 +82,16 @@ class ProjectPublicCompactAppBar extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: AppDimens.spaceMd),
+                if (onReportTap != null) ...[
+                  CircleActionButton(
+                    icon: Icons.flag_outlined,
+                    background: tc.cardInner,
+                    borderColor: tc.borderColor,
+                    iconColor: tc.textPrimary,
+                    onTap: onReportTap!,
+                  ),
+                  SizedBox(width: 8.w),
+                ],
                 CircleActionButton(
                   icon: isBookmarked
                       ? Icons.bookmark_rounded

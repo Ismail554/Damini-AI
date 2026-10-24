@@ -19,6 +19,7 @@ import '../../saved/controllers/sponsor_saved_provider.dart';
 import '../widgets/project_public_compact_app_bar.dart';
 import '../widgets/project_public_sheet_content.dart';
 import '../widgets/public_view_image_header.dart';
+import '../../../../shared/widgets/app_report_bottom_sheet.dart';
 
 class ProjectPublicView extends ConsumerStatefulWidget {
   final String? projectId;
@@ -110,6 +111,15 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
         });
       }
     } catch (_) {}
+  }
+
+  void _handleReportListing() {
+    final intId = int.tryParse(_project.id);
+    AppReportBottomSheet.show(
+      context,
+      title: "Report Listing",
+      reportedProjectId: intId,
+    );
   }
 
   @override
@@ -271,6 +281,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
                     imageUrls: _project.imageUrls,
                     isBookmarked: _isBookmarked,
                     onBookmarkTap: _toggleBookmark,
+                    onReportTap: _handleReportListing,
                   ),
                   if (headerDim > 0)
                     IgnorePointer(
@@ -349,6 +360,7 @@ class _ProjectPublicViewState extends ConsumerState<ProjectPublicView> {
             isBookmarked: _isBookmarked,
             onBackTap: () => Navigator.of(context).maybePop(),
             onBookmarkTap: _toggleBookmark,
+            onReportTap: _handleReportListing,
           ),
 
           // Request Collaboration Button (Investor Role)

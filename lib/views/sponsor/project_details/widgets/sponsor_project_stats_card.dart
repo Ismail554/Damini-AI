@@ -47,7 +47,7 @@ class SponsorProjectStatsCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Raised so far",
+                    "Capital Committed",
                     style: GoogleFonts.outfit(
                       fontSize: 12.sp,
                       color: tc.textTertiary,

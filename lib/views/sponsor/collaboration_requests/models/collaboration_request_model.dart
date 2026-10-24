@@ -15,10 +15,13 @@ class CollaborationRequestModel {
   final String? projectStatusText;
   final bool hasFundReceivedButton;
 
-  // Additional backend metadata
+  // Additional backend metadata & deal pipeline
   final int? projectId;
   final int? investorId;
   final String status;
+  final String committedAmount;
+  final String currency;
+  final DateTime? roadmapSentAt;
   final bool ndaSigned;
   final String ndaDigitalSignature;
   final String? ndaSignatureImage;
@@ -33,6 +36,9 @@ class CollaborationRequestModel {
     this.isApprovedBadge = false,
     required this.projectName,
     required this.proposedBudget,
+    this.committedAmount = '\$0.00',
+    this.currency = 'USD',
+    this.roadmapSentAt,
     this.proposalText = '',
     this.isHistory = false,
     this.confirmedDate,
@@ -47,6 +53,15 @@ class CollaborationRequestModel {
     this.createdAt,
   });
 
+  bool get isInterested => status == 'INTERESTED' || status == 'PENDING';
+  bool get isAgreedToProceed =>
+      status == 'AGREED_TO_PROCEED' || status == 'APPROVED' || status == 'ACCEPTED';
+  bool get isRoadmapSent => status == 'ROADMAP_SENT';
+  bool get isClosedOffPlatform =>
+      status == 'CLOSED_OFF_PLATFORM' || status == 'CONFIRMED' || status == 'RECEIVED';
+  bool get isDeclined =>
+      status == 'DECLINED' || status == 'REJECTED' || status == 'WITHDRAWN';
+
   CollaborationRequestModel copyWith({
     String? id,
     String? investorName,
@@ -56,6 +71,9 @@ class CollaborationRequestModel {
     bool? isApprovedBadge,
     String? projectName,
     String? proposedBudget,
+    String? committedAmount,
+    String? currency,
+    DateTime? roadmapSentAt,
     String? proposalText,
     bool? isHistory,
     String? confirmedDate,
@@ -78,6 +96,9 @@ class CollaborationRequestModel {
       isApprovedBadge: isApprovedBadge ?? this.isApprovedBadge,
       projectName: projectName ?? this.projectName,
       proposedBudget: proposedBudget ?? this.proposedBudget,
+      committedAmount: committedAmount ?? this.committedAmount,
+      currency: currency ?? this.currency,
+      roadmapSentAt: roadmapSentAt ?? this.roadmapSentAt,
       proposalText: proposalText ?? this.proposalText,
       isHistory: isHistory ?? this.isHistory,
       confirmedDate: confirmedDate ?? this.confirmedDate,
@@ -121,10 +142,14 @@ class CollaborationRequestModel {
     // Budget & proposal
     final rawBudget = json['proposed_budget']?.toString() ?? '';
     final proposedBudget = formatCurrency(rawBudget);
+    final rawCommitted =
+        json['committed_amount']?.toString() ?? json['proposed_budget']?.toString() ?? '';
+    final committedAmount = formatCurrency(rawCommitted);
+    final currency = json['currency']?.toString() ?? 'USD';
     final proposalText = json['proposal_text']?.toString() ?? '';
 
     // Status & NDA
-    final status = json['status']?.toString().toUpperCase() ?? 'PENDING';
+    final status = json['status']?.toString().toUpperCase() ?? 'INTERESTED';
     final ndaSigned = json['nda_signed'] == true;
     final ndaDigitalSignature =
         json['nda_digital_signature']?.toString() ?? '';
@@ -134,23 +159,46 @@ class CollaborationRequestModel {
     final createdAtStr = json['created_at']?.toString();
     final createdAt =
         createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;
+    final roadmapSentAtStr = json['roadmap_sent_at']?.toString();
+    final roadmapSentAt =
+        roadmapSentAtStr != null ? DateTime.tryParse(roadmapSentAtStr) : null;
 
-    final isApproved = status == 'APPROVED' || status == 'ACCEPTED';
-    final isConfirmed = status == 'CONFIRMED' || status == 'RECEIVED';
+    final isAgreed = status == 'AGREED_TO_PROCEED' ||
+        status == 'APPROVED' ||
+        status == 'ACCEPTED';
+    final isRoadmap = status == 'ROADMAP_SENT';
+    final isClosed = status == 'CLOSED_OFF_PLATFORM' ||
+        status == 'CONFIRMED' ||
+        status == 'RECEIVED';
+    final isDeclinedOrWithdrawn = status == 'DECLINED' ||
+        status == 'REJECTED' ||
+        status == 'WITHDRAWN';
 
     String? badgeText;
     bool isApprovedBadge = false;
-    if (isApproved) {
-      badgeText = 'Approved';
+    if (status == 'CLOSED_OFF_PLATFORM') {
+      badgeText = 'Closed Off-Platform';
       isApprovedBadge = true;
-    } else if (isConfirmed) {
+    } else if (status == 'CONFIRMED' || status == 'RECEIVED') {
       badgeText = 'Received';
       isApprovedBadge = true;
+    } else if (status == 'ROADMAP_SENT') {
+      badgeText = 'Roadmap Sent';
+      isApprovedBadge = true;
+    } else if (status == 'AGREED_TO_PROCEED') {
+      badgeText = 'Agreed to Proceed';
+      isApprovedBadge = true;
+    } else if (status == 'APPROVED' || status == 'ACCEPTED') {
+      badgeText = 'Approved';
+      isApprovedBadge = true;
+    } else if (isDeclinedOrWithdrawn) {
+      badgeText = status == 'WITHDRAWN' ? 'Withdrawn' : 'Declined';
+      isApprovedBadge = false;
     } else if (ndaSigned) {
       badgeText = 'NDA Signed';
       isApprovedBadge = false;
     } else {
-      badgeText = 'NDA Sign';
+      badgeText = status == 'INTERESTED' ? 'Interested' : 'NDA Sign';
       isApprovedBadge = false;
     }
 
@@ -163,11 +211,16 @@ class CollaborationRequestModel {
       isApprovedBadge: isApprovedBadge,
       projectName: projectName,
       proposedBudget: proposedBudget,
+      committedAmount: committedAmount,
+      currency: currency,
+      roadmapSentAt: roadmapSentAt,
       proposalText: proposalText,
-      isHistory: isApproved,
+      isHistory: isAgreed || isRoadmap || isClosed,
       confirmedDate: formatConfirmedDate(createdAtStr),
-      projectStatusText: isConfirmed ? 'Received' : 'Project in progress',
-      hasFundReceivedButton: isApproved && !isConfirmed,
+      projectStatusText: isClosed
+          ? 'Closed off-platform'
+          : (isRoadmap ? 'Roadmap sent' : 'Project in progress'),
+      hasFundReceivedButton: isAgreed && !isClosed,
       projectId: projectId,
       investorId: investorId,
       status: status,

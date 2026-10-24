@@ -189,7 +189,7 @@ class InvestorSavedProjectCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _buildMetricBox(tc, "Invested", item.invested),
+                  child: _buildMetricBox(tc, "Committed", item.invested),
                 ),
                 SizedBox(width: 8.w),
                 Expanded(child: _buildMetricBox(tc, "Value", item.value)),

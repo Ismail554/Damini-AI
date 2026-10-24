@@ -63,7 +63,7 @@ class ProjectDetailsSection extends StatelessWidget {
           SizedBox(height: AppDimens.spaceMd),
           ProjectFormField(
             label: "Use of funds",
-            hint: "How will the raised capital be deployed?",
+            hint: "How will the requested capital be deployed?",
             controller: useOfFundsController,
           ),
           SizedBox(height: AppDimens.spaceMd),

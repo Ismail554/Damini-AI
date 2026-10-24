@@ -119,7 +119,7 @@ class _InvestorDashboardState extends ConsumerState<InvestorDashboard> {
                       "${filteredTrending.first.category} • ${filteredTrending.first.location} • ${filteredTrending.first.daysLeft} days left",
                   imageUrl: filteredTrending.first.imageUrl,
                   raisedAmount: filteredTrending.first.minInvestment,
-                  raisedLabel: "Min Investment",
+                  raisedLabel: "Min Indicative Amt",
                   goalAmount: filteredTrending.first.location,
                   goalLabel: "Location",
                   progress: filteredTrending.first.fundedPercent,

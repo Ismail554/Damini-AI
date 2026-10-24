@@ -122,7 +122,7 @@ class InvestorContributionCard extends StatelessWidget {
                                 ),
                                 SizedBox(width: 4.w),
                                 Text(
-                                  "Funded",
+                                  "Committed",
                                   style: GoogleFonts.outfit(
                                     fontSize: 10.sp,
                                     color: AppColors.successGreen,

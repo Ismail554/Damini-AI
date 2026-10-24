@@ -409,7 +409,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Invested",
+                    "Committed",
                     style: GoogleFonts.outfit(
                       fontSize: 11.sp,
                       color: tc.textTertiary,

@@ -162,7 +162,7 @@ class _DaminiAiInteractiveHeaderState extends State<DaminiAiInteractiveHeader>
                         Row(
                           children: [
                             Text(
-                              "Damini Advisor",
+                              "Damani Advisor",
                               style: GoogleFonts.outfit(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,

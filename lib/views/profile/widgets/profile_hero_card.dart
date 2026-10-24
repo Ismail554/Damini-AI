@@ -102,7 +102,7 @@ class ProfileHeroCard extends StatelessWidget {
                           : "Institutional Investor")
                     : (isSponsor ? "Sponsor Partner" : "Angel Investor")));
 
-    final defaultStat1Label = isSponsor ? "TOTAL RAISED" : "INVESTED";
+    final defaultStat1Label = isSponsor ? "CAPITAL COMMITTED" : "COMMITTED";
     final defaultStat2Label = "PROJECTS";
 
     return Container(

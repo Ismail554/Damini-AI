@@ -157,7 +157,7 @@ class SponsorProfileView extends ConsumerWidget {
             companyName: personal.companyName,
             bio: personal.bio,
             email: personal.email,
-            stat1Label: "TOTAL RAISED",
+            stat1Label: "CAPITAL COMMITTED",
             stat2Label: "PROJECTS",
           ),
           SizedBox(height: AppDimens.spaceLg),

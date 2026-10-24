@@ -154,7 +154,7 @@ class InvestorProfileView extends ConsumerWidget {
             companyName: personalInfo.companyName,
             bio: personalInfo.bio,
             email: personalInfo.email,
-            stat1Label: "INVESTED",
+            stat1Label: "COMMITTED",
             stat2Label: "PROJECTS",
           ),
           SizedBox(height: 18.h),

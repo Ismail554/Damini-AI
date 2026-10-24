@@ -135,7 +135,7 @@ class SponsorUserProfile {
   List<SponsorDashboardMetric> toMetrics() {
     return [
       SponsorDashboardMetric(
-        label: "Total Raised",
+        label: "Indicative Commitments",
         value: totalRaised,
         icon: Icons.monetization_on_outlined,
       ),

@@ -41,7 +41,7 @@ class SponsorSavedProjectCard extends StatelessWidget {
             ],
             overviewText: item.shortDescription.isNotEmpty
                 ? item.shortDescription
-                : "${item.title} located in ${item.location} is a high-yield ${item.category} project with a target raise of ${item.targetRaise} and minimum contribution of ${item.minInvestmentAmt}.",
+                : "${item.title} located in ${item.location} is a high-yield ${item.category} project requesting ${item.targetRaise} in capital with a minimum indicative amount of ${item.minInvestmentAmt}.",
             timeline: item.timelineMonths != null
                 ? "${item.timelineMonths} Months"
                 : "24 Months",
@@ -49,7 +49,7 @@ class SponsorSavedProjectCard extends StatelessWidget {
             teamMembers: ProjectPublicViewModel.mockData().teamMembers,
             businessDescription: item.shortDescription.isNotEmpty
                 ? item.shortDescription
-                : "Detailed opportunity analysis for ${item.title}. Minimum investment amount starts at ${item.minInvestmentAmt} with projected ROI of ${item.targetRoi}.",
+                : "Detailed opportunity analysis for ${item.title}. Minimum indicative amount starts at ${item.minInvestmentAmt} with projected ROI of ${item.targetRoi}.",
             minContribution: item.minInvestmentAmt,
             expectedRoi: item.targetRoi,
             isSaved: item.isSaved,
@@ -198,7 +198,7 @@ class SponsorSavedProjectCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Target Raise",
+                              "Capital Requested",
                               style: GoogleFonts.outfit(
                                 fontSize: 11.sp,
                                 color: tc.textTertiary,
@@ -221,7 +221,7 @@ class SponsorSavedProjectCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              "Minimum Investment Amt",
+                              "Min Indicative Amt",
                               style: GoogleFonts.outfit(
                                 fontSize: 11.sp,
                                 color: tc.textTertiary,
