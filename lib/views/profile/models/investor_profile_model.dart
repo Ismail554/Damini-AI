@@ -7,6 +7,7 @@ class InvestorProfileModel {
   final String investedAmount;
   final String projectsCount;
   final String? verificationStatus;
+  final String subscriptionTier;
 
   const InvestorProfileModel({
     this.name = "Member",
@@ -15,6 +16,7 @@ class InvestorProfileModel {
     this.investedAmount = "\$0.00",
     this.projectsCount = "0",
     this.verificationStatus,
+    this.subscriptionTier = "FREE",
   });
 
   factory InvestorProfileModel.fromJson(Map<String, dynamic> json) {
@@ -95,6 +97,7 @@ class InvestorProfileModel {
       investedAmount: investedAmount,
       projectsCount: projectsCount,
       verificationStatus: rawVerificationStatus?.toUpperCase(),
+      subscriptionTier: (data['subscription_tier'] ?? profile['subscription_tier'] ?? 'FREE').toString(),
     );
   }
 
@@ -105,6 +108,7 @@ class InvestorProfileModel {
     String? investedAmount,
     String? projectsCount,
     String? verificationStatus,
+    String? subscriptionTier,
   }) {
     return InvestorProfileModel(
       name: name ?? this.name,
@@ -113,6 +117,7 @@ class InvestorProfileModel {
       investedAmount: investedAmount ?? this.investedAmount,
       projectsCount: projectsCount ?? this.projectsCount,
       verificationStatus: verificationStatus ?? this.verificationStatus,
+      subscriptionTier: subscriptionTier ?? this.subscriptionTier,
     );
   }
 }

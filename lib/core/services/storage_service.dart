@@ -89,6 +89,25 @@ class StorageService {
     }
   }
 
+  static Future<void> saveUserEmail(String email) async {
+    try {
+      final trimmed = email.trim();
+      if (trimmed.isNotEmpty) {
+        await _storage.write(key: GlobalKeys.userEmail, value: trimmed);
+      }
+    } catch (_) {}
+  }
+
+  static Future<String?> getUserEmail() async {
+    try {
+      final val = await _storage.read(key: GlobalKeys.userEmail);
+      if (val == null || val.trim().isEmpty) return null;
+      return val.trim();
+    } catch (_) {
+      return null;
+    }
+  }
+
   static Future<void> saveUserName(String name) async {
     try {
       final trimmed = name.trim();
@@ -255,6 +274,7 @@ class StorageService {
       await _storage.delete(key: GlobalKeys.access);
       await _storage.delete(key: GlobalKeys.refresh);
       await _storage.delete(key: GlobalKeys.uuid);
+      await _storage.delete(key: GlobalKeys.userEmail);
       await _storage.delete(key: GlobalKeys.userName);
       await _storage.delete(key: GlobalKeys.userRole);
       await _storage.delete(key: GlobalKeys.isRoleSelected);

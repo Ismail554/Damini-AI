@@ -69,6 +69,8 @@ class ProjectDropdownField extends StatelessWidget {
         ),
         SizedBox(height: AppDimens.spaceXxs),
         DropdownButtonFormField<String>(
+          isExpanded: true,
+          isDense: true,
           value: effectiveValue,
           onChanged: onChanged,
           dropdownColor: tc.cardBg,
@@ -82,6 +84,8 @@ class ProjectDropdownField extends StatelessWidget {
           ),
           hint: Text(
             hint,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: GoogleFonts.outfit(
               fontSize: 13.sp,
               color: tc.textTertiary,
@@ -114,6 +118,8 @@ class ProjectDropdownField extends StatelessWidget {
               value: item,
               child: Text(
                 item,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.outfit(
                   fontSize: 13.sp,
                   color: tc.textPrimary,

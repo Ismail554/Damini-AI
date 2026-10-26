@@ -16,6 +16,7 @@ class PersonalInfoModel {
   final String? verificationStatus;
   final String? registrationNumber;
   final String? businessAddress;
+  final String subscriptionTier;
 
   const PersonalInfoModel({
     required this.fullName,
@@ -33,6 +34,7 @@ class PersonalInfoModel {
     this.verificationStatus,
     this.registrationNumber,
     this.businessAddress,
+    this.subscriptionTier = 'FREE',
   });
 
   bool get isCompany => sponsorType?.toUpperCase() == 'COMPANY';
@@ -120,6 +122,7 @@ class PersonalInfoModel {
       verificationStatus: rawVerificationStatus?.toUpperCase(),
       registrationNumber: profile['registration_number']?.toString(),
       businessAddress: profile['business_address']?.toString(),
+      subscriptionTier: (data['subscription_tier'] ?? profile['subscription_tier'] ?? 'FREE').toString(),
     );
   }
 
@@ -140,6 +143,7 @@ class PersonalInfoModel {
     String? verificationStatus,
     String? registrationNumber,
     String? businessAddress,
+    String? subscriptionTier,
   }) {
     return PersonalInfoModel(
       fullName: fullName ?? this.fullName,
@@ -157,6 +161,7 @@ class PersonalInfoModel {
       verificationStatus: verificationStatus ?? this.verificationStatus,
       registrationNumber: registrationNumber ?? this.registrationNumber,
       businessAddress: businessAddress ?? this.businessAddress,
+      subscriptionTier: subscriptionTier ?? this.subscriptionTier,
     );
   }
 }

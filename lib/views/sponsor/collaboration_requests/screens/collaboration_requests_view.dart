@@ -85,9 +85,9 @@ class _CollaborationRequestsViewState
                   setState(() => _selectedTabIndex = index);
                 },
                 children: [
-                  _buildPendingListView(state),
-                  _buildApprovedListView(state),
-                  _buildConfirmationListView(state),
+                  _KeepAlive(child: _buildPendingListView(state)),
+                  _KeepAlive(child: _buildApprovedListView(state)),
+                  _KeepAlive(child: _buildConfirmationListView(state)),
                 ],
               ),
             ),
@@ -96,57 +96,9 @@ class _CollaborationRequestsViewState
       ),
     );
 
-    if (widget.heroTag == null) {
-      return content;
-    }
-
-    return Hero(
-      tag: widget.heroTag!,
-      flightShuttleBuilder: (
-        flightContext,
-        animation,
-        flightDirection,
-        fromHeroContext,
-        toHeroContext,
-      ) {
-        final isPush = flightDirection == HeroFlightDirection.push;
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeInOutCubicEmphasized,
-        );
-
-        return AnimatedBuilder(
-          animation: curved,
-          builder: (context, _) {
-            final t = curved.value;
-            final radius = isPush
-                ? (1.0 - t) * AppDimens.radiusMd
-                : t * AppDimens.radiusMd;
-
-            final size = MediaQuery.of(flightContext).size;
-
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(radius),
-              child: Material(
-                type: MaterialType.transparency,
-                child: OverflowBox(
-                  alignment: Alignment.topCenter,
-                  minWidth: size.width,
-                  maxWidth: size.width,
-                  minHeight: size.height,
-                  maxHeight: size.height,
-                  child: toHeroContext.widget,
-                ),
-              ),
-            );
-          },
-        );
-      },
-      child: Material(
-        type: MaterialType.transparency,
-        child: content,
-      ),
-    );
+    // Page transition is handled by the router; a full-screen Hero re-built
+    // the whole screen on every frame and caused nested-Hero errors.
+    return content;
   }
 
   Widget _buildPendingListView(CollaborationRequestsState state) {
@@ -200,6 +152,7 @@ class _CollaborationRequestsViewState
         itemBuilder: (context, index) {
           final item = list[index];
           return CollaborationCard(
+            key: ValueKey(item.id),
             item: item,
             onLeftAction: () async {
               final confirmed = await showDialog<bool>(
@@ -322,6 +275,7 @@ class _CollaborationRequestsViewState
         itemBuilder: (context, index) {
           final item = list[index];
           return CollaborationCard(
+            key: ValueKey(item.id),
             item: item,
             onLeftAction: () => ref
                 .read(collaborationRequestsProvider.notifier)
@@ -398,6 +352,7 @@ class _CollaborationRequestsViewState
         itemBuilder: (context, index) {
           final item = list[index];
           return CollaborationConfirmationCard(
+            key: ValueKey(item.id),
             item: item,
             onFundReceived: () async {
               final success = await ref
@@ -443,8 +398,30 @@ class _CollaborationRequestsViewState
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: AppEmptyView.requests(
         title: message,
-        subtitle: "When investors send proposals or fund confirmations, they will appear right here.",
+        subtitle:
+            "When investors send proposals or fund confirmations, they will appear right here.",
       ),
     );
+  }
+}
+
+/// Keeps a PageView tab alive so it isn't rebuilt/re-laid-out on every swipe.
+class _KeepAlive extends StatefulWidget {
+  final Widget child;
+  const _KeepAlive({required this.child});
+
+  @override
+  State<_KeepAlive> createState() => _KeepAliveState();
+}
+
+class _KeepAliveState extends State<_KeepAlive>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }

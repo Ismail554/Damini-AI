@@ -4,6 +4,7 @@ import 'package:Braintech/core/constants/api_endpoints.dart';
 import 'package:Braintech/core/services/api_error_handler.dart';
 import 'package:Braintech/core/services/api_service.dart';
 import 'package:Braintech/core/services/notification_service.dart';
+import 'package:Braintech/core/services/revenue_cat_service.dart';
 import 'package:Braintech/core/services/storage_service.dart';
 import 'package:Braintech/shared/global_key.dart';
 import 'package:Braintech/views/auth/login/models/login_request_model.dart';
@@ -183,6 +184,15 @@ class LoginRepositoryImpl implements LoginRepository {
             .trim();
     if (resolvedName.isNotEmpty) {
       await StorageService.saveUserName(resolvedName);
+    }
+    final resolvedEmail = (user?.email != null && user!.email!.trim().isNotEmpty)
+        ? user.email!.trim()
+        : (data is Map
+            ? ((data['data'] is Map ? data['data']['email'] : null) ?? data['email'])?.toString().trim()
+            : null);
+    if (resolvedEmail != null && resolvedEmail.isNotEmpty) {
+      await StorageService.saveUserEmail(resolvedEmail);
+      unawaited(RevenueCatService.logIn(resolvedEmail));
     }
     await StorageService.saveIsApiConnected(true);
     await StorageService.saveHasSeenOnboarding();

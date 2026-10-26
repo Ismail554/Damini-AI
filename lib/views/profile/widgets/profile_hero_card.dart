@@ -27,6 +27,7 @@ class ProfileHeroCard extends StatelessWidget {
   final String? stat2Label;
   final String? stat3Value;
   final String? stat3Label;
+  final String subscriptionTier;
   final VoidCallback? onEdit;
 
   const ProfileHeroCard({
@@ -47,6 +48,7 @@ class ProfileHeroCard extends StatelessWidget {
     this.stat2Label,
     this.stat3Value,
     this.stat3Label,
+    this.subscriptionTier = 'FREE',
     this.onEdit,
   });
 
@@ -57,6 +59,7 @@ class ProfileHeroCard extends StatelessWidget {
     final isApproved = status == 'APPROVED';
     final isRejected = status == 'REJECTED';
     final isSponsor = role?.toLowerCase() == 'sponsor';
+    final isPro = subscriptionTier.toUpperCase() == 'PRO';
 
     Color avatarBadgeColor;
     IconData avatarBadgeIcon;
@@ -332,10 +335,14 @@ class ProfileHeroCard extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.5.h),
                       decoration: BoxDecoration(
-                        color: tc.textPrimary.withValues(alpha: 0.07),
+                        color: isPro
+                            ? const Color(0xFF2563EB).withValues(alpha: 0.15)
+                            : tc.textPrimary.withValues(alpha: 0.07),
                         borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                         border: Border.all(
-                          color: tc.borderSubtle,
+                          color: isPro
+                              ? const Color(0xFF2563EB).withValues(alpha: 0.4)
+                              : tc.borderSubtle,
                           width: 0.8,
                         ),
                       ),
@@ -344,16 +351,16 @@ class ProfileHeroCard extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.auto_awesome_rounded,
-                            color: const Color(0xFF9333EA),
+                            color: isPro ? const Color(0xFF38BDF8) : const Color(0xFF9333EA),
                             size: 11.sp,
                           ),
                           SizedBox(width: 3.5.w),
                           Text(
-                            "Free Member",
+                            isPro ? "Pro Member" : "Free Member",
                             style: GoogleFonts.outfit(
                               fontSize: 10.sp,
-                              color: tc.textSecondary,
-                              fontWeight: FontWeight.w600,
+                              color: isPro ? const Color(0xFF38BDF8) : tc.textSecondary,
+                              fontWeight: isPro ? FontWeight.bold : FontWeight.w600,
                             ),
                           ),
                         ],

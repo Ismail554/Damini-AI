@@ -7,6 +7,7 @@ class SponsorProfileData {
   final String investedAmount;
   final String projectsCount;
   final String? verificationStatus;
+  final String subscriptionTier;
 
   const SponsorProfileData({
     required this.name,
@@ -15,6 +16,7 @@ class SponsorProfileData {
     required this.investedAmount,
     required this.projectsCount,
     this.verificationStatus,
+    this.subscriptionTier = 'FREE',
   });
 
   factory SponsorProfileData.fromJson(Map<String, dynamic> json) {
@@ -95,6 +97,7 @@ class SponsorProfileData {
       investedAmount: investedAmount,
       projectsCount: projectsCount,
       verificationStatus: rawVerificationStatus?.toUpperCase(),
+      subscriptionTier: (data['subscription_tier'] ?? profile['subscription_tier'] ?? 'FREE').toString(),
     );
   }
 }

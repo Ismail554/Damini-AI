@@ -40,7 +40,7 @@ class ApiEndpoints {
   // User & Projects
   static const String currentUser = "/api/v1/users/me/";
   static const String deleteAccount = "/api/v1/users/delete-account/";
-  static const String reports = "/api/v1/core/reports/";
+  static const String reports = "/api/v1/reports/";
   static const String sponsorNda = "/api/v1/profiles/sponsor/nda/";
   static const String sponsorProjects = "/api/v1/projects/sponsor/";
   static const String savedProjects = "/api/v1/projects/saved/";
@@ -90,6 +90,12 @@ class ApiEndpoints {
       "/api/v1/ai/chat/conversations/$conversationId/messages/";
   static String aiChatClear(String conversationId) =>
       "/api/v1/ai/chat/conversations/$conversationId/clear/";
+
+  // Subscriptions & RevenueCat
+  static const String subscriptionPlans = "/api/v1/subscriptions/plans/";
+  static const String subscriptionMe = "/api/v1/subscriptions/me/";
+  static const String subscriptionSync = "/api/v1/subscriptions/sync/";
+  static const String subscriptionHistory = "/api/v1/subscriptions/history/";
 
   // Chat & Notifications
   static const String startConversation =

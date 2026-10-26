@@ -2,6 +2,7 @@ import 'dart:async';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/services/revenue_cat_service.dart';
 import '../../../../core/services/storage_service.dart';
 import '../models/otp_model.dart';
 
@@ -48,6 +49,11 @@ class OtpRepositoryImpl implements OtpRepository {
         await StorageService.saveToken(token);
         if (refreshToken != null) {
           await StorageService.saveRefreshToken(refreshToken);
+        }
+        final email = request.email.trim();
+        if (email.isNotEmpty) {
+          await StorageService.saveUserEmail(email);
+          unawaited(RevenueCatService.logIn(email));
         }
         await StorageService.saveIsApiConnected(true);
         await StorageService.saveHasSeenOnboarding();

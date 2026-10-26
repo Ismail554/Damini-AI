@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/api_service.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/services/revenue_cat_service.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../shared/global_key.dart';
 import '../models/session_model.dart';
@@ -118,6 +119,9 @@ class SessionNotifier extends Notifier<SessionState> {
         await ref.read(googleAuthServiceProvider).signOut();
       } catch (_) {}
       await NotificationService.onLogout();
+      try {
+        await RevenueCatService.logOut();
+      } catch (_) {}
       await StorageService.clearAll();
       state = state.copyWith(
         isLoading: false,

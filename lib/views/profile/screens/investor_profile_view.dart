@@ -156,6 +156,9 @@ class InvestorProfileView extends ConsumerWidget {
             email: personalInfo.email,
             stat1Label: "COMMITTED",
             stat2Label: "PROJECTS",
+            subscriptionTier: personalInfo.subscriptionTier.isNotEmpty
+                ? personalInfo.subscriptionTier
+                : profile.subscriptionTier,
           ),
           SizedBox(height: 18.h),
 

@@ -159,6 +159,9 @@ class SponsorProfileView extends ConsumerWidget {
             email: personal.email,
             stat1Label: "CAPITAL COMMITTED",
             stat2Label: "PROJECTS",
+            subscriptionTier: personal.subscriptionTier.isNotEmpty
+                ? personal.subscriptionTier
+                : (profile?.subscriptionTier ?? 'FREE'),
           ),
           SizedBox(height: AppDimens.spaceLg),
 

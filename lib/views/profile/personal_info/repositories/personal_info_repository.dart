@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/services/api_service.dart';
+import 'dart:async';
+import '../../../../core/services/revenue_cat_service.dart';
+import '../../../../core/services/storage_service.dart';
 import '../models/personal_info_model.dart';
 
 final personalInfoRepositoryProvider = Provider<PersonalInfoRepository>((ref) {
@@ -34,9 +37,19 @@ class PersonalInfoRepositoryImpl implements PersonalInfoRepository {
       }
 
       if (data is Map<String, dynamic>) {
-        return PersonalInfoModel.fromJson(data);
+        final res = PersonalInfoModel.fromJson(data);
+        if (res.email.isNotEmpty) {
+          await StorageService.saveUserEmail(res.email);
+          unawaited(RevenueCatService.logIn(res.email));
+        }
+        return res;
       } else if (data is Map) {
-        return PersonalInfoModel.fromJson(Map<String, dynamic>.from(data));
+        final res = PersonalInfoModel.fromJson(Map<String, dynamic>.from(data));
+        if (res.email.isNotEmpty) {
+          await StorageService.saveUserEmail(res.email);
+          unawaited(RevenueCatService.logIn(res.email));
+        }
+        return res;
       }
       return const PersonalInfoModel(
         fullName: 'Member',

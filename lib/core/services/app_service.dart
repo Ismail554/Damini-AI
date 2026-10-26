@@ -37,7 +37,8 @@ class AppService {
     }
 
     try {
-      await RevenueCatService.init();
+      final savedEmail = await StorageService.getUserEmail();
+      await RevenueCatService.init(savedEmail);
     } catch (e) {
       log('RevenueCat initialization error: $e');
     }
