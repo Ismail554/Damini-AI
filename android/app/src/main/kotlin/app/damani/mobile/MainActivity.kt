@@ -1,4 +1,4 @@
-package com.braintekh.diafi
+package app.damani.mobile
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

@@ -18,10 +18,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -29,20 +26,11 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       default:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
@@ -81,6 +69,46 @@ class DefaultFirebaseOptions {
     projectId: _safeEnv('FIREBASE_PROJECT_ID') ?? 'damini-ai',
     storageBucket: _safeEnv('FIREBASE_STORAGE_BUCKET') ??
         'damini-ai.firebasestorage.app',
-    iosBundleId: _safeEnv('FIREBASE_IOS_BUNDLE_ID') ?? 'com.braintekh.diafi',
+    iosBundleId: _safeEnv('FIREBASE_IOS_BUNDLE_ID') ?? 'app.damani.mobile',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDEfX-DJLdJJeH8CCceM2fm4WfCfDakk5Q',
+    appId: '1:1003008036989:web:6ccdfb5fa71896a122a114',
+    messagingSenderId: '1003008036989',
+    projectId: 'damini-ai',
+    authDomain: 'damini-ai.firebaseapp.com',
+    storageBucket: 'damini-ai.firebasestorage.app',
+    measurementId: 'G-3G5T5SHJ67',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDus-Kwpx5cHGcdfKOVUU7jD2TlX8EZp90',
+    appId: '1:1003008036989:ios:b5424345fcfe478522a114',
+    messagingSenderId: '1003008036989',
+    projectId: 'damini-ai',
+    storageBucket: 'damini-ai.firebasestorage.app',
+    androidClientId: '1003008036989-d4t2houo0pt3ivfe3i4ortj0lc59a98g.apps.googleusercontent.com',
+    iosClientId: '1003008036989-cs3trdjrjdhkfdtvo6e26vilucfbisuh.apps.googleusercontent.com',
+    iosBundleId: 'com.julkar.jvai.julkarVai',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDus-Kwpx5cHGcdfKOVUU7jD2TlX8EZp90',
+    appId: '1:1003008036989:ios:dc2734771e7962e022a114',
+    messagingSenderId: '1003008036989',
+    projectId: 'damini-ai',
+    storageBucket: 'damini-ai.firebasestorage.app',
+    androidClientId: '1003008036989-d4t2houo0pt3ivfe3i4ortj0lc59a98g.apps.googleusercontent.com',
+    iosClientId: '1003008036989-fte65hh708ab5lplhhuoa9mosd7251j4.apps.googleusercontent.com',
+    iosBundleId: 'app.damani.mobile',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE',
+    appId: '1:1003008036989:android:724d1a2c53b3a54922a114',
+    messagingSenderId: '1003008036989',
+    projectId: 'damini-ai',
+    storageBucket: 'damini-ai.firebasestorage.app',
   );
 }

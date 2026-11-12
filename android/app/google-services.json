@@ -7,6 +7,42 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1003008036989:android:724d1a2c53b3a54922a114",
+        "android_client_info": {
+          "package_name": "app.damani.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1003008036989-vtiu7c5gn3936pj7jn5mg3nn5ao2k9bd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1003008036989-6tk0cdire97kg6hnk0jq91ns6hsj970u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1003008036989-pei20lpe6ngj908p6vnphjj4qpk3r7if.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.braintekh.diafi"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1003008036989:android:5ddc00f78c3c5d2022a114",
         "android_client_info": {
           "package_name": "com.braintekh.diafi"
