@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
     apiKey: _safeEnv('FIREBASE_ANDROID_API_KEY') ??
         'AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE',
     appId: _safeEnv('FIREBASE_ANDROID_APP_ID') ??
-        '1:1003008036989:android:5ddc00f78c3c5d2022a114',
+        '1:1003008036989:android:724d1a2c53b3a54922a114',
     messagingSenderId: _safeEnv('FIREBASE_MESSAGING_SENDER_ID') ??
         '1003008036989',
     projectId: _safeEnv('FIREBASE_PROJECT_ID') ?? 'damini-ai',
@@ -91,24 +91,5 @@ class DefaultFirebaseOptions {
     androidClientId: '1003008036989-d4t2houo0pt3ivfe3i4ortj0lc59a98g.apps.googleusercontent.com',
     iosClientId: '1003008036989-cs3trdjrjdhkfdtvo6e26vilucfbisuh.apps.googleusercontent.com',
     iosBundleId: 'com.julkar.jvai.julkarVai',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDus-Kwpx5cHGcdfKOVUU7jD2TlX8EZp90',
-    appId: '1:1003008036989:ios:dc2734771e7962e022a114',
-    messagingSenderId: '1003008036989',
-    projectId: 'damini-ai',
-    storageBucket: 'damini-ai.firebasestorage.app',
-    androidClientId: '1003008036989-d4t2houo0pt3ivfe3i4ortj0lc59a98g.apps.googleusercontent.com',
-    iosClientId: '1003008036989-fte65hh708ab5lplhhuoa9mosd7251j4.apps.googleusercontent.com',
-    iosBundleId: 'app.damani.mobile',
-  );
-
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDN6umw3hTVL4arpnIpKD2L-UzJ3Fvp0uE',
-    appId: '1:1003008036989:android:724d1a2c53b3a54922a114',
-    messagingSenderId: '1003008036989',
-    projectId: 'damini-ai',
-    storageBucket: 'damini-ai.firebasestorage.app',
   );
 }
