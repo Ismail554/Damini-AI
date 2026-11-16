@@ -104,142 +104,162 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
     final secondsLeft = ref.watch(otpTimerProvider);
 
     return CommonBackground(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 10.h),
-            IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go(
-                    widget.isRecovery ? '/forgot-password' : '/signup',
-                  );
-                }
-              },
-            ),
-            SizedBox(height: 10.h),
-            Text(
-              "Verification Code",
-              style: GoogleFonts.outfit(
-                fontSize: 28.sp,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              "Enter the 6-digit code sent to ${widget.email}",
-              style: GoogleFonts.outfit(fontSize: 15.sp, color: AppColors.grey),
-            ),
-            SizedBox(height: 48.h),
-
-            // 6 OTP Boxes
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                6,
-                (index) => OtpFieldWidget(
-                  controller: _controllers[index],
-                  focusNode: _focusNodes[index],
-                  onChanged: (val) {
-                    if (val.isNotEmpty && index < 5) {
-                      _focusNodes[index + 1].requestFocus();
-                    } else if (val.isEmpty && index > 0) {
-                      _focusNodes[index - 1].requestFocus();
-                    }
-                    if (val.isNotEmpty && index == 5) {
-                      FocusScope.of(context).unfocus();
-                      _verifyOtp();
-                    }
-                  },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: (constraints.maxHeight - 48.h).clamp(
+                  0.0,
+                  double.infinity,
                 ),
               ),
-            ),
-            SizedBox(height: 40.h),
-
-            // Timer & Resend
-            Center(
-              child: Column(
-                children: [
-                  Text(
-                    secondsLeft > 0
-                        ? "Resend code in ${secondsLeft}s"
-                        : "Didn't receive the code?",
-                    style: GoogleFonts.outfit(
-                      color: AppColors.grey,
-                      fontSize: 14.sp,
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10.h),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.go(
+                            widget.isRecovery ? '/forgot-password' : '/signup',
+                          );
+                        }
+                      },
                     ),
-                  ),
-                  if (secondsLeft == 0) ...[
-                    SizedBox(height: 6.h),
-                    TextButton(
-                      onPressed: resendState.isLoading ? null : _resendOtp,
-                      child: resendState.isLoading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                color: AppColors.primaryColor,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              "Resend Code",
-                              style: GoogleFonts.outfit(
-                                color: AppColors.primaryColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15.sp,
-                              ),
-                            ),
+                    SizedBox(height: 10.h),
+                    Text(
+                      "Verification Code",
+                      style: GoogleFonts.outfit(
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ],
-                ],
-              ),
-            ),
-            const Spacer(),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "Enter the 6-digit code sent to ${widget.email}",
+                      style: GoogleFonts.outfit(
+                        fontSize: 15.sp,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                    SizedBox(height: 48.h),
 
-            SizedBox(
-              width: double.infinity,
-              height: 56.h,
-              child: ElevatedButton(
-                onPressed: (otpState.isLoading || resendState.isLoading)
-                    ? null
-                    : _verifyOtp,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28.r),
-                  ),
-                ),
-                child: otpState.isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : Text(
-                        "Verify & Proceed",
-                        style: GoogleFonts.outfit(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+                    // 6 OTP Boxes
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: List.generate(
+                        6,
+                        (index) => OtpFieldWidget(
+                          controller: _controllers[index],
+                          focusNode: _focusNodes[index],
+                          onChanged: (val) {
+                            if (val.isNotEmpty && index < 5) {
+                              _focusNodes[index + 1].requestFocus();
+                            } else if (val.isEmpty && index > 0) {
+                              _focusNodes[index - 1].requestFocus();
+                            }
+                            if (val.isNotEmpty && index == 5) {
+                              FocusScope.of(context).unfocus();
+                              _verifyOtp();
+                            }
+                          },
                         ),
                       ),
+                    ),
+                    SizedBox(height: 40.h),
+
+                    // Timer & Resend
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            secondsLeft > 0
+                                ? "Resend code in ${secondsLeft}s"
+                                : "Didn't receive the code?",
+                            style: GoogleFonts.outfit(
+                              color: AppColors.grey,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                          if (secondsLeft == 0) ...[
+                            SizedBox(height: 6.h),
+                            TextButton(
+                              onPressed: resendState.isLoading
+                                  ? null
+                                  : _resendOtp,
+                              child: resendState.isLoading
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primaryColor,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      "Resend Code",
+                                      style: GoogleFonts.outfit(
+                                        color: AppColors.primaryColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15.sp,
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+                    const Spacer(),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56.h,
+                      child: ElevatedButton(
+                        onPressed: (otpState.isLoading || resendState.isLoading)
+                            ? null
+                            : _verifyOtp,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28.r),
+                          ),
+                        ),
+                        child: otpState.isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                "Verify & Proceed",
+                                style: GoogleFonts.outfit(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
